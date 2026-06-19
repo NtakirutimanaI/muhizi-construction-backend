@@ -9,7 +9,7 @@ async function bootstrap() {
 
   try {
     console.log('🌱 Starting database seeding...\n');
-    await seeder.seedCompanyProfile();
+    await seeder.seedAll();
     console.log('\n✅ Database seeding completed successfully!');
   } catch (error) {
     console.error('\n❌ Error seeding database:', error.message);

@@ -175,5 +175,9 @@ export class UpdateProfileDto {
         enableAnimations?: boolean;
         enableNotifications?: boolean;
     };
+
+    @IsOptional()
+    @IsObject()
+    pageContent?: object;
 }
 

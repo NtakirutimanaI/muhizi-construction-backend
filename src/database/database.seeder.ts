@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from '../modules/auth/entities/user.entity';
 import { Profile } from '../modules/profile/entities/profile.entity';
+import { Role } from '../modules/auth/enums/role.enum';
 
 @Injectable()
 export class DatabaseSeeder {
@@ -15,6 +16,11 @@ export class DatabaseSeeder {
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
   ) {}
+
+  async seedAll() {
+    await this.seedCompanyProfile();
+    await this.seedRoleAccounts();
+  }
 
   async seedCompanyProfile() {
     this.logger.log('Starting to seed MUHIZI CONSTRUCTION company profile...');
@@ -49,6 +55,7 @@ export class DatabaseSeeder {
         username: 'muhizi_construction',
         password: hashedPassword,
         isActive: true,
+        role: Role.ADMIN,
       });
 
       await this.userRepository.save(user);
@@ -65,6 +72,7 @@ export class DatabaseSeeder {
       this.logger.log('═══════════════════════════════════════');
       this.logger.log('Email: info@muhiziconstruction.rw');
       this.logger.log('Password: Muhizi@2024');
+      this.logger.log('Role: Admin');
       this.logger.log('═══════════════════════════════════════');
 
       return profile;
@@ -72,6 +80,59 @@ export class DatabaseSeeder {
       this.logger.error(`Failed to seed profile: ${error.message}`);
       throw error;
     }
+  }
+
+  async seedRoleAccounts() {
+    this.logger.log('Seeding role-based accounts...');
+
+    const accounts = [
+      { email: 'sitemanager@muhiziconstruction.rw', username: 'site_manager', role: Role.SITE_MANAGER, firstName: 'Patrick', lastName: 'Habimana', title: 'Site Manager' },
+      { email: 'employee@muhiziconstruction.rw', username: 'employee', role: Role.EMPLOYEE, firstName: 'Jean', lastName: 'Niyonzima', title: 'Employee' },
+      { email: 'client@muhiziconstruction.rw', username: 'client', role: Role.CLIENT, firstName: 'Alice', lastName: 'Mukamana', title: 'Client' },
+      { email: 'manager@muhiziconstruction.rw', username: 'manager', role: Role.MANAGER, firstName: 'David', lastName: 'Uwimana', title: 'Manager' },
+    ];
+
+    for (const account of accounts) {
+      try {
+        const existing = await this.userRepository.findOne({ where: { email: account.email } });
+        if (existing) {
+          this.logger.log(`✓ ${account.role} already exists, skipping...`);
+          continue;
+        }
+
+        const hashedPassword = await bcrypt.hash('Muhizi@2024', 10);
+
+        const user = this.userRepository.create({
+          email: account.email,
+          username: account.username,
+          password: hashedPassword,
+          isActive: true,
+          role: account.role,
+        });
+
+        await this.userRepository.save(user);
+
+        const profile = this.profileRepository.create({
+          firstName: account.firstName,
+          lastName: account.lastName,
+          title: account.title,
+          user: user,
+          isPublic: false,
+        });
+
+        await this.profileRepository.save(profile);
+
+        this.logger.log(`✓ ${account.role} account created`);
+        this.logger.log(`  Email: ${account.email}`);
+        this.logger.log(`  Password: Muhizi@2024`);
+      } catch (error) {
+        this.logger.error(`Failed to seed ${account.role}: ${error.message}`);
+      }
+    }
+
+    this.logger.log('═══════════════════════════════════════');
+    this.logger.log('All role accounts seeded successfully!');
+    this.logger.log('═══════════════════════════════════════');
   }
 
   private getProfileData() {
@@ -279,7 +340,44 @@ Our team specializes in modern construction techniques, project management, and 
 
       socialLinks: {
         website: 'https://muhiziconstruction.rw',
+        linkedin: 'https://linkedin.com/company/muhizi-construction',
+        twitter: 'https://twitter.com/muhizi_construction',
+        facebook: 'https://facebook.com/muhiziconstruction',
+        instagram: 'https://instagram.com/muhizi_construction',
       },
+
+      teamMembers: [
+        {
+          name: 'Jean Baptiste Muhizi',
+          role: 'CEO & Founder',
+          imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300&h=300',
+        },
+        {
+          name: 'Alice Mukamana',
+          role: 'Chief Operations Officer',
+          imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300&h=300',
+        },
+        {
+          name: 'David Habimana',
+          role: 'Senior Project Manager',
+          imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=300&h=300',
+        },
+        {
+          name: 'Grace Uwimana',
+          role: 'Lead Architect',
+          imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=300&h=300',
+        },
+        {
+          name: 'Patrick Niyonzima',
+          role: 'Civil Engineer',
+          imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300&h=300',
+        },
+        {
+          name: 'Diane Ishimwe',
+          role: 'Interior Designer',
+          imageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=300&h=300',
+        },
+      ],
 
       city: 'Kigali',
       country: 'Rwanda',

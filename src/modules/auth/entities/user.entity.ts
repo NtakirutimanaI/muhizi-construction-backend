@@ -27,6 +27,9 @@ export class User {
     @Column({ default: true })
     isActive: boolean;
 
+    @Column({ type: 'varchar', default: 'admin' })
+    role: string;
+
     @Column({ nullable: true })
     @Exclude()
     refreshToken: string;
