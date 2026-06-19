@@ -1,0 +1,368 @@
+# Professional Profile & Portfolio API
+
+Complete company website management system for **MUHIZI CONSTRUCTION** - Real Estate & Construction Company.
+
+## 🚀 Features
+
+- **Public Portfolio API** - Showcase professional profile without authentication
+- **Contact Form System** - Receive service inquiries and messages
+- **Profile Management** - Complete CRUD operations for professional information
+- **Authentication** - JWT-based secure authentication
+- **Real-time Notifications** - WebSocket integration for instant updates
+- **Queue System** - Background job processing with Bull and Redis
+- **Cron Jobs** - Automated scheduled tasks  
+- **Comprehensive Testing** - Jest test suites
+- **API Documentation** - Interactive Swagger/OpenAPI documentation
+
+---
+
+## 📚 API Documentation
+
+Access the **interactive Swagger documentation** at:
+
+```
+http://localhost:3000/api/docs
+```
+
+The Swagger interface provides:
+- ✅ Complete API reference
+- ✅ Try-it-out functionality
+- ✅ Request/response examples
+- ✅ Schema definitions
+- ✅ Authentication testing
+
+---
+
+## 🛠️ Technology Stack
+
+| Component | Technology |
+|-----------|------------|
+| **Backend Framework** | NestJS 11.x |
+| **Language** | TypeScript 5.x |
+| **Database** | PostgreSQL 15+ |
+| **ORM** | TypeORM 0.3.x |
+| **Cache/Queue** | Redis 7+ |
+| **Queue System** | Bull 4.x |
+| **Real-time** | Socket.IO 4.x |
+| **Authentication** | JWT (Passport) |
+| **Validation** | class-validator |
+| **Testing** | Jest 30.x |
+| **Documentation** | Swagger/OpenAPI |
+| **Containerization** | Docker |
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+
+- Node.js 18+ 
+- PostgreSQL 15+
+- Redis 7+ (optional, for queues)
+- npm or yarn
+
+### Setup
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment
+#    Update .env with your database credentials
+
+# 3. Seed the database with profile
+npm run seed
+
+# 4. Start the development server
+npm run start:dev
+```
+
+The application will be available at:
+- **API**: http://localhost:3000
+- **Swagger Docs**: http://localhost:3000/api/docs
+- **WebSocket**: ws://localhost:3000
+
+---
+
+## 🔑 Quick Start
+
+### 1. View Public Portfolio
+
+```bash
+curl http://localhost:3000/profile/public
+```
+
+### 2. Send a Contact Message
+
+```bash
+curl -X POST http://localhost:3000/profile/contact \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "subject": "Service Inquiry",
+    "message": "I need help with a web project"
+  }'
+```
+
+### 3. Login (Admin)
+
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "info@muhiziconstruction.rw",
+    "password": "Muhizi@2024"
+  }'
+```
+
+---
+
+## 📡 API Endpoints
+
+### Public (No Authentication Required)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/profile/public` | View complete portfolio |
+| POST | `/profile/contact` | Send contact message |
+
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login user |
+
+### Profile (Protected)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/profile` | Get current user profile |
+| GET | `/profile/all` | Get all profiles |
+| PUT | `/profile` | Update profile |
+| DELETE | `/profile` | Delete profile |
+| GET | `/profile/messages` | Get contact messages |
+| POST | `/profile/messages/:id/read` | Mark message as read |
+
+### Notifications (Protected)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/notifications` | Get all notifications |
+| GET | `/notifications/unread` | Get unread notifications |
+| PATCH | `/notifications/:id/read` | Mark as read |
+| PATCH | `/notifications/read-all` | Mark all as read |
+| DELETE | `/notifications/:id` | Delete notification |
+
+---
+
+## 🎯 Profile Data Structure
+
+The public profile includes:
+
+- **Personal Information**: Name, email, bio, location
+- **Professional Details**: Title, years of experience
+- **Education**: Degrees, institutions, graduation years
+- **Work Experience**: Positions, companies, responsibilities, technologies
+- **Skills**: Categorized by backend, frontend, databases, tools
+- **Projects**: Portfolio of completed projects
+- **Certifications**: Professional certifications
+- **Languages**: Spoken languages and proficiency levels
+- **Social Links**: GitHub, LinkedIn, Twitter, etc.
+- **Services**: Available services and availability status
+
+---
+
+## 🔌 WebSocket Events
+
+Connect to `ws://localhost:3000` with a userId parameter:
+
+```javascript
+const socket = io('http://localhost:3000', {
+  query: { userId: 'your-user-id' }
+});
+```
+
+### Server → Client Events
+
+- `user-registered` - When new user registers
+- `user-logged-in` - On successful login
+- `profile-updated` - When profile is modified
+- `profile-deleted` - When profile is removed
+- `unread-digest` - Hourly notification summary
+- `notification-cleanup` - Daily cleanup results
+
+### Client → Server Events
+
+- `ping` - Health check (responds with `pong`)
+- `joinRoom` - Join a specific room
+- `leaveRoom` - Leave a room
+
+---
+
+## ⚙️ Queue Jobs
+
+Background jobs processed with Bull and Redis:
+
+- `welcome-email` - Triggered on user registration
+- `profile-updated` - Triggered on profile changes
+- `contact-message-received` - Triggered on new contact message
+- `system-notification` - Generic system notifications
+
+---
+
+## ⏰ Cron Jobs
+
+Scheduled tasks run automatically:
+
+- **Daily (Midnight)**: Cleanup old read notifications (30+ days)
+- **Hourly**: Send unread notification digest
+- **Every 5 minutes**: Check for stuck pending notifications
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:cov
+```
+
+Tests are located in `__tests__` folders within each module.
+
+---
+
+## 🐳 Docker Deployment
+
+```bash
+# Start database and Redis
+docker-compose up -d postgres redis
+
+# Or start full stack
+docker-compose up --build
+```
+
+---
+
+## 📝 Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```env
+# Application
+NODE_ENV=development
+PORT=3000
+
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+DB_DATABASE=profile_db
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=7d
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+```
+
+---
+
+## 🎨 Frontend Integration
+
+### Example: Display Portfolio
+
+```javascript
+fetch('http://localhost:3000/profile/public')
+  .then(res => res.json())
+  .then(profile => {
+    console.log(profile.firstName, profile.lastName);
+    console.log('Skills:', profile.skills);
+    console.log('Experience:', profile.experience);
+  });
+```
+
+### Example: Contact Form
+
+```javascript
+fetch('http://localhost:3000/profile/contact', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    name: 'Client Name',
+    email: 'client@example.com',
+    subject: 'Project Inquiry',
+    message: 'I need help with...'
+  })
+})
+.then(res => res.json())
+.then(data => alert(data.message));
+```
+
+---
+
+## 📊 Project Structure
+
+```
+muhizi-construction-backend/
+├── src/
+│   ├── modules/
+│   │   ├── auth/              # Authentication
+│   │   ├── profile/           # Profile management
+│   │   ├── notification/      # Notifications + Queues + Cron
+│   │   └── events/            # WebSocket gateway
+│   ├── database/              # Seeder
+│   ├── main.ts                # Application entry + Swagger
+│   └── app.module.ts          # Root module
+├── docker-compose.yml         # Docker services
+├── Dockerfile                 # Production image
+└── package.json               # Dependencies
+```
+
+---
+
+## 🚢 Production Deployment
+
+1. Build the application:
+   ```bash
+   npm run build
+   ```
+
+2. Set production environment variables
+
+3. Run migrations if needed
+
+4. Start the application:
+   ```bash
+   npm run start:prod
+   ```
+
+---
+
+## 📞 Contact
+
+For any inquiries or service requests:
+
+- **Email**: info@muhiziconstruction.rw
+- **Portfolio**: Use the `/profile/public` API endpoint
+- **Contact Form**: Use the `/profile/contact` API endpoint
+
+---
+
+## 📄 License
+
+This project is developed for **MUHIZI CONSTRUCTION**.
+
+---
+
+**Built with NestJS, TypeScript, PostgreSQL, and modern web technologies** 🚀

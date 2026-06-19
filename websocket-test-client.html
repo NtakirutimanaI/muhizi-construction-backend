@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test Client</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.disconnect {
+            background: #f44336;
+        }
+        button.disconnect:hover {
+            background: #da190b;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        #events {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .event {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-left: 3px solid #4CAF50;
+            border-radius: 3px;
+        }
+        .event-name {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .event-data {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 WebSocket Test Client</h1>
+        
+        <div class="input-group">
+            <label for="serverUrl">Server URL:</label>
+            <input type="text" id="serverUrl" value="http://localhost:3000" />
+        </div>
+        
+        <div class="input-group">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" placeholder="Enter your user ID" />
+        </div>
+        
+        <div>
+            <button onclick="connect()">Connect</button>
+            <button class="disconnect" onclick="disconnect()">Disconnect</button>
+            <button onclick="sendPing()">Send Ping</button>
+            <button onclick="clearEvents()">Clear Events</button>
+        </div>
+        
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <h3>Events Log:</h3>
+        <div id="events"></div>
+    </div>
+
+    <script>
+        let socket = null;
+
+        function connect() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            const userId = document.getElementById('userId').value;
+            
+            if (!userId) {
+                alert('Please enter a User ID');
+                return;
+            }
+
+            socket = io(serverUrl, {
+                query: { userId: userId }
+            });
+
+            socket.on('connect', () => {
+                updateStatus(true);
+                addEvent('connect', { message: 'Connected to server' });
+            });
+
+            socket.on('disconnect', () => {
+                updateStatus(false);
+                addEvent('disconnect', { message: 'Disconnected from server' });
+            });
+
+            socket.on('pong', (data) => {
+                addEvent('pong', data);
+            });
+
+            socket.on('user-registered', (data) => {
+                addEvent('user-registered', data);
+            });
+
+            socket.on('user-logged-in', (data) => {
+                addEvent('user-logged-in', data);
+            });
+
+            socket.on('profile-updated', (data) => {
+                addEvent('profile-updated', data);
+            });
+
+            socket.on('profile-deleted', (data) => {
+                addEvent('profile-deleted', data);
+            });
+
+            socket.on('unread-digest', (data) => {
+                addEvent('unread-digest', data);
+            });
+
+            socket.on('notification-cleanup', (data) => {
+                addEvent('notification-cleanup', data);
+            });
+
+            socket.on('error', (error) => {
+                addEvent('error', { message: error.message });
+            });
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+        }
+
+        function sendPing() {
+            if (!socket) {
+                alert('Not connected');
+                return;
+            }
+            socket.emit('ping');
+            addEvent('ping', { message: 'Ping sent' });
+        }
+
+        function updateStatus(connected) {
+            const statusEl = document.getElementById('status');
+            if (connected) {
+                statusEl.className = 'status connected';
+                statusEl.textContent = 'Connected';
+            } else {
+                statusEl.className = 'status disconnected';
+                statusEl.textContent = 'Disconnected';
+            }
+        }
+
+        function addEvent(eventName, data) {
+            const eventsEl = document.getElementById('events');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event';
+            
+            const timestamp = new Date().toLocaleTimeString();
+            eventDiv.innerHTML = `
+                <div class="event-name">[${timestamp}] ${eventName}</div>
+                <div class="event-data">${JSON.stringify(data, null, 2)}</div>
+            `;
+            
+            eventsEl.insertBefore(eventDiv, eventsEl.firstChild);
+        }
+
+        function clearEvents() {
+            document.getElementById('events').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

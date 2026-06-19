@@ -1,0 +1,364 @@
+# Swagger API Documentation Guide
+
+## 🎯 Overview
+
+This project includes **comprehensive Swagger/OpenAPI documentation** for all API endpoints. The interactive documentation makes it easy to test and understand the API.
+
+---
+
+## 🌐 Access Swagger Documentation
+
+Once the application is running, access the documentation at:
+
+```
+http://localhost:3000/api/docs
+```
+
+---
+
+## ✨ Features
+
+### 1. **Interactive API Explorer**
+- View all available endpoints
+- See request/response schemas
+- Try out API calls directly in the browser
+
+### 2. **Authentication Support**
+- Built-in JWT token authorization
+- Persistent authentication across requests
+- Easy testing of protected endpoints
+
+### 3. **Detailed Documentation**
+- Request parameters and validation rules
+- Response examples
+- Error codes and messages
+- Data type definitions
+
+### 4. **Organized by Tags**
+- **Authentication** - Login and registration
+- **Profile** - Profile management
+- **Public** - Public endpoints (no auth)
+- **Notifications** - Notification management
+
+---
+
+## 🔐 How to Use Swagger Documentation
+
+### Step 1: View Endpoint Details
+
+1. Navigate to `http://localhost:3000/api/docs`
+2. Click on any endpoint to expand it
+3. View the request body, parameters, and response examples
+
+### Step 2: Test Public Endpoints
+
+**Example: View Public Portfolio**
+
+1. Find the **GET /profile/public** endpoint under "Public" tag
+2. Click "Try it out"
+3. (Optional) Enter a username in the query parameter
+4. Click "Execute"
+5. View the response below
+
+**Example: Send Contact Message**
+
+1. Find the **POST /profile/contact** endpoint under "Public" tag
+2. Click "Try it out"
+3. Edit the request body JSON:
+   ```json
+   {
+     "name": "Your Name",
+     "email": "your@email.com",
+     "subject": "Test Message",
+     "message": "This is a test message from Swagger"
+   }
+   ```
+4. Click "Execute"
+5. View the success response
+
+### Step 3: Test Protected Endpoints (Requires Authentication)
+
+**Step 3.1: Login**
+
+1. Find the **POST /auth/login** endpoint under "Authentication"
+2. Click "Try it out"
+3. Use the default credentials:
+   ```json
+   {
+     "email": "info@muhiziconstruction.rw",
+     "password": "Muhizi@2024"
+    }
+    ```
+4. Click "Execute"
+5. Copy the `accessToken` from the response
+
+**Step 3.2: Authorize**
+
+1. Click the "Authorize" button (🔒) at the top right
+2. Paste your access token in the "Value" field
+3. Click "Authorize"  
+4. Click "Close"
+
+**Step 3.3: Test Protected Endpoints**
+
+Now you can test any protected endpoint:
+
+1. Find **GET /profile** (get current user profile)
+2. Click "Try it out"
+3. Click "Execute"
+4. View your complete profile data
+
+---
+
+## 📚 Swagger Endpoints Guide
+
+### Public Endpoints (No Auth Required)
+
+#### 1. **GET /profile/public**
+View complete company portfolio.
+
+**Parameters:**
+- `username` (query, optional) - Filter by username
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "firstName": "MUHIZI",
+  "lastName": "CONSTRUCTION",
+  "title": "Real Estate & Construction Company",
+  "yearsOfExperience": 6,
+  "education": [...],
+  "experience": [...],
+  "skills": {...},
+  "projects": [...],
+  "availableForHire": true
+}
+```
+
+#### 2. **POST /profile/contact**
+Send a contact message.
+
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+250 788 123 456",
+  "company": "Tech Corp",
+  "subject": "Service Inquiry",
+  "message": "I need help with..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Your message has been sent successfully!"
+}
+```
+
+---
+
+### Authentication Endpoints
+
+#### 3. **POST /auth/register**
+Create a new user account.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "username": "johndoe",
+  "password": "Password123!",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+```
+
+#### 4. **POST /auth/login**
+Login and receive JWT tokens.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+```
+
+**Response:**
+```json
+{
+  "user": {...},
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "eyJhbGci..."
+}
+```
+
+---
+
+### Profile Endpoints (Protected)
+
+#### 5. **GET /profile**
+Get current user's complete profile.
+
+**Headers:** `Authorization: Bearer <token>`
+
+#### 6. **PUT /profile**
+Update profile information.
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Request Body:** (all fields optional)
+```json
+{
+  "bio": "Updated bio text",
+  "title": "Senior Full Stack Developer",
+  "skills": {
+    "backend": ["NestJS", "Node.js"],
+    "frontend": ["React", "Vue.js"]
+  }
+}
+```
+
+#### 7. **GET /profile/all**
+Get all profiles (admin).
+
+**Headers:** `Authorization: Bearer <token>`
+
+#### 8. **GET /profile/messages**
+View all contact messages (admin).
+
+**Headers:** `Authorization: Bearer <token>`
+
+---
+
+### Notification Endpoints (Protected)
+
+#### 9. **GET /notifications**
+Get all notifications.
+
+**Headers:** `Authorization: Bearer <token>`
+
+#### 10. **GET /notifications/unread**
+Get only unread notifications.
+
+**Headers:** `Authorization: Bearer <token>`
+
+#### 11. **PATCH /notifications/:id/read**
+Mark notification as read.
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Parameters:**
+- `id` (path, required) - Notification ID
+
+#### 12. **PATCH /notifications/read-all**
+Mark all notifications as read.
+
+**Headers:** `Authorization: Bearer <token>`
+
+---
+
+## 🎨 Swagger UI Customization
+
+The Swagger interface includes:
+
+- **Hidden top bar** - Cleaner interface
+- **Persistent authorization** - Token stays saved
+- **Collapsed by default** - Easier navigation
+- **Search filter** - Find endpoints quickly
+- **Request duration** - See API performance
+
+---
+
+## 💡 Tips & Tricks
+
+### 1. **Save Time with Persistent Auth**
+- Authorize once, test multiple endpoints
+- Token persists across page refreshes
+
+### 2. **Use the Filter**
+- Type in the search box to filter endpoints
+- Great for large APIs
+
+### 3. **Copy cURL Commands**
+- Each request shows the equivalent cURL command
+- Perfect for documentation or debugging
+
+### 4. **Schema Explorer**
+- Click on "Schemas" at the bottom
+- View all data models and their properties
+
+### 5. **Export API Specification**
+- The OpenAPI spec is available at `/api/docs-json`
+- Import into other tools (Postman, Insomnia, etc.)
+
+---
+
+## 🔄 Updating Documentation
+
+### Add Documentation to New Endpoints
+
+1. **Import decorators:**
+```typescript
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+```
+
+2. **Tag the controller:**
+```typescript
+@ApiTags('YourTag')
+@Controller('your-route')
+export class YourController {}
+```
+
+3. **Document each endpoint:**
+```typescript
+@Get()
+@ApiOperation({ summary: 'Description here' })
+@ApiResponse({ status: 200, description: 'Success' })
+@ApiResponse({ status: 404, description: 'Not found' })
+async yourMethod() {
+  // ...
+}
+```
+
+4. **For protected routes:**
+```typescript
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
+```
+
+5. **Document DTOs:**
+```typescript
+import { ApiProperty } from '@nestjs/swagger';
+
+export class YourDto {
+  @ApiProperty({ example: 'value', description: 'Field description' })
+  field: string;
+}
+```
+
+---
+
+## 📖 Additional Resources
+
+- **Swagger Editor**: https://editor.swagger.io
+- **OpenAPI Specification**: https://swagger.io/specification
+- **NestJS Swagger**: https://docs.nestjs.com/openapi/introduction
+
+---
+
+## 🎯 Best Practices
+
+1. ✅ Always document request/response examples
+2. ✅ Include error codes and descriptions
+3. ✅ Use consistent naming and tagging
+4. ✅ Keep descriptions clear and concise
+5. ✅ Update docs when endpoints change
+
+---
+
+**Your API documentation is now interactive, comprehensive, and easy to use!** 🚀
