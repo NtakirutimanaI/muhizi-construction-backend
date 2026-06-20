@@ -4,6 +4,7 @@ import { Repository, Between, IsNull, Not } from 'typeorm';
 import { Profile } from './entities/profile.entity';
 import { ContactMessage, MessageStatus } from './entities/contact-message.entity';
 import { Visitor } from './entities/visitor.entity';
+import { User } from '../auth/entities/user.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { SendAdminMessageDto } from './dto/send-admin-message.dto';
@@ -22,6 +23,8 @@ export class ProfileService {
         private contactMessageRepository: Repository<ContactMessage>,
         @InjectRepository(Visitor)
         private visitorRepository: Repository<Visitor>,
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
         private eventsGateway: EventsGateway,
         private notificationService: NotificationService,
         private cacheService: CacheService,
@@ -60,6 +63,9 @@ export class ProfileService {
         const educationCount = profile.education ? profile.education.length : 0;
         const languagesCount = profile.languages ? profile.languages.length : 0;
 
+        const viewsCount = await this.visitorRepository.count();
+        const clientsCount = await this.userRepository.count({ where: { role: 'client' as any } });
+
         return {
             projects: projectsCount,
             skills: skillsCount,
@@ -69,8 +75,8 @@ export class ProfileService {
             experience: experienceCount,
             education: educationCount,
             languages: languagesCount,
-            views: 0,
-            clients: 0,
+            views: viewsCount,
+            clients: clientsCount,
         };
     }
 

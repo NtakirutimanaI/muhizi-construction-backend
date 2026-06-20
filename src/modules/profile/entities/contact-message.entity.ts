@@ -61,7 +61,7 @@ export class ContactMessage {
     @Index('idx_contact_deleted')
     isDeleted: boolean;
 
-    @Column({ nullable: true })
+    @Column({ type: 'timestamp', nullable: true })
     deletedAt: Date | null;
 
     @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
