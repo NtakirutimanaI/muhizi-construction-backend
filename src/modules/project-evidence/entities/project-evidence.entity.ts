@@ -23,6 +23,9 @@ export class ProjectEvidence {
     @Column({ type: 'text', nullable: true })
     notes: string;
 
+    @Column({ default: false })
+    approvedForClient: boolean;
+
     @CreateDateColumn()
     createdAt: Date;
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -21,9 +21,9 @@ export class ProjectEvidenceController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER)
-    findAll() {
-        return this.service.findAll();
+    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.CLIENT)
+    findAll(@Query('clientVisible') clientVisible?: string) {
+        return this.service.findAll(clientVisible === 'true');
     }
 
     @Get(':id')

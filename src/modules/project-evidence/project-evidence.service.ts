@@ -16,8 +16,9 @@ export class ProjectEvidenceService {
         return this.repo.save(entity);
     }
 
-    async findAll(): Promise<ProjectEvidence[]> {
-        return this.repo.find({ order: { date: 'DESC', createdAt: 'DESC' } });
+    async findAll(clientVisible?: boolean): Promise<ProjectEvidence[]> {
+        const where = clientVisible ? { approvedForClient: true } : {};
+        return this.repo.find({ where: where as any, order: { date: 'DESC', createdAt: 'DESC' } });
     }
 
     async findOne(id: string): Promise<ProjectEvidence> {

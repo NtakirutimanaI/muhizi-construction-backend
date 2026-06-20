@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsBoolean, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateProjectEvidenceDto {
     @IsString()
@@ -24,4 +24,8 @@ export class CreateProjectEvidenceDto {
     @IsString()
     @IsOptional()
     notes?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    approvedForClient?: boolean;
 }

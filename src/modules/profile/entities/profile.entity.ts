@@ -30,6 +30,12 @@ export class Profile {
     cvUrl: string;
 
     @Column({ type: 'text', nullable: true })
+    companyLogo: string;
+
+    @Column({ nullable: true })
+    company: string;
+
+    @Column({ type: 'text', nullable: true })
     bio: string;
 
     @Column({ nullable: true, default: 'Hello' })

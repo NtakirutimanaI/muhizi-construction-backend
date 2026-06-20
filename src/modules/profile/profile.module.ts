@@ -7,10 +7,11 @@ import { ContactMessage } from './entities/contact-message.entity';
 import { Visitor } from './entities/visitor.entity';
 import { EventsModule } from '../events/events.module';
 import { NotificationModule } from '../notification/notification.module';
+import { User } from '../auth/entities/user.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Profile, ContactMessage, Visitor]),
+        TypeOrmModule.forFeature([Profile, ContactMessage, Visitor, User]),
         EventsModule,
         NotificationModule,
     ],
