@@ -22,6 +22,12 @@ import { PayrollModule } from './modules/payroll/payroll.module';
 import { IncomesModule } from './modules/incomes/incomes.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { ApprovalsModule } from './modules/approvals/approvals.module';
+import { ContractsModule } from './modules/contracts/contracts.module';
+import { MaterialRequestsModule } from './modules/material-requests/material-requests.module';
+import { ProjectEvidenceModule } from './modules/project-evidence/project-evidence.module';
+import { SiteActivitiesModule } from './modules/site-activities/site-activities.module';
+import { SiteRulesModule } from './modules/site-rules/site-rules.module';
 
 @Module({
     imports: [
@@ -79,6 +85,12 @@ import { ReportsModule } from './modules/reports/reports.module';
         IncomesModule,
         ExpensesModule,
         ReportsModule,
+        ApprovalsModule,
+        ContractsModule,
+        MaterialRequestsModule,
+        ProjectEvidenceModule,
+        SiteActivitiesModule,
+        SiteRulesModule,
     ],
 })
 export class AppModule {}
