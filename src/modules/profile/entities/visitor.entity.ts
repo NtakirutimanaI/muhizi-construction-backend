@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Index } from 'typeorm';
 
 @Entity('visitors')
 export class Visitor {
@@ -12,15 +12,18 @@ export class Visitor {
     email: string;
 
     @Column({ nullable: true })
+    @Index('idx_visitor_company')
     company: string;
 
     @Column({ nullable: true })
+    @Index('idx_visitor_location')
     location: string;
 
     @Column({ nullable: true })
     ipAddress: string;
 
     @Column({ nullable: true })
+    @Index('idx_visitor_page')
     page: string;
 
     @Column({ nullable: true })
@@ -33,5 +36,6 @@ export class Visitor {
     metadata: Record<string, any>;
 
     @CreateDateColumn()
+    @Index('idx_visitor_visited_at')
     visitedAt: Date;
 }

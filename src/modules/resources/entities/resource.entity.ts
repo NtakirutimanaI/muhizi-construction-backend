@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 @Entity('resources')
 export class Resource {
@@ -6,6 +6,7 @@ export class Resource {
     id: string;
 
     @Column()
+    @Index('idx_resource_type')
     type: 'credential' | 'link' | 'note' | 'event';
 
     @Column()
@@ -18,6 +19,7 @@ export class Resource {
     metadata: any; // Extra info: Username, Website Name, Event Date, Color
 
     @CreateDateColumn()
+    @Index('idx_resource_created')
     createdAt: Date;
 
     @UpdateDateColumn()

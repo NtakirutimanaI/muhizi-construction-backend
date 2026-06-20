@@ -5,6 +5,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     OneToOne,
+    Index,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Profile } from '../../profile/entities/profile.entity';
@@ -15,9 +16,11 @@ export class User {
     id: string;
 
     @Column({ unique: true })
+    @Index('idx_users_email')
     email: string;
 
     @Column({ unique: true })
+    @Index('idx_users_username')
     username: string;
 
     @Column()
@@ -25,9 +28,11 @@ export class User {
     password: string;
 
     @Column({ default: true })
+    @Index('idx_users_is_active')
     isActive: boolean;
 
     @Column({ type: 'varchar', default: 'admin' })
+    @Index('idx_users_role')
     role: string;
 
     @Column({ nullable: true })

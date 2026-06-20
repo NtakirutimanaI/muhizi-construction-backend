@@ -17,8 +17,13 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiQuery, A
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { SendMessageDto } from './dto/send-message.dto';
+import { SendAdminMessageDto } from './dto/send-admin-message.dto';
 import { RecordVisitDto } from './dto/record-visit.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @ApiTags('Profile')
 @Controller('profile')
@@ -40,15 +45,17 @@ export class ProfileController {
     }
 
     @Get('stats')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Get admin dashboard stats' })
-    async getStats(@Request() req) {
-        return this.profileService.getStats(req.user.id);
+    async getStats(@CurrentUser('id') userId: string) {
+        return this.profileService.getStats(userId);
     }
 
     @Get('all')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Get all profiles',
@@ -61,7 +68,8 @@ export class ProfileController {
     }
 
     @Put()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.EMPLOYEE)
     @ApiBearerAuth('JWT-auth')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
@@ -73,11 +81,18 @@ export class ProfileController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Profile not found' })
     async updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
-        return this.profileService.updateProfile(req.user.id, updateProfileDto);
+        return this.profileService.updateProfile(
+            req.user.id,
+            updateProfileDto,
+            req.user?.email,
+            req.user?.role,
+            req.ip,
+        );
     }
 
     @Delete()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
     @ApiBearerAuth('JWT-auth')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
@@ -183,7 +198,8 @@ export class ProfileController {
 
     // Admin endpoints
     @Get('messages')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Get all contact messages',
@@ -196,7 +212,8 @@ export class ProfileController {
     }
 
     @Post('messages/:id/read')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Mark message as read',
@@ -211,7 +228,8 @@ export class ProfileController {
     }
 
     @Delete('messages')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Delete all messages',
@@ -221,6 +239,72 @@ export class ProfileController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     async deleteAllMessages(@Request() req) {
         return this.profileService.deleteAllMessages();
+    }
+
+    // ───── Message Sub-routes (Inbox / Sent / Trash) ─────
+
+    @Post('messages/send')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Send a message from admin', description: 'Compose and send a message as admin' })
+    @ApiBody({ type: SendAdminMessageDto })
+    async sendAdminMessage(@Body() dto: SendAdminMessageDto, @Request() req) {
+        return this.profileService.sendAdminMessage(dto, req.user.id);
+    }
+
+    @Get('messages/inbox')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Get inbox messages', description: 'Non-deleted messages from contact form' })
+    async getInboxMessages() {
+        return this.profileService.getInboxMessages();
+    }
+
+    @Get('messages/sent')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Get sent messages', description: 'Messages sent by admin users' })
+    async getSentMessages() {
+        return this.profileService.getSentMessages();
+    }
+
+    @Get('messages/trash')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Get trashed messages', description: 'Soft-deleted messages' })
+    async getTrashMessages() {
+        return this.profileService.getTrashMessages();
+    }
+
+    @Post('messages/:id/trash')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Move message to trash', description: 'Soft delete a message' })
+    async trashMessage(@Param('id') id: string) {
+        return this.profileService.trashMessage(id);
+    }
+
+    @Post('messages/:id/restore')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Restore message from trash', description: 'Restore a soft-deleted message' })
+    async restoreMessage(@Param('id') id: string) {
+        return this.profileService.restoreMessage(id);
+    }
+
+    @Delete('messages/:id/permanent')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Permanently delete message', description: 'Hard delete a message' })
+    async permanentDeleteMessage(@Param('id') id: string) {
+        return this.profileService.permanentDeleteMessage(id);
     }
 
     // ───── Visitor Endpoints ─────
@@ -236,7 +320,8 @@ export class ProfileController {
     }
 
     @Get('visitors')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Get all visitors', description: 'Retrieve paginated visitor records (admin only)' })
     @ApiQuery({ name: 'page', required: false, example: 1 })
@@ -246,7 +331,8 @@ export class ProfileController {
     }
 
     @Get('visitors/stats')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Get visitor statistics', description: 'Get aggregated visitor stats for the admin dashboard' })
     async getVisitorStats() {

@@ -29,6 +29,6 @@ import { EventsModule } from '../events/events.module';
     ],
     controllers: [AuthController],
     providers: [AuthService, JwtStrategy, RolesGuard],
-    exports: [AuthService, JwtStrategy, PassportModule],
+    exports: [AuthService, JwtStrategy, PassportModule, RolesGuard],
 })
 export class AuthModule { }

@@ -5,6 +5,7 @@ import {
     CreateDateColumn,
     ManyToOne,
     JoinColumn,
+    Index,
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
 
@@ -31,6 +32,7 @@ export class Notification {
         type: 'enum',
         enum: NotificationType,
     })
+    @Index('idx_notif_type')
     type: NotificationType;
 
     @Column()
@@ -44,9 +46,11 @@ export class Notification {
         enum: NotificationStatus,
         default: NotificationStatus.PENDING,
     })
+    @Index('idx_notif_status')
     status: NotificationStatus;
 
     @Column({ default: false })
+    @Index('idx_notif_is_read')
     isRead: boolean;
 
     @Column({ type: 'json', nullable: true })
@@ -57,6 +61,7 @@ export class Notification {
     user: User;
 
     @CreateDateColumn()
+    @Index('idx_notif_created')
     createdAt: Date;
 
     @Column({ nullable: true })

@@ -6,6 +6,7 @@ import {
     UpdateDateColumn,
     OneToOne,
     JoinColumn,
+    Index,
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
 
@@ -15,9 +16,11 @@ export class Profile {
     id: string;
 
     @Column()
+    @Index('idx_profiles_first_name')
     firstName: string;
 
     @Column()
+    @Index('idx_profiles_last_name')
     lastName: string;
 
     @Column({ type: 'text', nullable: true, name: 'avatar_content' })
@@ -39,6 +42,7 @@ export class Profile {
     phone: string;
 
     @Column({ nullable: true })
+    @Index('idx_profiles_email')
     email: string;
 
     @Column({ nullable: true })
@@ -157,6 +161,7 @@ export class Profile {
     availableForHire: boolean;
 
     @Column({ default: true })
+    @Index('idx_profiles_is_public')
     isPublic: boolean;
 
     @Column({ default: true })
@@ -166,6 +171,7 @@ export class Profile {
     showViews: boolean;
 
     @Column({ default: false })
+    @Index('idx_profiles_maintenance')
     maintenanceMode: boolean;
 
     @Column({ type: 'json', nullable: true })
@@ -184,6 +190,7 @@ export class Profile {
             body: string;
             color: string;
         }>;
+        heroVideoUrl?: string;
         services?: {
             heading?: string;
             subtitle?: string;
@@ -225,6 +232,34 @@ export class Profile {
             buttonLink: string;
             secondaryButtonText: string;
             secondaryButtonLink: string;
+        };
+        followUs?: {
+            heading?: string;
+            subtitle?: string;
+            youtubeUrl?: string;
+            videos?: Array<{
+                url: string;
+                title: string;
+                description?: string;
+            }>;
+        };
+        faq?: {
+            heading?: string;
+            items?: Array<{
+                question: string;
+                answer: string;
+            }>;
+        };
+        contactSection?: {
+            heading?: string;
+            subtitle?: string;
+        };
+        footer?: {
+            companyDescription?: string;
+            copyrightText?: string;
+            quickLinks?: Array<{ label: string; url: string }>;
+            showSocialLinks?: boolean;
+            showContactInfo?: boolean;
         };
     };
 

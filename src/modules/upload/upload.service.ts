@@ -1,0 +1,86 @@
+import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { FileUpload } from './entities/file-upload.entity';
+import { CloudinaryService } from './cloudinary.service';
+
+@Injectable()
+export class UploadService {
+    private readonly logger = new Logger(UploadService.name);
+
+    constructor(
+        @InjectRepository(FileUpload)
+        private fileUploadRepository: Repository<FileUpload>,
+        private cloudinaryService: CloudinaryService,
+    ) { }
+
+    async uploadFile(
+        file: Express.Multer.File,
+        folder?: string,
+    ) {
+        let uploadResult;
+        try {
+            uploadResult = await this.cloudinaryService.uploadFile(file, {
+                folder: folder || 'muhizi_construction',
+                resourceType: this.detectResourceType(file.mimetype),
+            });
+        } catch (error: any) {
+            this.logger.error(`Cloudinary upload failed: ${error.message}`);
+            throw new InternalServerErrorException(`Cloudinary upload failed: ${error.message}`);
+        }
+
+        try {
+            const fileRecord = this.fileUploadRepository.create({
+                publicId: uploadResult.publicId,
+                url: uploadResult.url,
+                secureUrl: uploadResult.secureUrl,
+                format: uploadResult.format,
+                resourceType: uploadResult.resourceType,
+                originalFilename: uploadResult.originalFilename,
+                bytes: uploadResult.bytes,
+                width: uploadResult.width,
+                height: uploadResult.height,
+            });
+
+            const savedRecord = await this.fileUploadRepository.save(fileRecord);
+            this.logger.log(`File record saved to database: ${savedRecord.id}`);
+
+            return savedRecord;
+        } catch (error: any) {
+            this.logger.error(`Database save failed after Cloudinary upload: ${error.message}`);
+            // Cleanup: remove the uploaded file from Cloudinary
+            try {
+                await this.cloudinaryService.deleteFile(uploadResult.publicId);
+            } catch { }
+            throw new InternalServerErrorException(`Failed to save file record: ${error.message}`);
+        }
+    }
+
+    async uploadFiles(files: Express.Multer.File[], folder?: string) {
+        const uploadPromises = files.map((file) => this.uploadFile(file, folder));
+        return Promise.all(uploadPromises);
+    }
+
+    async deleteFile(id: string): Promise<void> {
+        const fileRecord = await this.fileUploadRepository.findOne({ where: { id } });
+        if (!fileRecord) {
+            throw new Error('File record not found');
+        }
+
+        await this.cloudinaryService.deleteFile(fileRecord.publicId);
+        await this.fileUploadRepository.remove(fileRecord);
+        this.logger.log(`File record deleted from database: ${id}`);
+    }
+
+    async getAllFiles() {
+        return this.fileUploadRepository.find({
+            order: { createdAt: 'DESC' },
+        });
+    }
+
+    private detectResourceType(mimetype: string): 'image' | 'video' | 'raw' | 'auto' {
+        if (mimetype.startsWith('image/')) return 'image';
+        if (mimetype.startsWith('video/')) return 'video';
+        return 'auto';
+    }
+}

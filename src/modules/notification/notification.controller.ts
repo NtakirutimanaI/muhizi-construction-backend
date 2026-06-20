@@ -12,13 +12,19 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { NotificationService } from './services/notification.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
 
 @ApiTags('Notifications')
 @Controller('notifications')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class NotificationController {
     constructor(private readonly notificationService: NotificationService) { }
+
+    @Get()
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
 
     @Get()
     @ApiOperation({
@@ -49,6 +55,7 @@ export class NotificationController {
     }
 
     @Get('unread')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
     @ApiOperation({
         summary: 'Get unread notifications',
         description: 'Retrieve only unread notifications for the authenticated user'
@@ -60,6 +67,7 @@ export class NotificationController {
     }
 
     @Patch(':id/read')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
         summary: 'Mark notification as read',
@@ -74,6 +82,7 @@ export class NotificationController {
     }
 
     @Patch('read-all')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
         summary: 'Mark all notifications as read',
@@ -94,6 +103,7 @@ export class NotificationController {
     }
 
     @Delete(':id')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
         summary: 'Delete notification',

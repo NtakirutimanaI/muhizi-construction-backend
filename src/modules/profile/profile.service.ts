@@ -1,14 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, IsNull, Not } from 'typeorm';
 import { Profile } from './entities/profile.entity';
-import { ContactMessage } from './entities/contact-message.entity';
+import { ContactMessage, MessageStatus } from './entities/contact-message.entity';
 import { Visitor } from './entities/visitor.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { SendMessageDto } from './dto/send-message.dto';
+import { SendAdminMessageDto } from './dto/send-admin-message.dto';
 import { EventsGateway } from '../events/events.gateway';
 import { NotificationService } from '../notification/services/notification.service';
 import { NotificationType } from '../notification/entities/notification.entity';
+import { CacheService } from '../cache/cache.service';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class ProfileService {
@@ -21,6 +24,8 @@ export class ProfileService {
         private visitorRepository: Repository<Visitor>,
         private eventsGateway: EventsGateway,
         private notificationService: NotificationService,
+        private cacheService: CacheService,
+        private auditService: AuditService,
     ) { }
 
     async getProfile(userId: string) {
@@ -70,41 +75,39 @@ export class ProfileService {
     }
 
     async getPublicProfile(username?: string) {
-        // Get company profile (or profile by username)
+        const cacheKey = `public_profile_${username || 'default'}`;
+        const cached = this.cacheService.get<any>(cacheKey);
+        if (cached) return cached;
+
         const profile = await this.profileRepository.findOne({
             where: username ? { user: { username } } : {},
             relations: ['user'],
-            order: { createdAt: 'ASC' }, // Get first profile if no username provided
+            order: { createdAt: 'ASC' },
         });
 
         if (!profile) {
             throw new NotFoundException('Profile not found');
         }
 
-        // Return profile without sensitive user data
         const { user, ...profileData } = profile;
-        return {
+        const result = {
             ...profileData,
             username: user.username,
         };
+
+        this.cacheService.set(cacheKey, result, 300);
+        return result;
     }
 
-    async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    async updateProfile(userId: string, updateProfileDto: UpdateProfileDto, userEmail?: string, userRole?: string, ipAddress?: string) {
         try {
-            console.log('=== UPDATE PROFILE START ===');
-            console.log('User ID:', userId);
-            console.log('Update Data:', JSON.stringify(updateProfileDto, null, 2));
-
             const profile = await this.getProfile(userId);
-            console.log('Profile found:', profile.id);
-
             Object.assign(profile, updateProfileDto);
-            console.log('Profile updated, saving to database...');
-
             const updatedProfile = await this.profileRepository.save(profile);
-            console.log('✅ Profile saved successfully to database');
 
-            // Create internal notification
+            this.cacheService.del('public_profile_default');
+            this.cacheService.del(`public_profile_${profile.user?.username}`);
+
             try {
                 await this.notificationService.create({
                     type: NotificationType.PROFILE_UPDATE,
@@ -114,29 +117,34 @@ export class ProfileService {
                     metadata: { changes: Object.keys(updateProfileDto) }
                 });
             } catch (notifyError) {
-                console.warn('⚠️ Failed to create internal notification:', notifyError.message);
+                console.warn('Failed to create internal notification:', notifyError.message);
             }
 
-            // Try to emit real-time event (non-critical)
+            this.auditService.log({
+                userId,
+                userEmail,
+                userRole,
+                action: 'profile.update',
+                entity: 'Profile',
+                entityId: profile.id,
+                metadata: { changes: Object.keys(updateProfileDto) },
+                ipAddress,
+            });
+
             if (this.eventsGateway) {
                 try {
                     this.eventsGateway.emitToUser(userId, 'profile-updated', {
                         message: 'Profile updated successfully',
                         profile: updatedProfile,
                     });
-                    console.log('✅ Event emitted');
                 } catch (eventError) {
-                    console.warn('⚠️ Event error (non-critical):', eventError.message);
+                    console.warn('Event error (non-critical):', eventError.message);
                 }
             }
 
-            console.log('=== UPDATE PROFILE SUCCESS ===');
             return updatedProfile;
         } catch (error) {
-            console.error('=== UPDATE PROFILE ERROR ===');
-            console.error('Error message:', error.message);
-            console.error('Error stack:', error.stack);
-            console.error('Error details:', error);
+            console.error('Profile update error:', error.message);
             throw error;
         }
     }
@@ -243,6 +251,76 @@ export class ProfileService {
         return { message: 'All messages deleted successfully' };
     }
 
+    // Admin compose & send message
+    async sendAdminMessage(sendAdminMessageDto: SendAdminMessageDto, senderId: string) {
+        const message = this.contactMessageRepository.create({
+            ...sendAdminMessageDto,
+            status: MessageStatus.SENT,
+            sender: { id: senderId } as any,
+        });
+        return this.contactMessageRepository.save(message);
+    }
+
+    // Inbox: non-deleted messages from contact form (no sender)
+    async getInboxMessages() {
+        try {
+            return await this.contactMessageRepository.find({
+                where: { isDeleted: false, senderId: IsNull() },
+                order: { createdAt: 'DESC' },
+            });
+        } catch (error) {
+            return this.contactMessageRepository.find({
+                order: { createdAt: 'DESC' },
+            });
+        }
+    }
+
+    // Sent: messages sent by admin (has sender)
+    async getSentMessages() {
+        try {
+            return await this.contactMessageRepository.find({
+                where: { senderId: Not(IsNull()), isDeleted: false },
+                relations: ['sender'],
+                order: { createdAt: 'DESC' },
+            });
+        } catch (error) {
+            return [];
+        }
+    }
+
+    // Trash: soft-deleted messages
+    async getTrashMessages() {
+        return this.contactMessageRepository.find({
+            where: { isDeleted: true },
+            order: { deletedAt: 'DESC' },
+        });
+    }
+
+    // Soft delete (move to trash)
+    async trashMessage(messageId: string) {
+        const message = await this.contactMessageRepository.findOne({ where: { id: messageId } });
+        if (!message) throw new NotFoundException('Message not found');
+        message.isDeleted = true;
+        message.deletedAt = new Date();
+        return this.contactMessageRepository.save(message);
+    }
+
+    // Restore from trash
+    async restoreMessage(messageId: string) {
+        const message = await this.contactMessageRepository.findOne({ where: { id: messageId } });
+        if (!message) throw new NotFoundException('Message not found');
+        message.isDeleted = false;
+        message.deletedAt = null;
+        return this.contactMessageRepository.save(message);
+    }
+
+    // Permanently delete
+    async permanentDeleteMessage(messageId: string) {
+        const message = await this.contactMessageRepository.findOne({ where: { id: messageId } });
+        if (!message) throw new NotFoundException('Message not found');
+        return this.contactMessageRepository.remove(message);
+    }
+
     // ───── Visitor Methods ─────
 
     async recordVisit(dto: { name?: string; email?: string; company?: string; location?: string; page?: string; referrer?: string }, ipAddress?: string, userAgent?: string) {
@@ -264,6 +342,10 @@ export class ProfileService {
     }
 
     async getVisitorStats() {
+        const cacheKey = 'visitor_stats';
+        const cached = this.cacheService.get<any>(cacheKey);
+        if (cached) return cached;
+
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -309,14 +391,8 @@ export class ProfileService {
         today.setHours(0, 0, 0, 0);
         const todayVisits = await this.visitorRepository.count({ where: { visitedAt: Between(today, new Date()) } });
 
-        return {
-            total,
-            last30Days,
-            last7Days,
-            today: todayVisits,
-            companies,
-            locations,
-            pages,
-        };
+        const result = { total, last30Days, last7Days, today: todayVisits, companies, locations, pages };
+        this.cacheService.set(cacheKey, result, 120);
+        return result;
     }
 }

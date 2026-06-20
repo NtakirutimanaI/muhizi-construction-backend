@@ -9,6 +9,19 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { ResourcesModule } from './modules/resources/resources.module';
 import { EventsModule } from './modules/events/events.module';
 import { DatabaseModule } from './database/database.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { CacheModule } from './modules/cache/cache.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { MlModule } from './modules/ml/ml.module';
+import { ProjectsModule } from './modules/projects/projects.module';
+import { DesignsModule } from './modules/designs/designs.module';
+import { PartnershipsModule } from './modules/partnerships/partnerships.module';
+import { EmployeesModule } from './modules/employees/employees.module';
+import { AttendanceModule } from './modules/attendance/attendance.module';
+import { PayrollModule } from './modules/payroll/payroll.module';
+import { IncomesModule } from './modules/incomes/incomes.module';
+import { ExpensesModule } from './modules/expenses/expenses.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
     imports: [
@@ -53,6 +66,19 @@ import { DatabaseModule } from './database/database.module';
         ResourcesModule,
         EventsModule,
         DatabaseModule,
+        UploadModule,
+        CacheModule,
+        AuditModule,
+        MlModule,
+        ProjectsModule,
+        DesignsModule,
+        PartnershipsModule,
+        EmployeesModule,
+        AttendanceModule,
+        PayrollModule,
+        IncomesModule,
+        ExpensesModule,
+        ReportsModule,
     ],
 })
 export class AppModule {}

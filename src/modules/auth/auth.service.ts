@@ -50,6 +50,7 @@ export class AuthService {
         const profile = this.profileRepository.create({
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
+            phone: registerDto.phone,
             user: user,
         });
 
@@ -133,10 +134,6 @@ export class AuthService {
     }
 
     async getAllUsers(requestUserId: string) {
-        const admin = await this.userRepository.findOne({ where: { id: requestUserId } });
-        if (!admin || admin.email !== 'info@muhiziconstruction.rw') {
-            throw new ForbiddenException('Only the admin can view all users');
-        }
         const users = await this.userRepository.find({
             relations: ['profile'],
             order: { createdAt: 'DESC' },
@@ -145,6 +142,64 @@ export class AuthService {
             const { password, refreshToken, ...userData } = u;
             return userData;
         });
+    }
+
+    async createUser(dto: { email: string; username: string; password: string; firstName: string; lastName: string; role?: string; phone?: string }) {
+        const existingUser = await this.userRepository.findOne({
+            where: [{ email: dto.email }, { username: dto.username }],
+        });
+        if (existingUser) {
+            throw new ConflictException('Email or username already exists');
+        }
+        const hashedPassword = await bcrypt.hash(dto.password, 10);
+        const user = this.userRepository.create({
+            email: dto.email,
+            username: dto.username,
+            password: hashedPassword,
+            role: dto.role || 'employee',
+        });
+        await this.userRepository.save(user);
+        const profile = this.profileRepository.create({
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            phone: dto.phone,
+            user: user,
+        });
+        await this.profileRepository.save(profile);
+        const { password, ...result } = user;
+        return result;
+    }
+
+    async updateUser(id: string, dto: { email?: string; username?: string; role?: string; isActive?: boolean; firstName?: string; lastName?: string; phone?: string }) {
+        const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] });
+        if (!user) throw new NotFoundException('User not found');
+
+        if (dto.email !== undefined) user.email = dto.email;
+        if (dto.username !== undefined) user.username = dto.username;
+        if (dto.role !== undefined) user.role = dto.role;
+        if (dto.isActive !== undefined) user.isActive = dto.isActive;
+
+        await this.userRepository.save(user);
+
+        if (user.profile && (dto.firstName !== undefined || dto.lastName !== undefined || dto.phone !== undefined)) {
+            if (dto.firstName !== undefined) user.profile.firstName = dto.firstName;
+            if (dto.lastName !== undefined) user.profile.lastName = dto.lastName;
+            if (dto.phone !== undefined) user.profile.phone = dto.phone;
+            await this.profileRepository.save(user.profile);
+        }
+
+        const { password, refreshToken, ...result } = user;
+        return result;
+    }
+
+    async removeUser(id: string) {
+        const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] });
+        if (!user) throw new NotFoundException('User not found');
+        if (user.profile) {
+            await this.profileRepository.remove(user.profile);
+        }
+        await this.userRepository.remove(user);
+        return { success: true, message: 'User deleted successfully' };
     }
 
     async validateUser(userId: string): Promise<User> {

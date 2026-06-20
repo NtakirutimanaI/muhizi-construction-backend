@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
 import { ChatMessage } from './chat-message.entity';
 
 @Entity('chat_conversations')
@@ -7,6 +7,7 @@ export class ChatConversation {
     id: string;
 
     @Column()
+    @Index('idx_chat_session_id')
     sessionId: string; // Creates a unique ID for the visitor stored in local storage
 
     @Column({ nullable: true })
@@ -25,9 +26,11 @@ export class ChatConversation {
     messages: ChatMessage[];
 
     @Column({ default: false })
+    @Index('idx_chat_archived')
     archived: boolean;
 
     @CreateDateColumn()
+    @Index('idx_chat_created')
     createdAt: Date;
 
     @UpdateDateColumn()
