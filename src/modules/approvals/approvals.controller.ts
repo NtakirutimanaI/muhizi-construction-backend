@@ -6,6 +6,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { ApprovalsService } from './approvals.service';
 import { CreateApprovalDto } from './dto/create-approval.dto';
+import { UpdateApprovalDto } from './dto/update-approval.dto';
 
 @ApiTags('Approvals')
 @ApiBearerAuth('JWT-auth')
@@ -34,7 +35,7 @@ export class ApprovalsController {
 
     @Put(':id')
     @Roles(Role.ADMIN, Role.MANAGER)
-    update(@Param('id') id: string, @Body() dto: CreateApprovalDto) {
+    update(@Param('id') id: string, @Body() dto: UpdateApprovalDto) {
         return this.service.update(id, dto);
     }
 

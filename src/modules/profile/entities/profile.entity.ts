@@ -58,6 +58,9 @@ export class Profile {
     address: string;
 
     @Column({ nullable: true })
+    location: string;
+
+    @Column({ nullable: true })
     city: string;
 
     @Column({ nullable: true })
@@ -158,6 +161,8 @@ export class Profile {
         website?: string;
         portfolio?: string;
         stackoverflow?: string;
+        facebook?: string;
+        instagram?: string;
     };
 
     @Column({ type: 'text', nullable: true })

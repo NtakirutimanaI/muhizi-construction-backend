@@ -12,6 +12,14 @@ export class CreateAttendanceDto {
 
     @IsString()
     @IsOptional()
+    projectId?: string;
+
+    @IsString()
+    @IsOptional()
+    site?: string;
+
+    @IsString()
+    @IsOptional()
     checkIn?: string;
 
     @IsString()

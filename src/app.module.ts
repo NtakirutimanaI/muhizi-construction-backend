@@ -28,6 +28,7 @@ import { MaterialRequestsModule } from './modules/material-requests/material-req
 import { ProjectEvidenceModule } from './modules/project-evidence/project-evidence.module';
 import { SiteActivitiesModule } from './modules/site-activities/site-activities.module';
 import { SiteRulesModule } from './modules/site-rules/site-rules.module';
+import { EmployeeAssignmentsModule } from './modules/employee-assignments/employee-assignments.module';
 
 @Module({
     imports: [
@@ -91,6 +92,7 @@ import { SiteRulesModule } from './modules/site-rules/site-rules.module';
         ProjectEvidenceModule,
         SiteActivitiesModule,
         SiteRulesModule,
+        EmployeeAssignmentsModule,
     ],
 })
 export class AppModule {}

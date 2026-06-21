@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index, ManyToOne, JoinColumn } from 'typeorm';
 import { Employee } from '../../employees/entities/employee.entity';
+import { Project } from '../../projects/entities/project.entity';
 
 export enum AttendanceStatus {
     PRESENT = 'present',
@@ -7,6 +8,8 @@ export enum AttendanceStatus {
     LATE = 'late',
     HALF_DAY = 'half_day',
     ON_LEAVE = 'on_leave',
+    PERMISSION = 'permission',
+    SUSPENDED = 'suspended',
 }
 
 @Entity('attendance')
@@ -21,6 +24,16 @@ export class Attendance {
     @ManyToOne(() => Employee, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'employeeId' })
     employee: Employee;
+
+    @Column({ nullable: true })
+    projectId: string;
+
+    @ManyToOne(() => Project, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'projectId' })
+    project: Project;
+
+    @Column({ nullable: true })
+    site: string;
 
     @Column({ type: 'date' })
     @Index('idx_attendance_date')

@@ -32,6 +32,12 @@ export class Contract {
     @Column({ nullable: true })
     fileSize: string;
 
+    @Column({ type: 'text', nullable: true })
+    body: string;
+
+    @Column({ type: 'text', nullable: true })
+    footer: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

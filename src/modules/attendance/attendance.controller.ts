@@ -44,6 +44,28 @@ export class AttendanceController {
         return this.service.findByEmployee(employeeId);
     }
 
+    @Get('employee/:employeeId/month')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    findByEmployeeInMonth(
+        @Param('employeeId') employeeId: string,
+        @Query('year') year: number,
+        @Query('month') month: number,
+    ) {
+        return this.service.findByEmployeeInMonth(employeeId, year, month);
+    }
+
+    @Get('project/:projectId')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    findByProject(@Param('projectId') projectId: string) {
+        return this.service.findByProject(projectId);
+    }
+
+    @Get('site/:site')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    findBySite(@Param('site') site: string) {
+        return this.service.findBySite(site);
+    }
+
     @Get(':id')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
     findOne(@Param('id') id: string) {

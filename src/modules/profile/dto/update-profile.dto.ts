@@ -26,6 +26,14 @@ class SocialLinksDto {
     @IsOptional()
     @IsString()
     website?: string;
+
+    @IsOptional()
+    @IsString()
+    facebook?: string;
+
+    @IsOptional()
+    @IsString()
+    instagram?: string;
 }
 
 export class UpdateProfileDto {
@@ -64,6 +72,10 @@ export class UpdateProfileDto {
     @IsOptional()
     @IsString()
     phone?: string;
+
+    @IsOptional()
+    @IsString()
+    location?: string;
 
     @IsOptional()
     @IsDateString()
@@ -179,5 +191,13 @@ export class UpdateProfileDto {
     @IsOptional()
     @IsObject()
     pageContent?: object;
+
+    @IsOptional()
+    @IsString()
+    companyLogo?: string;
+
+    @IsOptional()
+    @IsString()
+    company?: string;
 }
 

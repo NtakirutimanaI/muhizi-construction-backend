@@ -19,12 +19,12 @@ export class AttendanceService {
     async findAll(): Promise<Attendance[]> {
         return this.repo.find({
             order: { date: 'DESC', checkIn: 'DESC' },
-            relations: ['employee'],
+            relations: ['employee', 'project'],
         });
     }
 
     async findOne(id: string): Promise<Attendance> {
-        const attendance = await this.repo.findOne({ where: { id }, relations: ['employee'] });
+        const attendance = await this.repo.findOne({ where: { id }, relations: ['employee', 'project'] });
         if (!attendance) throw new NotFoundException('Attendance record not found');
         return attendance;
     }
@@ -33,7 +33,7 @@ export class AttendanceService {
         return this.repo.find({
             where: { date: Between(start, end) },
             order: { date: 'DESC' },
-            relations: ['employee'],
+            relations: ['employee', 'project'],
         });
     }
 
@@ -41,6 +41,34 @@ export class AttendanceService {
         return this.repo.find({
             where: { employeeId },
             order: { date: 'DESC' },
+            relations: ['project'],
+        });
+    }
+
+    async findByProject(projectId: string): Promise<Attendance[]> {
+        return this.repo.find({
+            where: { projectId },
+            order: { date: 'DESC', checkIn: 'DESC' },
+            relations: ['employee', 'project'],
+        });
+    }
+
+    async findBySite(site: string): Promise<Attendance[]> {
+        return this.repo.find({
+            where: { site },
+            order: { date: 'DESC', checkIn: 'DESC' },
+            relations: ['employee', 'project'],
+        });
+    }
+
+    async findByEmployeeInMonth(employeeId: string, year: number, month: number): Promise<Attendance[]> {
+        const start = `${year}-${String(month).padStart(2, '0')}-01`;
+        const lastDay = new Date(year, month, 0).getDate();
+        const end = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+        return this.repo.find({
+            where: { employeeId, date: Between(start, end) },
+            order: { date: 'ASC' },
+            relations: ['project'],
         });
     }
 
@@ -56,7 +84,10 @@ export class AttendanceService {
 
     async getStats(): Promise<any> {
         const today = new Date().toISOString().split('T')[0];
-        const allToday = await this.repo.find({ where: { date: today } });
+        const allToday = await this.repo.find({
+            where: { date: today },
+            relations: ['project'],
+        });
         return {
             total: allToday.length,
             present: allToday.filter(a => a.status === 'present').length,
@@ -64,6 +95,8 @@ export class AttendanceService {
             late: allToday.filter(a => a.status === 'late').length,
             halfDay: allToday.filter(a => a.status === 'half_day').length,
             onLeave: allToday.filter(a => a.status === 'on_leave').length,
+            permission: allToday.filter(a => a.status === 'permission').length,
+            suspended: allToday.filter(a => a.status === 'suspended').length,
         };
     }
 }

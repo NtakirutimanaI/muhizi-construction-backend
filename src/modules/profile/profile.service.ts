@@ -85,11 +85,24 @@ export class ProfileService {
         const cached = this.cacheService.get<any>(cacheKey);
         if (cached) return cached;
 
-        const profile = await this.profileRepository.findOne({
-            where: username ? { user: { username } } : {},
-            relations: ['user'],
-            order: { createdAt: 'ASC' },
-        });
+        let profile;
+        if (!username) {
+            profile = await this.profileRepository.findOne({
+                where: { companyLogo: Not(IsNull()) },
+                relations: ['user'],
+                order: { updatedAt: 'DESC' },
+            });
+        }
+        if (!profile) {
+            profile = await this.profileRepository.findOne({
+                where: username ? { user: { username } } : {},
+                relations: ['user'],
+                order: { updatedAt: 'DESC' },
+            });
+        }
+        if (!profile) {
+            throw new NotFoundException('Profile not found');
+        }
 
         if (!profile) {
             throw new NotFoundException('Profile not found');

@@ -36,4 +36,12 @@ export class CreateContractDto {
     @IsString()
     @IsOptional()
     fileSize?: string;
+
+    @IsString()
+    @IsOptional()
+    body?: string;
+
+    @IsString()
+    @IsOptional()
+    footer?: string;
 }
