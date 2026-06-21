@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Subscriber } from './entities/subscriber.entity';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
@@ -63,7 +63,7 @@ export class SubscribersService {
     async sendUpdate(dto: SendUpdateDto): Promise<{ sent: number; total: number }> {
         let subscribers: Subscriber[];
         if (dto.subscriberIds?.length) {
-            subscribers = await this.repo.findByIds(dto.subscriberIds);
+            subscribers = await this.repo.find({ where: { id: In(dto.subscriberIds) } });
         } else {
             subscribers = await this.repo.find({ where: { isActive: true } });
         }
