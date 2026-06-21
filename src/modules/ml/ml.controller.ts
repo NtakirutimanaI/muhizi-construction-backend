@@ -40,4 +40,11 @@ export class MlController {
     async classifyMessage(@Body() data: { message: string }) {
         return this.mlService.classifyMessage(data.message);
     }
+
+    @Post('validate-email')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiOperation({ summary: 'Validate email quality using ML' })
+    async validateEmail(@Body() data: { email: string }) {
+        return this.mlService.validateEmail(data.email);
+    }
 }

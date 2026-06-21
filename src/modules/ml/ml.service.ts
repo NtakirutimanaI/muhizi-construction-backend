@@ -86,4 +86,28 @@ export class MlService {
             return { category: 'inquiry', confidence: 0, label: 'General Inquiry' };
         }
     }
+
+    async validateEmail(email: string): Promise<{ score: number; category: string; reasons: string[] }> {
+        try {
+            const response = await fetch(`${this.mlBaseUrl}/ml/validate-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+            if (!response.ok) throw new Error('ML service error');
+            return await response.json();
+        } catch {
+            const spamDomains = ['tempmail.com', 'throwaway.com', 'mailinator.com', 'guerrillamail.com', 'sharklasers.com'];
+            const domain = email.split('@')[1]?.toLowerCase() || '';
+            let score = 80;
+            const reasons: string[] = [];
+            if (spamDomains.includes(domain)) {
+                score = 10;
+                reasons.push('Known temporary email domain');
+            }
+            if (email.length > 50) { score -= 20; reasons.push('Unusually long email address'); }
+            if (/[0-9]{4,}/.test(email)) { score -= 10; reasons.push('Contains many digits, may be auto-generated'); }
+            return { score: Math.max(0, score), category: score >= 60 ? 'valid' : score >= 20 ? 'suspicious' : 'spam', reasons };
+        }
+    }
 }

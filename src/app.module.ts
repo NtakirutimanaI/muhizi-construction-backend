@@ -29,6 +29,7 @@ import { ProjectEvidenceModule } from './modules/project-evidence/project-eviden
 import { SiteActivitiesModule } from './modules/site-activities/site-activities.module';
 import { SiteRulesModule } from './modules/site-rules/site-rules.module';
 import { EmployeeAssignmentsModule } from './modules/employee-assignments/employee-assignments.module';
+import { SubscribersModule } from './modules/subscribers/subscribers.module';
 
 @Module({
     imports: [
@@ -93,6 +94,7 @@ import { EmployeeAssignmentsModule } from './modules/employee-assignments/employ
         SiteActivitiesModule,
         SiteRulesModule,
         EmployeeAssignmentsModule,
+        SubscribersModule,
     ],
 })
 export class AppModule {}
