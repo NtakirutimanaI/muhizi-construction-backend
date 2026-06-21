@@ -61,7 +61,12 @@ export class SubscribersService {
     }
 
     async sendUpdate(dto: SendUpdateDto): Promise<{ sent: number; total: number }> {
-        const subscribers = await this.repo.find({ where: { isActive: true } });
+        let subscribers: Subscriber[];
+        if (dto.subscriberIds?.length) {
+            subscribers = await this.repo.findByIds(dto.subscriberIds);
+        } else {
+            subscribers = await this.repo.find({ where: { isActive: true } });
+        }
         const total = subscribers.length;
         let sent = 0;
 

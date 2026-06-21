@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
 
 export class SendUpdateDto {
     @IsString()
@@ -12,4 +12,8 @@ export class SendUpdateDto {
     @IsString()
     @IsOptional()
     html?: string;
+
+    @IsArray()
+    @IsOptional()
+    subscriberIds?: string[];
 }
