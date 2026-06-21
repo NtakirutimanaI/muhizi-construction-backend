@@ -1,13 +1,16 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subscriber } from './entities/subscriber.entity';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
+import { SendUpdateDto } from './dto/send-update.dto';
 import { MlService } from '../ml/ml.service';
 
 @Injectable()
 export class SubscribersService {
+    private readonly logger = new Logger(SubscribersService.name);
+
     constructor(
         @InjectRepository(Subscriber)
         private repo: Repository<Subscriber>,
@@ -55,5 +58,32 @@ export class SubscribersService {
     async remove(id: string): Promise<void> {
         const result = await this.repo.delete(id);
         if (result.affected === 0) throw new NotFoundException('Subscriber not found');
+    }
+
+    async sendUpdate(dto: SendUpdateDto): Promise<{ sent: number; total: number }> {
+        const subscribers = await this.repo.find({ where: { isActive: true } });
+        const total = subscribers.length;
+        let sent = 0;
+
+        for (const sub of subscribers) {
+            try {
+                this.logger.log(`
+        ======================================
+        SENDING UPDATE TO SUBSCRIBER
+        ======================================
+        To: ${sub.email}
+        Subject: ${dto.subject}
+        Message: ${dto.message}
+        ${dto.html ? `HTML: ${dto.html.substring(0, 100)}...` : ''}
+        ======================================
+        `);
+                sent++;
+            } catch (err) {
+                this.logger.error(`Failed to send to ${sub.email}: ${err.message}`);
+            }
+        }
+
+        this.logger.log(`Broadcast complete: ${sent}/${total} emails sent`);
+        return { sent, total };
     }
 }

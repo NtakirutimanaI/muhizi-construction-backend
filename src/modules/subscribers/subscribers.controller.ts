@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SubscribersService } from './subscribers.service';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
+import { SendUpdateDto } from './dto/send-update.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -54,5 +55,14 @@ export class SubscribersController {
     async remove(@Param('id') id: string) {
         await this.service.remove(id);
         return { message: 'Subscriber deleted' };
+    }
+
+    @Post('send-update')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Send email update to all active subscribers' })
+    async sendUpdate(@Body() dto: SendUpdateDto) {
+        return this.service.sendUpdate(dto);
     }
 }
