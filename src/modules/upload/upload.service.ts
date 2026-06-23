@@ -18,17 +18,37 @@ export class UploadService {
         file: Express.Multer.File,
         folder?: string,
     ) {
-        let uploadResult;
-        try {
-            uploadResult = await this.cloudinaryService.uploadFile(file, {
+        const uploadResult = await this.uploadToCloudinary(
+            () => this.cloudinaryService.uploadFile(file, {
                 folder: folder || 'muhizi_construction',
                 resourceType: this.detectResourceType(file.mimetype),
-            });
+            }),
+        );
+        return this.saveFileRecord(uploadResult);
+    }
+
+    async uploadFromBase64(
+        data: { filename: string; mimeType: string; data: string },
+        folder?: string,
+    ) {
+        const uploadResult = await this.uploadToCloudinary(
+            () => this.cloudinaryService.uploadFromBase64(data, {
+                folder: folder || 'muhizi_construction',
+            }),
+        );
+        return this.saveFileRecord(uploadResult);
+    }
+
+    private async uploadToCloudinary(uploadFn: () => Promise<any>) {
+        try {
+            return await uploadFn();
         } catch (error: any) {
             this.logger.error(`Cloudinary upload failed: ${error.message}`);
             throw new InternalServerErrorException(`Cloudinary upload failed: ${error.message}`);
         }
+    }
 
+    private async saveFileRecord(uploadResult: any) {
         try {
             const fileRecord = this.fileUploadRepository.create({
                 publicId: uploadResult.publicId,

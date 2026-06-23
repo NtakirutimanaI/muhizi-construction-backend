@@ -4,6 +4,7 @@ import {
     Get,
     Delete,
     Param,
+    Body,
     UseGuards,
     UseInterceptors,
     UploadedFile,
@@ -38,6 +39,23 @@ export class UploadController {
         }
         try {
             return await this.uploadService.uploadFile(file);
+        } catch (error: any) {
+            throw new InternalServerErrorException(error?.message || 'File upload failed');
+        }
+    }
+
+    @Post('base64')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Upload a file via base64 JSON (works on serverless)' })
+    @ApiResponse({ status: 201, description: 'File uploaded successfully' })
+    async uploadBase64(@Body() body: { filename: string; mimeType: string; data: string }) {
+        if (!body.data || !body.filename) {
+            throw new BadRequestException('Missing filename or data');
+        }
+        try {
+            return await this.uploadService.uploadFromBase64(body);
         } catch (error: any) {
             throw new InternalServerErrorException(error?.message || 'File upload failed');
         }
