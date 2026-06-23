@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
 
-const ROLE_ALIASES: Record<string, string[]> = {
+const ROLE_ALIASES: Partial<Record<Role, Role[]>> = {
     [Role.MANAGING_DIRECTOR]: [Role.MANAGER, Role.MANAGING_DIRECTOR],
     [Role.FINANCE_DIRECTOR]: [Role.MANAGER, Role.FINANCE_DIRECTOR],
     [Role.SITE_ENGINEER]: [Role.SITE_MANAGER, Role.SITE_ENGINEER],
