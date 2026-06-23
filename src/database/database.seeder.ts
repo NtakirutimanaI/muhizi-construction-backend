@@ -28,7 +28,7 @@ export class DatabaseSeeder {
     try {
       // Check if user already exists
       const existingUser = await this.userRepository.findOne({
-        where: { email: 'info@muhiziconstruction.rw' },
+        where: { email: 'muhizidesigningacademy@gmail.com' },
       });
 
       if (existingUser) {
@@ -51,8 +51,8 @@ export class DatabaseSeeder {
       const hashedPassword = await bcrypt.hash('Muhizi@2024', 10);
 
       const user = this.userRepository.create({
-        email: 'info@muhiziconstruction.rw',
-        username: 'muhizi_construction',
+        email: 'muhizidesigningacademy@gmail.com',
+        username: 'ceo_muhizi',
         password: hashedPassword,
         isActive: true,
         role: Role.ADMIN,
@@ -70,9 +70,9 @@ export class DatabaseSeeder {
       await this.profileRepository.save(profile);
       this.logger.log('✓ Profile created successfully!');
       this.logger.log('═══════════════════════════════════════');
-      this.logger.log('Email: info@muhiziconstruction.rw');
+      this.logger.log('Email: muhizidesigningacademy@gmail.com');
       this.logger.log('Password: Muhizi@2024');
-      this.logger.log('Role: Admin');
+      this.logger.log('Role: Admin / CEO');
       this.logger.log('═══════════════════════════════════════');
 
       return profile;
@@ -86,10 +86,11 @@ export class DatabaseSeeder {
     this.logger.log('Seeding role-based accounts...');
 
     const accounts = [
-      { email: 'sitemanager@muhiziconstruction.rw', username: 'site_manager', role: Role.SITE_MANAGER, firstName: 'Patrick', lastName: 'Habimana', title: 'Site Manager' },
-      { email: 'employee@muhiziconstruction.rw', username: 'employee', role: Role.EMPLOYEE, firstName: 'Jean', lastName: 'Niyonzima', title: 'Employee' },
-      { email: 'client@muhiziconstruction.rw', username: 'client', role: Role.CLIENT, firstName: 'Alice', lastName: 'Mukamana', title: 'Client' },
-      { email: 'manager@muhiziconstruction.rw', username: 'manager', role: Role.MANAGER, firstName: 'David', lastName: 'Uwimana', title: 'Manager' },
+      { email: 'managing.director@muhizidesigningacademy.com', username: 'managing_director', role: Role.MANAGING_DIRECTOR, firstName: 'KWIHANGANA', lastName: 'Akissa', title: 'Managing Director' },
+      { email: 'finance.director@muhizidesigningacademy.com', username: 'finance_director', role: Role.FINANCE_DIRECTOR, firstName: 'MUTIMUKEYE', lastName: 'Odette', title: 'Finance Director' },
+      { email: 'site.engineer@muhizidesigningacademy.com', username: 'site_engineer', role: Role.SITE_ENGINEER, firstName: 'Site', lastName: 'Engineer', title: 'Site Engineer' },
+      { email: 'engineering@muhizidesigningacademy.com', username: 'engineering_studio', role: Role.ENGINEERING_STUDIO, firstName: 'Engineering', lastName: 'Studio', title: 'Engineering Studio' },
+      { email: 'client@muhizidesigningacademy.com', username: 'client', role: Role.CLIENT, firstName: 'Client', lastName: 'User', title: 'Client' },
     ];
 
     for (const account of accounts) {
@@ -137,12 +138,12 @@ export class DatabaseSeeder {
 
   private getProfileData() {
     return {
-      firstName: 'MUHIZI',
-      lastName: 'CONSTRUCTION',
-      email: 'info@muhiziconstruction.rw',
-      phone: '+250 788 000 000',
+      firstName: 'UWIMANA MUHIZI',
+      lastName: 'Papias',
+      email: 'muhizidesigningacademy@gmail.com',
+      phone: '+250780620735',
       avatar: undefined,
-      title: 'Real Estate & Construction Company',
+      title: 'CEO & Founder',
       yearsOfExperience: 6,
 
       bio: `MUHIZI CONSTRUCTION is a leading construction and real estate company in Rwanda specializing in residential and commercial building construction, road infrastructure, and property development. 
@@ -379,6 +380,7 @@ Our team specializes in modern construction techniques, project management, and 
         },
       ],
 
+      address: 'Nyamirambo/COSMOS',
       city: 'Kigali',
       country: 'Rwanda',
 

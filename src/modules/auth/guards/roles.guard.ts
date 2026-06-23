@@ -3,6 +3,13 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
 
+const ROLE_ALIASES: Record<string, string[]> = {
+    [Role.MANAGING_DIRECTOR]: [Role.MANAGER, Role.MANAGING_DIRECTOR],
+    [Role.FINANCE_DIRECTOR]: [Role.MANAGER, Role.FINANCE_DIRECTOR],
+    [Role.SITE_ENGINEER]: [Role.SITE_MANAGER, Role.SITE_ENGINEER],
+    [Role.ENGINEERING_STUDIO]: [Role.EMPLOYEE, Role.ENGINEERING_STUDIO],
+};
+
 @Injectable()
 export class RolesGuard implements CanActivate {
     constructor(private reflector: Reflector) { }
@@ -16,6 +23,7 @@ export class RolesGuard implements CanActivate {
             return true;
         }
         const { user } = context.switchToHttp().getRequest();
-        return requiredRoles.includes(user.role);
+        const userRoles = ROLE_ALIASES[user.role] || [user.role];
+        return userRoles.some(r => requiredRoles.includes(r));
     }
 }
