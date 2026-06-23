@@ -32,3 +32,4 @@ api/*.js.map
 
 # Vercel
 .env.vercel
+.env*
