@@ -25,8 +25,6 @@ export class NotificationController {
 
     @Get()
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
-
-    @Get()
     @ApiOperation({
         summary: 'Get all notifications',
         description: 'Retrieve all notifications for the authenticated user'

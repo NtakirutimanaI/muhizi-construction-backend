@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MaterialRequest } from './entities/material-request.entity';
 import { CreateMaterialRequestDto } from './dto/create-material-request.dto';
+import { UpdateMaterialRequestStatusDto } from './dto/update-material-request-status.dto';
 
 @Injectable()
 export class MaterialRequestsService {
@@ -11,8 +12,8 @@ export class MaterialRequestsService {
         private repo: Repository<MaterialRequest>,
     ) { }
 
-    async create(dto: CreateMaterialRequestDto): Promise<MaterialRequest> {
-        const entity = this.repo.create(dto);
+    async create(dto: CreateMaterialRequestDto, userId?: string, userName?: string): Promise<MaterialRequest> {
+        const entity = this.repo.create({ ...dto, createdById: userId, createdByName: userName });
         return this.repo.save(entity);
     }
 
@@ -29,6 +30,27 @@ export class MaterialRequestsService {
     async update(id: string, dto: Partial<CreateMaterialRequestDto>): Promise<MaterialRequest> {
         await this.repo.update(id, dto as any);
         return this.findOne(id);
+    }
+
+    async approve(id: string, userId: string, userName: string): Promise<MaterialRequest> {
+        const entity = await this.findOne(id);
+        if (entity.status !== 'pending') throw new Error('Can only approve pending requests');
+        entity.status = 'approved';
+        entity.approvedById = userId;
+        entity.approvedByName = userName;
+        entity.approvedAt = new Date();
+        return this.repo.save(entity);
+    }
+
+    async reject(id: string, userId: string, userName: string, notes?: string): Promise<MaterialRequest> {
+        const entity = await this.findOne(id);
+        if (entity.status !== 'pending') throw new Error('Can only reject pending requests');
+        entity.status = 'rejected';
+        entity.approvedById = userId;
+        entity.approvedByName = userName;
+        entity.approvedAt = new Date();
+        if (notes) entity.notes = notes;
+        return this.repo.save(entity);
     }
 
     async remove(id: string): Promise<void> {

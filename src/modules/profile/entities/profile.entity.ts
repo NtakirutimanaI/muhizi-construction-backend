@@ -272,6 +272,7 @@ export class Profile {
             showSocialLinks?: boolean;
             showContactInfo?: boolean;
         };
+        showTeamSection?: boolean;
     };
 
     @OneToOne(() => User, (user) => user.profile)

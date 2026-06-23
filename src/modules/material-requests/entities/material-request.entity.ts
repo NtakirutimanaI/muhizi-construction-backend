@@ -26,6 +26,21 @@ export class MaterialRequest {
     @Column({ type: 'text', nullable: true })
     notes: string;
 
+    @Column({ nullable: true })
+    createdById: string;
+
+    @Column({ nullable: true })
+    createdByName: string;
+
+    @Column({ nullable: true })
+    approvedById: string;
+
+    @Column({ nullable: true })
+    approvedByName: string;
+
+    @Column({ type: 'timestamp', nullable: true })
+    approvedAt: Date;
+
     @CreateDateColumn()
     createdAt: Date;
 

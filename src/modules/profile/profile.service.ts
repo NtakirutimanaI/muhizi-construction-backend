@@ -88,22 +88,18 @@ export class ProfileService {
         let profile;
         if (!username) {
             profile = await this.profileRepository.findOne({
-                where: { companyLogo: Not(IsNull()) },
+                where: { isPublic: true },
                 relations: ['user'],
                 order: { updatedAt: 'DESC' },
             });
         }
         if (!profile) {
             profile = await this.profileRepository.findOne({
-                where: username ? { user: { username } } : {},
+                where: username ? { user: { username } } : { isPublic: true },
                 relations: ['user'],
                 order: { updatedAt: 'DESC' },
             });
         }
-        if (!profile) {
-            throw new NotFoundException('Profile not found');
-        }
-
         if (!profile) {
             throw new NotFoundException('Profile not found');
         }
@@ -277,7 +273,20 @@ export class ProfileService {
             status: MessageStatus.SENT,
             sender: { id: senderId } as any,
         });
-        return this.contactMessageRepository.save(message);
+        const saved = await this.contactMessageRepository.save(message);
+        try {
+            const adminProfile = await this.profileRepository.findOne({ relations: ['user'], order: { createdAt: 'ASC' } });
+            if (adminProfile?.user) {
+                await this.notificationService.create({
+                    type: NotificationType.ACCOUNT_ACTIVITY,
+                    title: 'Message Sent',
+                    message: `Admin replied to ${sendAdminMessageDto.name}: ${sendAdminMessageDto.subject || 'No subject'}`,
+                    user: { id: adminProfile.user.id },
+                    metadata: { messageId: saved.id, email: sendAdminMessageDto.email },
+                });
+            }
+        } catch { }
+        return saved;
     }
 
     // Inbox: non-deleted messages from contact form (no sender)

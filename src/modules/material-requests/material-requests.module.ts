@@ -8,5 +8,6 @@ import { MaterialRequestsService } from './material-requests.service';
     imports: [TypeOrmModule.forFeature([MaterialRequest])],
     controllers: [MaterialRequestsController],
     providers: [MaterialRequestsService],
+    exports: [MaterialRequestsService],
 })
 export class MaterialRequestsModule {}
