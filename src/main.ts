@@ -1,14 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { setupApp } from './setup';
+import { patchExpressAdapter } from './custom-express.adapter';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  patchExpressAdapter();
+  const app = await NestFactory.create(AppModule);
 
   // Setup application (pipes, cors, swagger, etc.)
   setupApp(app);

@@ -1,13 +1,15 @@
 import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../dist/app.module';
 import { setupApp } from '../dist/setup';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import { patchExpressAdapter } from '../dist/custom-express.adapter';
 import express from 'express';
 
 const server = express();
 let cachedApp: express.Express;
 
 async function bootstrap() {
+  patchExpressAdapter();
   const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(server),
