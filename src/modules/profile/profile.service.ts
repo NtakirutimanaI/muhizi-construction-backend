@@ -117,7 +117,16 @@ export class ProfileService {
     async updateProfile(userId: string, updateProfileDto: UpdateProfileDto, userEmail?: string, userRole?: string, ipAddress?: string) {
         try {
             const profile = await this.getProfile(userId);
-            Object.assign(profile, updateProfileDto);
+            if (updateProfileDto.pageContent !== undefined) {
+                profile.pageContent = {
+                    ...(profile.pageContent || {}),
+                    ...updateProfileDto.pageContent,
+                };
+                const { pageContent, ...rest } = updateProfileDto as any;
+                Object.assign(profile, rest);
+            } else {
+                Object.assign(profile, updateProfileDto);
+            }
             const updatedProfile = await this.profileRepository.save(profile);
 
             this.cacheService.del('public_profile_default');
