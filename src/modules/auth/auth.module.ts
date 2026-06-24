@@ -18,7 +18,7 @@ import { EventsModule } from '../events/events.module';
         JwtModule.registerAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
-                secret: configService.get('JWT_SECRET'),
+                secret: configService.get('JWT_SECRET') || 'default-secret',
                 signOptions: {
                     expiresIn: configService.get('JWT_EXPIRES_IN', '7d'),
                 },
