@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Module, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProfileModule } from './modules/profile/profile.module';
@@ -95,6 +96,19 @@ import { SubscribersModule } from './modules/subscribers/subscribers.module';
         SiteRulesModule,
         EmployeeAssignmentsModule,
         SubscribersModule,
+    ],
+    providers: [
+        {
+            provide: 'DATABASE_INIT',
+            useFactory: (dataSource: DataSource) => {
+                setTimeout(async () => {
+                    try { await dataSource.query(`ALTER TYPE construction_projects_type_enum ADD VALUE IF NOT EXISTS 'design'`); } catch { }
+                    try { await dataSource.query(`ALTER TABLE construction_projects ALTER COLUMN type TYPE varchar(50) USING type::text`); } catch { }
+                }, 3000);
+                return {};
+            },
+            inject: [DataSource],
+        },
     ],
 })
 export class AppModule {}

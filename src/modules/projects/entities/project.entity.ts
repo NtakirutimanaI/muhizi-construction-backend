@@ -10,6 +10,7 @@ export enum ProjectStatus {
 export enum ProjectType {
     CONSTRUCTION = 'construction',
     RENOVATION = 'renovation',
+    DESIGN = 'design',
 }
 
 @Entity('construction_projects')
@@ -23,8 +24,8 @@ export class Project {
     @Column({ type: 'text', nullable: true })
     description: string;
 
-    @Column({ type: 'enum', enum: ProjectType, default: ProjectType.CONSTRUCTION })
-    type: ProjectType;
+    @Column({ type: 'varchar', length: 50, default: ProjectType.CONSTRUCTION })
+    type: string;
 
     @Column({ type: 'enum', enum: ProjectStatus, default: ProjectStatus.PLANNING })
     @Index('idx_project_status')
