@@ -27,7 +27,7 @@ export class Profile {
     @Index('idx_profiles_email')
     email: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, unique: true })
     phone: string;
 
     @Column({ nullable: true })

@@ -1,8 +1,8 @@
 export const RateLimitConfig = {
     auth: {
-        windowMs: 15 * 60 * 1000,
-        max: 10,
-        message: 'Too many authentication attempts, please try again after 15 minutes',
+        windowMs: 60 * 1000,
+        max: 100,
+        message: 'Too many authentication attempts, please try again later',
     },
     global: {
         windowMs: 60 * 1000,

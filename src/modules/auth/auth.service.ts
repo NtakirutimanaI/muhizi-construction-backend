@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -17,6 +17,8 @@ import { EmailService } from '../../common/services/email.service';
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
@@ -39,12 +41,23 @@ export class AuthService {
             throw new ConflictException('Email or username already exists');
         }
 
+        if (registerDto.phone) {
+            const existingPhone = await this.profileRepository.findOne({
+                where: { phone: registerDto.phone },
+            });
+            if (existingPhone) {
+                throw new ConflictException('Phone number already exists');
+            }
+        }
+
         const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
         const user = this.userRepository.create({
             email: registerDto.email,
             username: registerDto.username,
             password: hashedPassword,
+            firstName: registerDto.firstName,
+            lastName: registerDto.lastName,
             role: 'client',
         });
 
@@ -217,6 +230,8 @@ export class AuthService {
         user.otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
         await this.userRepository.save(user);
 
+        this.logger.log(`Password reset OTP for ${user.email}: ${otp}`);
+
         await this.emailService.sendPasswordResetEmail(
             user.email,
             user.username,
@@ -366,11 +381,22 @@ export class AuthService {
         if (existingUser) {
             throw new ConflictException('Email or username already exists');
         }
+
+        if (dto.phone) {
+            const existingPhone = await this.profileRepository.findOne({
+                where: { phone: dto.phone },
+            });
+            if (existingPhone) {
+                throw new ConflictException('Phone number already exists');
+            }
+        }
         const hashedPassword = await bcrypt.hash(dto.password, 10);
         const user = this.userRepository.create({
             email: dto.email,
             username: dto.username,
             password: hashedPassword,
+            firstName: dto.firstName,
+            lastName: dto.lastName,
             role: dto.role || 'employee',
         });
         await this.userRepository.save(user);
@@ -389,8 +415,19 @@ export class AuthService {
         const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] });
         if (!user) throw new NotFoundException('User not found');
 
+        if (dto.phone && dto.phone !== user.profile?.phone) {
+            const existingPhone = await this.profileRepository.findOne({
+                where: { phone: dto.phone },
+            });
+            if (existingPhone) {
+                throw new ConflictException('Phone number already exists');
+            }
+        }
+
         if (dto.email !== undefined) user.email = dto.email;
         if (dto.username !== undefined) user.username = dto.username;
+        if (dto.firstName !== undefined) user.firstName = dto.firstName;
+        if (dto.lastName !== undefined) user.lastName = dto.lastName;
         if (dto.role !== undefined) user.role = dto.role;
         if (dto.isActive !== undefined) user.isActive = dto.isActive;
         if (dto.password) user.password = await bcrypt.hash(dto.password, 10);
