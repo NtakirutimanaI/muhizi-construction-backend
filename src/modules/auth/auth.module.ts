@@ -40,7 +40,7 @@ import { EventsModule } from '../events/events.module';
     providers: [
         AuthService,
         JwtStrategy,
-        GoogleStrategy,
+        ...(process.env.GOOGLE_CLIENT_ID ? [GoogleStrategy] : []),
         RolesGuard,
         { provide: APP_GUARD, useClass: JwtAuthGuard },
     ],
