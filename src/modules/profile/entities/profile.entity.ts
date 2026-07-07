@@ -223,6 +223,11 @@ export class Profile {
                 color: string;
             }>;
         };
+        news?: Array<{
+            title: string;
+            date: string;
+            summary: string;
+        }>;
         events?: Array<{
             title: string;
             date: string;

@@ -25,7 +25,6 @@ coverage/
 # Build
 build/
 *.tsbuildinfo
-api/*.js
 api/*.d.ts
 api/*.js.map
 .vercel

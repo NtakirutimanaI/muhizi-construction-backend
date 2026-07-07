@@ -16,6 +16,7 @@ export class CloudinaryService {
             cloud_name: config.cloudName,
             api_key: config.apiKey,
             api_secret: config.apiSecret,
+            timeout: 600000,
         });
     }
 
