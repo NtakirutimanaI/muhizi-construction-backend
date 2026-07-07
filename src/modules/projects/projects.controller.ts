@@ -1,0 +1,71 @@
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
+import { ProjectsService } from './projects.service';
+import { CreateProjectDto } from './dto/create-project.dto';
+
+@ApiTags('Projects')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('projects')
+export class ProjectsController {
+    constructor(private readonly service: ProjectsService) { }
+
+    @Post()
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: 'Create project', description: 'Creates a new project' })
+    @ApiBody({ type: CreateProjectDto })
+    @ApiResponse({ status: 201, description: 'Project created successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    create(@Body() dto: CreateProjectDto) {
+        return this.service.create(dto);
+    }
+
+    @Get()
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @ApiOperation({ summary: 'Get all projects', description: 'Retrieves a list of all projects' })
+    @ApiResponse({ status: 200, description: 'All projects retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findAll() {
+        return this.service.findAll();
+    }
+
+    @Get(':id')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @ApiOperation({ summary: 'Get project by ID', description: 'Retrieves a single project by its ID' })
+    @ApiResponse({ status: 200, description: 'Project retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    findOne(@Param('id') id: string) {
+        return this.service.findOne(id);
+    }
+
+    @Put(':id')
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: 'Update project', description: 'Updates an existing project by ID' })
+    @ApiBody({ type: CreateProjectDto })
+    @ApiResponse({ status: 200, description: 'Project updated successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    update(@Param('id') id: string, @Body() dto: CreateProjectDto) {
+        return this.service.update(id, dto);
+    }
+
+    @Delete(':id')
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: 'Delete project', description: 'Deletes a project by ID' })
+    @ApiResponse({ status: 200, description: 'Project deleted successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    remove(@Param('id') id: string) {
+        return this.service.remove(id);
+    }
+}

@@ -1,0 +1,135 @@
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
+import { AttendanceService } from './attendance.service';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
+
+@ApiTags('Attendance')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('attendance')
+export class AttendanceController {
+    constructor(private readonly service: AttendanceService) { }
+
+    @Post()
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiOperation({ summary: 'Create attendance', description: 'Create a new attendance record' })
+    @ApiBody({ type: CreateAttendanceDto })
+    @ApiResponse({ status: 201, description: 'Attendance record created successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    create(@Body() dto: CreateAttendanceDto) {
+        return this.service.create(dto);
+    }
+
+    @Get()
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @ApiOperation({ summary: 'Get all attendance', description: 'Retrieve all attendance records' })
+    @ApiResponse({ status: 200, description: 'All attendance records retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findAll() {
+        return this.service.findAll();
+    }
+
+    @Get('stats')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @ApiOperation({ summary: 'Get attendance stats', description: 'Retrieve attendance statistics' })
+    @ApiResponse({ status: 200, description: 'Attendance stats retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    stats() {
+        return this.service.getStats();
+    }
+
+    @Get('range')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @ApiOperation({ summary: 'Get attendance by date range', description: 'Retrieve attendance records filtered by date range' })
+    @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findByDateRange(@Query('start') start: string, @Query('end') end: string) {
+        return this.service.findByDateRange(start, end);
+    }
+
+    @Get('employee/:employeeId')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @ApiOperation({ summary: 'Get attendance by employee', description: 'Retrieve attendance records for a specific employee' })
+    @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findByEmployee(@Param('employeeId') employeeId: string) {
+        return this.service.findByEmployee(employeeId);
+    }
+
+    @Get('employee/:employeeId/month')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @ApiOperation({ summary: 'Get attendance by employee and month', description: 'Retrieve attendance records for a specific employee in a given month' })
+    @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findByEmployeeInMonth(
+        @Param('employeeId') employeeId: string,
+        @Query('year') year: number,
+        @Query('month') month: number,
+    ) {
+        return this.service.findByEmployeeInMonth(employeeId, year, month);
+    }
+
+    @Get('project/:projectId')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @ApiOperation({ summary: 'Get attendance by project', description: 'Retrieve attendance records for a specific project' })
+    @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findByProject(@Param('projectId') projectId: string) {
+        return this.service.findByProject(projectId);
+    }
+
+    @Get('site/:site')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @ApiOperation({ summary: 'Get attendance by site', description: 'Retrieve attendance records for a specific site' })
+    @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findBySite(@Param('site') site: string) {
+        return this.service.findBySite(site);
+    }
+
+    @Get(':id')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @ApiOperation({ summary: 'Get attendance by ID', description: 'Retrieve an attendance record by ID' })
+    @ApiResponse({ status: 200, description: 'Attendance record retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    findOne(@Param('id') id: string) {
+        return this.service.findOne(id);
+    }
+
+    @Put(':id')
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiOperation({ summary: 'Update attendance', description: 'Update an existing attendance record' })
+    @ApiBody({ type: CreateAttendanceDto })
+    @ApiResponse({ status: 200, description: 'Attendance record updated successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    update(@Param('id') id: string, @Body() dto: CreateAttendanceDto) {
+        return this.service.update(id, dto);
+    }
+
+    @Delete(':id')
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: 'Delete attendance', description: 'Delete an attendance record' })
+    @ApiResponse({ status: 200, description: 'Attendance record deleted successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    remove(@Param('id') id: string) {
+        return this.service.remove(id);
+    }
+}
