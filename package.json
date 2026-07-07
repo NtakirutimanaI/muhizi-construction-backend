@@ -7,7 +7,6 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "postbuild": "node -e \"const fs=require('fs'); fs.mkdirSync('dist/api',{recursive:true}); fs.copyFileSync('dist/lambda.js','dist/api/index.js')\"",
     "vercel-build": "npm run build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
