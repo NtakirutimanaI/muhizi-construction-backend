@@ -23,10 +23,7 @@ export function setupApp(app: INestApplication) {
     app.use(urlencoded({ extended: true, limit: '10mb' }));
 
     // Enable CORS
-    app.enableCors({
-        origin: FrontendConfig.url,
-        ...FrontendConfig.cors,
-    });
+    app.enableCors(FrontendConfig.cors);
 
     // Global validation pipe
     app.useGlobalPipes(

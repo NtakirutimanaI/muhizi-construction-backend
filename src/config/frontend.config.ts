@@ -1,9 +1,8 @@
-const isVercel = process.env.VERCEL === '1' || process.env.VERCEL_ENV;
-
+// TEMPORARY: allow all origins to unblock testing. Tighten back to an allowlist afterward.
 export const FrontendConfig = {
-    url: isVercel ? process.env.FRONTEND_URL || true : process.env.FRONTEND_URL || true,
     cors: {
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    }
+        origin: true,
+    },
 };
