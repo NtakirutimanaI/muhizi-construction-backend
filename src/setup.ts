@@ -8,7 +8,9 @@ import { RateLimitConfig } from './config/rate-limit.config';
 
 export function setupApp(app: INestApplication) {
     // Security headers
-    app.use(helmet());
+    app.use(helmet({
+        contentSecurityPolicy: false,
+    }));
 
     // Global rate limit
     app.use(rateLimit(RateLimitConfig.global));
