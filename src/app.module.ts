@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AppController } from './app.controller';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProfileModule } from './modules/profile/profile.module';
@@ -125,6 +126,7 @@ import { EngineeringSubmissionsModule } from './modules/engineering-submissions/
         DashboardModule,
         EngineeringSubmissionsModule,
     ],
+    controllers: [AppController],
     providers: [],
 })
 export class AppModule {}
