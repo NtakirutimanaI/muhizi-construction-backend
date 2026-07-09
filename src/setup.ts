@@ -7,39 +7,41 @@ import { FrontendConfig } from './config/frontend.config';
 import { RateLimitConfig } from './config/rate-limit.config';
 
 export function setupApp(app: INestApplication) {
-    // Security headers
-    app.use(helmet({
-        contentSecurityPolicy: false,
-    }));
+  // Security headers
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    }),
+  );
 
-    // Global rate limit
-    app.use(rateLimit(RateLimitConfig.global));
+  // Global rate limit
+  app.use(rateLimit(RateLimitConfig.global));
 
-    // Auth-specific rate limit (stricter for login/register)
-    app.use('/auth', rateLimit(RateLimitConfig.auth));
+  // Auth-specific rate limit (stricter for login/register)
+  app.use('/auth', rateLimit(RateLimitConfig.auth));
 
-    // Parse JSON with increased limit for image uploads
-    app.use(json({ limit: '10mb' }));
-    app.use(urlencoded({ extended: true, limit: '10mb' }));
+  // Parse JSON with increased limit for image uploads
+  app.use(json({ limit: '10mb' }));
+  app.use(urlencoded({ extended: true, limit: '10mb' }));
 
-    // Enable CORS
-    app.enableCors(FrontendConfig.cors);
+  // Enable CORS
+  app.enableCors(FrontendConfig.cors);
 
-    // Global validation pipe
-    app.useGlobalPipes(
-        new ValidationPipe({
-            whitelist: true,
-            forbidNonWhitelisted: true,
-            transform: true,
-        }),
-    );
+  // Global validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
-    // Swagger Documentation (only in development)
-    if (process.env.NODE_ENV !== 'production') {
-        const config = new DocumentBuilder()
-            .setTitle('MUHIZI CONSTRUCTION API')
-            .setDescription(
-                `
+  // Swagger Documentation (only in development)
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('MUHIZI CONSTRUCTION API')
+      .setDescription(
+        `
       Complete company website management API for MUHIZI CONSTRUCTION.
       
       This API provides:
@@ -55,40 +57,40 @@ export function setupApp(app: INestApplication) {
       **Protected Endpoints** (Require authentication):
       - All other profile, notification, and message management endpoints
     `,
-            )
-            .setVersion('1.0')
-            .setContact(
-                'MUHIZI CONSTRUCTION',
-                'https://muhiziconstruction.rw',
-                'info@muhiziconstruction.rw',
-            )
-            .addTag('Authentication', 'User authentication and login')
-            .addTag('Profile', 'Portfolio and profile management')
-            .addTag('Notifications', 'Notification management')
-            .addTag('Public', 'Public endpoints (no auth required)')
-            .addBearerAuth(
-                {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT',
-                    description: 'Enter JWT token',
-                    name: 'Authorization',
-                    in: 'header',
-                },
-                'JWT-auth',
-            )
-            .build();
+      )
+      .setVersion('1.0')
+      .setContact(
+        'MUHIZI CONSTRUCTION',
+        'https://muhiziconstruction.rw',
+        'info@muhiziconstruction.rw',
+      )
+      .addTag('Authentication', 'User authentication and login')
+      .addTag('Profile', 'Portfolio and profile management')
+      .addTag('Notifications', 'Notification management')
+      .addTag('Public', 'Public endpoints (no auth required)')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Enter JWT token',
+          name: 'Authorization',
+          in: 'header',
+        },
+        'JWT-auth',
+      )
+      .build();
 
-        const document = SwaggerModule.createDocument(app, config);
-        SwaggerModule.setup('api/docs', app, document, {
-            customSiteTitle: 'MUHIZI CONSTRUCTION API Documentation',
-            customCss: '.swagger-ui .topbar { display: none }',
-            swaggerOptions: {
-                persistAuthorization: true,
-                docExpansion: 'none',
-                filter: true,
-                showRequestDuration: true,
-            },
-        });
-    }
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document, {
+      customSiteTitle: 'MUHIZI CONSTRUCTION API Documentation',
+      customCss: '.swagger-ui .topbar { display: none }',
+      swaggerOptions: {
+        persistAuthorization: true,
+        docExpansion: 'none',
+        filter: true,
+        showRequestDuration: true,
+      },
+    });
+  }
 }
