@@ -1,0 +1,11 @@
+.git
+.gitignore
+*.md
+.env
+.env.local
+.env.production
+.env.vercel
+.env.vercel.prod
+.env*
+.gitkeep
+node_modules

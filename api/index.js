@@ -1,1 +1,1 @@
-module.exports = require(process.cwd() + '/dist/lambda').default;
+module.exports = require('../dist/lambda').default;
