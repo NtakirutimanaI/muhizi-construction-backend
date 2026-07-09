@@ -42,6 +42,7 @@ import { ClientReportsModule } from './modules/client-reports/client-reports.mod
 import { DesignReviewsModule } from './modules/design-reviews/design-reviews.module';
 import { StockApprovalsModule } from './modules/stock-approvals/stock-approvals.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { EngineeringSubmissionsModule } from './modules/engineering-submissions/engineering-submissions.module';
 
 @Module({
     imports: [
@@ -61,6 +62,9 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
                         autoLoadEntities: true,
                         synchronize: false,
                         logging: false,
+                        retryAttempts: 1,
+                        retryDelay: 1000,
+                        extra: { max: 1 },
                     };
                 }
                 return {
@@ -119,6 +123,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
         DesignReviewsModule,
         StockApprovalsModule,
         DashboardModule,
+        EngineeringSubmissionsModule,
     ],
     providers: [],
 })

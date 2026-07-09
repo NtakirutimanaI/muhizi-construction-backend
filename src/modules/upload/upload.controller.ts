@@ -96,4 +96,82 @@ export class UploadController {
         await this.uploadService.deleteFile(id);
         return { message: 'File deleted successfully' };
     }
+
+    @Post('national-id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.EMPLOYEE, Role.SITE_ENGINEER, Role.ADMIN)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Upload National ID document', description: 'Upload a National ID image or document for attendance/employee records' })
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ status: 201, description: 'National ID uploaded successfully' })
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadNationalId(@UploadedFile() file: Express.Multer.File) {
+        if (!file) throw new BadRequestException('No file provided');
+        return this.uploadService.uploadFile(file, 'national_ids');
+    }
+
+    @Post('store-bill')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Upload store bill', description: 'Upload a store bill document for products in/out tracking' })
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ status: 201, description: 'Store bill uploaded successfully' })
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadStoreBill(@UploadedFile() file: Express.Multer.File) {
+        if (!file) throw new BadRequestException('No file provided');
+        return this.uploadService.uploadFile(file, 'store_bills');
+    }
+
+    @Post('material-evidence')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Upload material evidence', description: 'Upload evidence photo or PDF for used construction materials' })
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ status: 201, description: 'Material evidence uploaded successfully' })
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadMaterialEvidence(@UploadedFile() file: Express.Multer.File) {
+        if (!file) throw new BadRequestException('No file provided');
+        return this.uploadService.uploadFile(file, 'material_evidence');
+    }
+
+    @Post('engineering-report')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ENGINEERING_STUDIO, Role.ADMIN)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Upload engineering report', description: 'Upload an engineering studio report (PDF, image, video, or document)' })
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ status: 201, description: 'Engineering report uploaded successfully' })
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadEngineeringReport(@UploadedFile() file: Express.Multer.File) {
+        if (!file) throw new BadRequestException('No file provided');
+        return this.uploadService.uploadFile(file, 'engineering_reports');
+    }
+
+    @Post('contract-document')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.MANAGER, Role.FINANCE_DIRECTOR)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Upload contract document', description: 'Upload a contract document (PDF, Word, or other format)' })
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ status: 201, description: 'Contract document uploaded successfully' })
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadContractDocument(@UploadedFile() file: Express.Multer.File) {
+        if (!file) throw new BadRequestException('No file provided');
+        return this.uploadService.uploadFile(file, 'contracts');
+    }
+
+    @Post('project-progress')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Upload project progress media for client', description: 'Upload images, PDFs, or videos showing project progress to share with client' })
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ status: 201, description: 'Project progress media uploaded successfully' })
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadProjectProgress(@UploadedFile() file: Express.Multer.File) {
+        if (!file) throw new BadRequestException('No file provided');
+        return this.uploadService.uploadFile(file, 'project_progress');
+    }
 }
