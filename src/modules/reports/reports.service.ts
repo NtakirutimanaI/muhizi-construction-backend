@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Income } from '../incomes/entities/income.entity';
@@ -14,6 +14,8 @@ export class ReportsService {
     ) { }
 
     async getMonthlyReport(year: number, month: number): Promise<any> {
+        if (month < 1 || month > 12) throw new BadRequestException('Month must be between 1 and 12');
+        if (year < 1900 || year > 2100) throw new BadRequestException('Invalid year');
         const start = `${year}-${String(month).padStart(2, '0')}-01`;
         const endDate = new Date(year, month, 0);
         const end = endDate.toISOString().split('T')[0];

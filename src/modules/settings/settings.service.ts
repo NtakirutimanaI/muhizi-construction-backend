@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SystemSetting } from './entities/system-setting.entity';
@@ -43,6 +43,9 @@ export class SettingsService {
     }
 
     async restore(data: any[]) {
+        if (!Array.isArray(data)) {
+            throw new BadRequestException('Body must be an array of setting objects');
+        }
         await this.repo.clear();
         for (const item of data) {
             await this.repo.save(this.repo.create(item));

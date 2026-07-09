@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Permission } from '../permissions/entities/permission.entity';
@@ -21,6 +21,9 @@ export class PermissionsManagementService {
     }
 
     async updateByRole(role: string, actions: string[]) {
+        if (!Array.isArray(actions)) {
+            throw new BadRequestException('Body must be an array of permission strings');
+        }
         await this.repo.delete({ role });
         const permissions = actions.map(action => this.repo.create({ role, action }));
         return this.repo.save(permissions);

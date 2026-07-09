@@ -1,4 +1,4 @@
-import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FileUpload } from './entities/file-upload.entity';
@@ -84,7 +84,7 @@ export class UploadService {
     async deleteFile(id: string): Promise<void> {
         const fileRecord = await this.fileUploadRepository.findOne({ where: { id } });
         if (!fileRecord) {
-            throw new Error('File record not found');
+            throw new NotFoundException('File record not found');
         }
 
         await this.cloudinaryService.deleteFile(fileRecord.publicId);

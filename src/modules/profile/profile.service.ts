@@ -77,15 +77,18 @@ export class ProfileService {
     async updateProfile(userId: string, updateProfileDto: UpdateProfileDto, userEmail?: string, userRole?: string, ipAddress?: string) {
         try {
             const profile = await this.getProfile(userId);
+            const cleaned = Object.fromEntries(
+                Object.entries(updateProfileDto as any).filter(([_, v]) => v !== undefined)
+            );
             if (updateProfileDto.pageContent !== undefined) {
                 profile.pageContent = {
                     ...(profile.pageContent || {}),
                     ...updateProfileDto.pageContent,
                 };
-                const { pageContent, ...rest } = updateProfileDto as any;
+                const { pageContent, ...rest } = cleaned as any;
                 Object.assign(profile, rest);
             } else {
-                Object.assign(profile, updateProfileDto);
+                Object.assign(profile, cleaned);
             }
             const updatedProfile = await this.profileRepository.save(profile);
 

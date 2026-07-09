@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Resource } from './entities/resource.entity';
@@ -27,7 +27,8 @@ export class ResourcesService {
         return this.repo.findOne({ where: { id } });
     }
 
-    remove(id: string) {
-        return this.repo.delete(id);
+    async remove(id: string) {
+        const result = await this.repo.delete(id);
+        if (result.affected === 0) throw new NotFoundException('Resource not found');
     }
 }

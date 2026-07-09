@@ -40,11 +40,14 @@ export class MlService {
     }
 
     async forecastVisitorTrend(historicalCounts: number[]): Promise<{ trend: string; growth_rate: number; forecast: number; confidence: string }> {
-        const cacheKey = `ml_trend_${historicalCounts.length}`;
-        const cached = this.cacheService.get<any>(cacheKey);
-        if (cached) return cached;
-
         try {
+            if (!historicalCounts || !Array.isArray(historicalCounts) || historicalCounts.length === 0) {
+                return { trend: 'unknown', growth_rate: 0, forecast: 0, confidence: 'low' };
+            }
+            const cacheKey = `ml_trend_${historicalCounts.length}`;
+            const cached = this.cacheService.get<any>(cacheKey);
+            if (cached) return cached;
+
             const response = await fetch(`${this.mlBaseUrl}/ml/visitor-trend`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

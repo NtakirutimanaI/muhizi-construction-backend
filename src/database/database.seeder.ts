@@ -32,19 +32,33 @@ export class DatabaseSeeder {
       });
 
       if (existingUser) {
-        this.logger.log('Profile already exists. Updating...');
-
-        // Update existing profile
-        const profile = await this.profileRepository.findOne({
+        // Check if profile exists
+        let profile = await this.profileRepository.findOne({
           where: { user: { id: existingUser.id } },
         });
 
         if (profile) {
+          this.logger.log('Profile already exists. Updating...');
           Object.assign(profile, this.getProfileData());
           await this.profileRepository.save(profile);
           this.logger.log('✓ Profile updated successfully!');
           return profile;
         }
+
+        // User exists but profile was deleted - create a new one
+        this.logger.log('User exists but profile missing. Creating new profile...');
+        profile = this.profileRepository.create({
+          ...this.getProfileData(),
+          user: existingUser,
+        });
+        await this.profileRepository.save(profile);
+        this.logger.log('✓ Profile created successfully!');
+        this.logger.log('═══════════════════════════════════════');
+        this.logger.log('Email: muhizidesigningacademy@gmail.com');
+        this.logger.log('Password: Muhizi@2024');
+        this.logger.log('Role: Admin / CEO');
+        this.logger.log('═══════════════════════════════════════');
+        return profile;
       }
 
       // Create new user

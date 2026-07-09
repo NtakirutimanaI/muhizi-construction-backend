@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChatConversation } from './entities/chat-conversation.entity';
@@ -95,7 +95,9 @@ export class ChatService {
     }
 
     async deleteConversation(id: string) {
-        return this.conversationRepo.delete(id);
+        const result = await this.conversationRepo.delete(id);
+        if (result.affected === 0) throw new NotFoundException('Conversation not found');
+        return { message: 'Conversation deleted successfully' };
     }
 
     private async generateBotResponse(userQuery: string): Promise<string> {

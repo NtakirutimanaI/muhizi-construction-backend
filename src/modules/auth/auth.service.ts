@@ -451,7 +451,14 @@ export class AuthService {
         if (user.profile) {
             await this.profileRepository.remove(user.profile);
         }
-        await this.userRepository.remove(user);
+        try {
+            await this.userRepository.remove(user);
+        } catch (error: any) {
+            if (error?.code === '23503') {
+                throw new BadRequestException('Cannot delete user: user has associated records (notifications, chat messages, etc.)');
+            }
+            throw error;
+        }
         return { success: true, message: 'User deleted successfully' };
     }
 
