@@ -58,7 +58,7 @@ export class AuthService {
             password: hashedPassword,
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
-            role: 'partner',
+            role: 'client',
         });
 
         await this.userRepository.save(user);
@@ -320,7 +320,7 @@ export class AuthService {
             username,
             password: null,
             googleId: data.googleId,
-            role: 'partner',
+            role: 'client',
         });
 
         await this.userRepository.save(user);
