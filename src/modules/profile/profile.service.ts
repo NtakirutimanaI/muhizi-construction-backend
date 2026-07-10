@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Profile } from './entities/profile.entity';
 import { ContactMessage } from './entities/contact-message.entity';
 import { User } from '../auth/entities/user.entity';
+import { Role } from '../auth/enums/role.enum';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { EventsGateway } from '../events/events.gateway';
@@ -46,16 +47,18 @@ export class ProfileService {
         if (cached) return cached;
 
         let profile;
-        if (!username) {
+        if (username) {
             profile = await this.profileRepository.findOne({
-                where: { isPublic: true },
+                where: { user: { username }, isPublic: true },
                 relations: ['user'],
-                order: { updatedAt: 'DESC' },
             });
-        }
-        if (!profile) {
+        } else {
+            // No username given (e.g. the marketing site's public homepage):
+            // serve the single admin/site-owner account, not just whichever
+            // public profile happens to have been touched most recently —
+            // this repo has many seeded test accounts marked isPublic too.
             profile = await this.profileRepository.findOne({
-                where: username ? { user: { username } } : { isPublic: true },
+                where: { user: { role: Role.ADMIN }, isPublic: true },
                 relations: ['user'],
                 order: { updatedAt: 'DESC' },
             });
