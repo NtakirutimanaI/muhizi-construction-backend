@@ -81,6 +81,19 @@ export class ProfileController {
 
     // Public endpoints
     @Public()
+    @Get('public')
+    @ApiTags('Public')
+    @ApiOperation({
+        summary: 'Get public company profile',
+        description: 'Retrieve the public-facing company profile for the marketing site. No authentication required.'
+    })
+    @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'Profile not found' })
+    async getPublicProfile() {
+        return this.profileService.getPublicProfile();
+    }
+
+    @Public()
     @Post('contact')
     @ApiTags('Public')
     @HttpCode(HttpStatus.OK)
