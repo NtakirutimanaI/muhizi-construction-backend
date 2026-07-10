@@ -1,18 +1,18 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { ClientPortalService } from './client-portal.service';
+import { PartnerPortalService } from './partner-portal.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 
-@ApiTags('Client Portal')
-@Controller('client')
+@ApiTags('Partner Portal')
+@Controller('partner')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.CLIENT)
+@Roles(Role.PARTNER)
 @ApiBearerAuth('JWT-auth')
-export class ClientPortalController {
-    constructor(private readonly service: ClientPortalService) {}
+export class PartnerPortalController {
+    constructor(private readonly service: PartnerPortalService) {}
 
     @Get('projects')
     @ApiOperation({ summary: 'Get my projects' })
@@ -33,7 +33,7 @@ export class ClientPortalController {
     }
 
     @Get('reports')
-    @ApiOperation({ summary: 'Get published client reports' })
+    @ApiOperation({ summary: 'Get published partner reports' })
     getReports() {
         return this.service.getReports();
     }

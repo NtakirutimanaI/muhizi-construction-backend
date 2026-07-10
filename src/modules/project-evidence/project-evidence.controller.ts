@@ -26,7 +26,7 @@ export class ProjectEvidenceController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.CLIENT)
+    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.PARTNER)
     @ApiOperation({ summary: 'Get all project evidence', description: 'Retrieves a list of all project evidence' })
     @ApiResponse({ status: 200, description: 'All project evidence retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

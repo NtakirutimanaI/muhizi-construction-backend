@@ -104,7 +104,7 @@ export class DatabaseSeeder {
       { email: 'finance.director@muhizidesigningacademy.com', username: 'finance_director', role: Role.FINANCE_DIRECTOR, firstName: 'MUTIMUKEYE', lastName: 'Odette', title: 'Finance Director' },
       { email: 'site.engineer@muhizidesigningacademy.com', username: 'site_engineer', role: Role.SITE_ENGINEER, firstName: 'Site', lastName: 'Engineer', title: 'Site Engineer' },
       { email: 'engineering@muhizidesigningacademy.com', username: 'engineering_studio', role: Role.ENGINEERING_STUDIO, firstName: 'Engineering', lastName: 'Studio', title: 'Engineering Studio' },
-      { email: 'client@muhizidesigningacademy.com', username: 'client', role: Role.CLIENT, firstName: 'Client', lastName: 'User', title: 'Client' },
+      { email: 'partner@muhizidesigningacademy.com', username: 'partner', role: Role.PARTNER, firstName: 'Partner', lastName: 'User', title: 'Partner' },
     ];
 
     for (const account of accounts) {

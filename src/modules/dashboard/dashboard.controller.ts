@@ -48,10 +48,10 @@ export class DashboardController {
         return this.service.getEngineeringStudioKpi();
     }
 
-    @Get('client')
-    @Roles(Role.CLIENT)
-    @ApiOperation({ summary: 'Client dashboard KPIs' })
-    getClientKpi() {
-        return this.service.getClientKpi();
+    @Get('partner')
+    @Roles(Role.PARTNER)
+    @ApiOperation({ summary: 'Partner dashboard KPIs' })
+    getPartnerKpi() {
+        return this.service.getPartnerKpi();
     }
 }
