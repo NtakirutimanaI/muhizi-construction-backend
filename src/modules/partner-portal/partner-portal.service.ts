@@ -6,7 +6,7 @@ import { ProjectEvidence } from '../project-evidence/entities/project-evidence.e
 import { ClientReport } from '../client-reports/entities/client-report.entity';
 
 @Injectable()
-export class ClientPortalService {
+export class PartnerPortalService {
     constructor(
         @InjectRepository(Project)
         private projectRepo: Repository<Project>,

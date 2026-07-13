@@ -27,7 +27,7 @@ export class SitesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, Role.CLIENT)
     @ApiOperation({ summary: 'Get all sites', description: 'Retrieves a list of all sites' })
     @ApiResponse({ status: 200, description: 'All sites retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -37,7 +37,7 @@ export class SitesController {
     }
 
     @Get('project/:projectId')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, Role.CLIENT)
     @ApiOperation({ summary: 'Get sites by project', description: 'Retrieves all sites for a given project' })
     @ApiResponse({ status: 200, description: 'Sites retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -48,7 +48,7 @@ export class SitesController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, Role.CLIENT)
     @ApiOperation({ summary: 'Get site by ID', description: 'Retrieves a single site by its ID' })
     @ApiResponse({ status: 200, description: 'Site retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

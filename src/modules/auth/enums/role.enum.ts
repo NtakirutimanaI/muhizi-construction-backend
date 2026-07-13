@@ -8,4 +8,5 @@ export enum Role {
     FINANCE_DIRECTOR = 'finance_director',
     SITE_ENGINEER = 'site_engineer',
     ENGINEERING_STUDIO = 'engineering_studio',
+    PARTNER = 'partner',
 }
