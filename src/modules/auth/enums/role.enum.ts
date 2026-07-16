@@ -3,10 +3,10 @@ export enum Role {
     SITE_MANAGER = 'site_manager',
     EMPLOYEE = 'employee',
     CLIENT = 'client',
+    PARTNER = 'partner',
     MANAGER = 'manager',
     MANAGING_DIRECTOR = 'managing_director',
     FINANCE_DIRECTOR = 'finance_director',
     SITE_ENGINEER = 'site_engineer',
     ENGINEERING_STUDIO = 'engineering_studio',
-    PARTNER = 'partner',
 }

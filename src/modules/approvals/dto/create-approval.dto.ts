@@ -12,10 +12,10 @@ export class CreateApprovalDto {
     @IsNotEmpty({ message: 'title is required' })
     title: string;
 
-    @ApiProperty({ example: 'John Doe', description: 'Name of the person requesting approval' })
+    @ApiProperty({ example: 'John Doe', description: 'Name of the person requesting approval — set automatically from the authenticated user, this is ignored if sent by the client', required: false })
     @IsString({ message: 'requester must be a string' })
-    @IsNotEmpty({ message: 'requester is required' })
-    requester: string;
+    @IsOptional()
+    requester?: string;
 
     @ApiProperty({ example: 1500.0, description: 'Monetary amount associated with the request', required: false })
     @IsNumber({}, { message: 'amount must be a number' })

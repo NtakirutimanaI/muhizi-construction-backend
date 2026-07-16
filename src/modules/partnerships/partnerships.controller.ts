@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -47,15 +47,17 @@ export class PartnershipsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
-    @ApiOperation({ summary: 'Update partnership', description: 'Update an existing partnership' })
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGING_DIRECTOR)
+    @ApiOperation({ summary: 'Update partnership', description: 'Update an existing partnership. Moving status out of "pending" records the reviewer automatically.' })
     @ApiBody({ type: CreatePartnershipDto })
     @ApiResponse({ status: 200, description: 'Partnership updated successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    update(@Param('id') id: string, @Body() dto: CreatePartnershipDto) {
-        return this.service.update(id, dto);
+    update(@Param('id') id: string, @Body() dto: CreatePartnershipDto, @Request() req) {
+        const user = req.user;
+        const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+        return this.service.update(id, dto, user.id, name);
     }
 
     @Delete(':id')

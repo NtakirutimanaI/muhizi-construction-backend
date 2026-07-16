@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Project, ProjectStatus } from '../projects/entities/project.entity';
+import { Project } from '../projects/entities/project.entity';
 import { ProjectEvidence } from '../project-evidence/entities/project-evidence.entity';
-import { ClientReport } from '../client-reports/entities/client-report.entity';
 
 @Injectable()
 export class PartnerPortalService {
@@ -12,42 +11,30 @@ export class PartnerPortalService {
         private projectRepo: Repository<Project>,
         @InjectRepository(ProjectEvidence)
         private evidenceRepo: Repository<ProjectEvidence>,
-        @InjectRepository(ClientReport)
-        private reportRepo: Repository<ClientReport>,
     ) {}
 
-    async getProjects() {
+    async getProjects(partnerUserId: string) {
         return this.projectRepo.find({
+            where: { partnerUserId },
             relations: ['sites'],
             order: { createdAt: 'DESC' },
         });
     }
 
-    async getProjectProgress(projectId: string) {
+    /** Loads a project only if it belongs to this partner — throws 404 otherwise. */
+    private async getOwnedProject(projectId: string, partnerUserId: string): Promise<Project> {
         const project = await this.projectRepo.findOne({
-            where: { id: projectId },
-            relations: ['sites'],
+            where: { id: projectId, partnerUserId },
         });
         if (!project) throw new NotFoundException('Project not found');
-        const evidenceCount = await this.evidenceRepo.count();
-        const reports = await this.reportRepo.find({
-            where: { projectId, status: 'published' },
-            order: { createdAt: 'DESC' },
-        });
-        return { project, evidenceCount, reports };
+        return project;
     }
 
-    async getProjectEvidence(projectId: string) {
+    async getProjectEvidence(projectId: string, partnerUserId: string) {
+        await this.getOwnedProject(projectId, partnerUserId);
         return this.evidenceRepo.find({
-            order: { createdAt: 'DESC' },
-        });
-    }
-
-    async getReports() {
-        return this.reportRepo.find({
-            where: { status: 'published' },
-            relations: ['project', 'createdBy'],
-            order: { createdAt: 'DESC' },
+            where: { site: { projectId }, approvedForClient: true } as any,
+            order: { date: 'DESC', createdAt: 'DESC' },
         });
     }
 }

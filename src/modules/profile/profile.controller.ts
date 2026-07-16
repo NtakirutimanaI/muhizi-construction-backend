@@ -19,6 +19,7 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { Role } from '../auth/enums/role.enum';
 
@@ -65,7 +66,8 @@ export class ProfileController {
 
     @Delete()
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @RequirePermissions('profile:delete')
     @ApiBearerAuth('JWT-auth')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
@@ -111,11 +113,12 @@ export class ProfileController {
     // Admin message endpoints
     @Get('messages')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @RequirePermissions('messages:read')
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Get all contact messages',
-        description: 'Retrieve all contact messages (admin only)'
+        description: 'Retrieve all contact messages'
     })
     @ApiResponse({ status: 200, description: 'Messages retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -125,11 +128,12 @@ export class ProfileController {
 
     @Post('messages/:id/read')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @RequirePermissions('messages:update')
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Mark message as read',
-        description: 'Update message status to read (admin only)'
+        description: 'Update message status to read'
     })
     @ApiParam({ name: 'id', description: 'Message ID' })
     @ApiResponse({ status: 200, description: 'Message marked as read' })
@@ -141,11 +145,12 @@ export class ProfileController {
 
     @Delete('messages')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @RequirePermissions('messages:delete')
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Delete all messages',
-        description: 'Delete all contact messages (admin only)'
+        description: 'Delete all contact messages'
     })
     @ApiResponse({ status: 200, description: 'Messages deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

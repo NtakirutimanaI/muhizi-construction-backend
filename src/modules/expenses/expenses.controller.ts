@@ -3,9 +3,12 @@ import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nes
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
+
+const TOGGLE_ROLES = [Role.FINANCE_DIRECTOR];
 
 @ApiTags('Expenses')
 @ApiBearerAuth('JWT-auth')
@@ -15,7 +18,8 @@ export class ExpensesController {
     constructor(private readonly service: ExpensesService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @RequirePermissions('expenses:create')
     @ApiOperation({ summary: 'Create expense', description: 'Create a new expense' })
     @ApiBody({ type: CreateExpenseDto })
     @ApiResponse({ status: 201, description: 'Expense created successfully' })
@@ -26,7 +30,8 @@ export class ExpensesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @RequirePermissions('expenses:read')
     @ApiOperation({ summary: 'Get all expenses', description: 'Retrieve all expenses' })
     @ApiResponse({ status: 200, description: 'All expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +41,8 @@ export class ExpensesController {
     }
 
     @Get('total')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @RequirePermissions('expenses:read')
     @ApiOperation({ summary: 'Get total expenses', description: 'Retrieve the total amount of expenses' })
     @ApiResponse({ status: 200, description: 'Total expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +53,8 @@ export class ExpensesController {
     }
 
     @Get('range')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @RequirePermissions('expenses:read')
     @ApiOperation({ summary: 'Get expenses by date range', description: 'Retrieve expenses filtered by date range' })
     @ApiResponse({ status: 200, description: 'Expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -57,7 +64,8 @@ export class ExpensesController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @RequirePermissions('expenses:read')
     @ApiOperation({ summary: 'Get expense by ID', description: 'Retrieve an expense by ID' })
     @ApiResponse({ status: 200, description: 'Expense retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -68,7 +76,8 @@ export class ExpensesController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @RequirePermissions('expenses:update')
     @ApiOperation({ summary: 'Update expense', description: 'Update an existing expense' })
     @ApiBody({ type: CreateExpenseDto })
     @ApiResponse({ status: 200, description: 'Expense updated successfully' })
@@ -81,6 +90,7 @@ export class ExpensesController {
 
     @Delete(':id')
     @Roles(Role.ADMIN)
+    @RequirePermissions('expenses:delete')
     @ApiOperation({ summary: 'Delete expense', description: 'Delete an expense' })
     @ApiResponse({ status: 200, description: 'Expense deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

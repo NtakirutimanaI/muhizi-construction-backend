@@ -58,6 +58,16 @@ export class CreateProjectDto {
     @IsOptional()
     clientContact?: string;
 
+    @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', required: false, description: 'User ID (role=client) who can view this project in the client portal' })
+    @IsString({ message: 'clientUserId must be a string' })
+    @IsOptional()
+    clientUserId?: string;
+
+    @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440001', required: false, description: 'User ID (role=partner) who can view this project in the partner portal' })
+    @IsString({ message: 'partnerUserId must be a string' })
+    @IsOptional()
+    partnerUserId?: string;
+
     @ApiProperty({ example: 35, required: false, description: 'Project progress percentage (0-100)' })
     @IsNumber({}, { message: 'progress must be a number' })
     @Min(0, { message: 'progress must be between 0 and 100' })

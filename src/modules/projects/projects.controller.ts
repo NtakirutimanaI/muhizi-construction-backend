@@ -3,9 +3,12 @@ import { ApiBearerAuth, ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nes
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
+
+const TOGGLE_ROLES = [Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER];
 
 @ApiTags('Projects')
 @ApiBearerAuth('JWT-auth')
@@ -15,7 +18,8 @@ export class ProjectsController {
     constructor(private readonly service: ProjectsService) { }
 
     @Post()
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, ...TOGGLE_ROLES)
+    @RequirePermissions('projects:create')
     @ApiOperation({ summary: 'Create project', description: 'Creates a new project' })
     @ApiBody({ type: CreateProjectDto })
     @ApiResponse({ status: 201, description: 'Project created successfully' })
@@ -26,7 +30,8 @@ export class ProjectsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @RequirePermissions('projects:read')
     @ApiOperation({ summary: 'Get all projects', description: 'Retrieves a list of all projects' })
     @ApiResponse({ status: 200, description: 'All projects retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +41,8 @@ export class ProjectsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @RequirePermissions('projects:read')
     @ApiOperation({ summary: 'Get project by ID', description: 'Retrieves a single project by its ID' })
     @ApiResponse({ status: 200, description: 'Project retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +53,8 @@ export class ProjectsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, ...TOGGLE_ROLES)
+    @RequirePermissions('projects:update')
     @ApiOperation({ summary: 'Update project', description: 'Updates an existing project by ID' })
     @ApiBody({ type: CreateProjectDto })
     @ApiResponse({ status: 200, description: 'Project updated successfully' })
@@ -59,7 +66,8 @@ export class ProjectsController {
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, ...TOGGLE_ROLES)
+    @RequirePermissions('projects:delete')
     @ApiOperation({ summary: 'Delete project', description: 'Deletes a project by ID' })
     @ApiResponse({ status: 200, description: 'Project deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
