@@ -26,7 +26,7 @@ export class ProjectEvidenceController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.CLIENT)
+    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.PARTNER, Role.CLIENT)
     @ApiOperation({ summary: 'Get all project evidence', description: 'Retrieves a list of all project evidence' })
     @ApiResponse({ status: 200, description: 'All project evidence retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +36,7 @@ export class ProjectEvidenceController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.CLIENT)
     @ApiOperation({ summary: 'Get project evidence by ID', description: 'Retrieves a single project evidence record by its ID' })
     @ApiResponse({ status: 200, description: 'Project evidence retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

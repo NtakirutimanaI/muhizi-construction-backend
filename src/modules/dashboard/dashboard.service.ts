@@ -69,7 +69,7 @@ export class DashboardService {
         return { assignedDesigns: 0, pendingSubmissions: 0 };
     }
 
-    async getClientKpi() {
+    async getPartnerKpi() {
         const projects = await this.projectRepo.find();
         return { totalProjects: projects.length, activeProjects: projects.filter(p => p.status === ProjectStatus.IN_PROGRESS).length };
     }
