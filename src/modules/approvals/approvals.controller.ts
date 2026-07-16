@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -22,8 +22,10 @@ export class ApprovalsController {
     @ApiResponse({ status: 201, description: 'Approval created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    create(@Body() dto: CreateApprovalDto) {
-        return this.service.create(dto);
+    create(@Body() dto: CreateApprovalDto, @Request() req) {
+        const user = req.user;
+        const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+        return this.service.create(dto, user.id, name);
     }
 
     @Get()
@@ -55,8 +57,10 @@ export class ApprovalsController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    update(@Param('id') id: string, @Body() dto: UpdateApprovalDto) {
-        return this.service.update(id, dto);
+    update(@Param('id') id: string, @Body() dto: UpdateApprovalDto, @Request() req) {
+        const user = req.user;
+        const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+        return this.service.update(id, dto, user.id, name);
     }
 
     @Delete(':id')

@@ -3,9 +3,12 @@ import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nes
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { DesignsService } from './designs.service';
 import { CreateDesignDto } from './dto/create-design.dto';
+
+const TOGGLE_ROLES = [Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER];
 
 @ApiTags('Designs')
 @ApiBearerAuth('JWT-auth')
@@ -15,7 +18,8 @@ export class DesignsController {
     constructor(private readonly service: DesignsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @RequirePermissions('designs:create')
     @ApiOperation({ summary: 'Create design', description: 'Create a new design' })
     @ApiBody({ type: CreateDesignDto })
     @ApiResponse({ status: 201, description: 'Design created successfully' })
@@ -26,7 +30,8 @@ export class DesignsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @RequirePermissions('designs:read')
     @ApiOperation({ summary: 'Get all designs', description: 'Retrieve all designs' })
     @ApiResponse({ status: 200, description: 'All designs retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +41,8 @@ export class DesignsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @RequirePermissions('designs:read')
     @ApiOperation({ summary: 'Get design by ID', description: 'Retrieve a design by ID' })
     @ApiResponse({ status: 200, description: 'Design retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +53,8 @@ export class DesignsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @RequirePermissions('designs:update')
     @ApiOperation({ summary: 'Update design', description: 'Update an existing design' })
     @ApiBody({ type: CreateDesignDto })
     @ApiResponse({ status: 200, description: 'Design updated successfully' })
@@ -59,7 +66,8 @@ export class DesignsController {
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, ...TOGGLE_ROLES)
+    @RequirePermissions('designs:delete')
     @ApiOperation({ summary: 'Delete design', description: 'Delete a design' })
     @ApiResponse({ status: 200, description: 'Design deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

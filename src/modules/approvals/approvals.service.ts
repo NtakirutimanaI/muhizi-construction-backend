@@ -11,8 +11,8 @@ export class ApprovalsService {
         private repo: Repository<Approval>,
     ) { }
 
-    async create(dto: CreateApprovalDto): Promise<Approval> {
-        const entity = this.repo.create(dto);
+    async create(dto: CreateApprovalDto, requesterId: string, requesterName: string): Promise<Approval> {
+        const entity = this.repo.create({ ...dto, requester: requesterName, requesterId });
         return this.repo.save(entity);
     }
 
@@ -26,8 +26,13 @@ export class ApprovalsService {
         return entity;
     }
 
-    async update(id: string, dto: Partial<CreateApprovalDto>): Promise<Approval> {
-        await this.repo.update(id, dto as any);
+    async update(id: string, dto: Partial<CreateApprovalDto>, reviewerId?: string, reviewerName?: string): Promise<Approval> {
+        const patch: Partial<Approval> = { ...dto };
+        if (dto.status && dto.status !== 'pending' && reviewerId) {
+            patch.reviewedById = reviewerId;
+            patch.reviewedByName = reviewerName;
+        }
+        await this.repo.update(id, patch as any);
         return this.findOne(id);
     }
 

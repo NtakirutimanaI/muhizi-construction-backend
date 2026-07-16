@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Partnership } from './entities/partnership.entity';
+import { Partnership, PartnershipStatus } from './entities/partnership.entity';
 import { CreatePartnershipDto } from './dto/create-partnership.dto';
 
 @Injectable()
@@ -12,22 +12,29 @@ export class PartnershipsService {
     ) { }
 
     async create(dto: CreatePartnershipDto): Promise<Partnership> {
-        const partnership = this.repo.create(dto);
+        const partnership = this.repo.create({ ...dto, status: dto.status || PartnershipStatus.PENDING });
         return this.repo.save(partnership);
     }
 
     async findAll(): Promise<Partnership[]> {
-        return this.repo.find({ order: { createdAt: 'DESC' } });
+        return this.repo.find({ order: { createdAt: 'DESC' }, relations: ['project'] });
     }
 
     async findOne(id: string): Promise<Partnership> {
-        const partnership = await this.repo.findOne({ where: { id } });
+        const partnership = await this.repo.findOne({ where: { id }, relations: ['project'] });
         if (!partnership) throw new NotFoundException('Partnership not found');
         return partnership;
     }
 
-    async update(id: string, dto: Partial<CreatePartnershipDto>): Promise<Partnership> {
-        await this.repo.update(id, dto as any);
+    async update(id: string, dto: Partial<CreatePartnershipDto>, reviewerId?: string, reviewerName?: string): Promise<Partnership> {
+        const current = await this.findOne(id);
+        const patch: Partial<Partnership> = { ...dto } as any;
+        if (dto.status && dto.status !== current.status && dto.status !== PartnershipStatus.PENDING && reviewerId) {
+            patch.reviewedById = reviewerId;
+            patch.reviewedByName = reviewerName;
+            patch.reviewedAt = new Date();
+        }
+        await this.repo.update(id, patch as any);
         return this.findOne(id);
     }
 

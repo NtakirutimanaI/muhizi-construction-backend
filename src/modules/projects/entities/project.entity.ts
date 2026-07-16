@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { Site } from '../../sites/entities/site.entity';
+import { User } from '../../auth/entities/user.entity';
 
 export enum ProjectStatus {
     PLANNING = 'planning',
@@ -30,6 +31,22 @@ export class Project {
 
     @Column({ nullable: true })
     clientContact: string;
+
+    @Column({ nullable: true })
+    @Index('idx_project_client_user')
+    clientUserId: string;
+
+    @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'clientUserId' })
+    clientUser: User;
+
+    @Column({ nullable: true })
+    @Index('idx_project_partner_user')
+    partnerUserId: string;
+
+    @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'partnerUserId' })
+    partnerUser: User;
 
     @Column({ type: 'varchar', length: 50, default: ProjectType.CONSTRUCTION })
     type: string;

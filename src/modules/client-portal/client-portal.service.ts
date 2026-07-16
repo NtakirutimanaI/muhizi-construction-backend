@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Project, ProjectStatus } from '../projects/entities/project.entity';
+import { In, Repository } from 'typeorm';
+import { Project } from '../projects/entities/project.entity';
 import { ProjectEvidence } from '../project-evidence/entities/project-evidence.entity';
 import { ClientReport } from '../client-reports/entities/client-report.entity';
 
@@ -16,20 +16,29 @@ export class ClientPortalService {
         private reportRepo: Repository<ClientReport>,
     ) {}
 
-    async getProjects() {
+    async getProjects(clientUserId: string) {
         return this.projectRepo.find({
+            where: { clientUserId },
             relations: ['sites'],
             order: { createdAt: 'DESC' },
         });
     }
 
-    async getProjectProgress(projectId: string) {
+    /** Loads a project only if it belongs to this client — throws 404 otherwise (never leaks another client's project). */
+    private async getOwnedProject(projectId: string, clientUserId: string): Promise<Project> {
         const project = await this.projectRepo.findOne({
-            where: { id: projectId },
+            where: { id: projectId, clientUserId },
             relations: ['sites'],
         });
         if (!project) throw new NotFoundException('Project not found');
-        const evidenceCount = await this.evidenceRepo.count();
+        return project;
+    }
+
+    async getProjectProgress(projectId: string, clientUserId: string) {
+        const project = await this.getOwnedProject(projectId, clientUserId);
+        const evidenceCount = await this.evidenceRepo.count({
+            where: { site: { projectId }, approvedForClient: true } as any,
+        });
         const reports = await this.reportRepo.find({
             where: { projectId, status: 'published' },
             order: { createdAt: 'DESC' },
@@ -37,15 +46,19 @@ export class ClientPortalService {
         return { project, evidenceCount, reports };
     }
 
-    async getProjectEvidence(projectId: string) {
+    async getProjectEvidence(projectId: string, clientUserId: string) {
+        await this.getOwnedProject(projectId, clientUserId);
         return this.evidenceRepo.find({
-            order: { createdAt: 'DESC' },
+            where: { site: { projectId }, approvedForClient: true } as any,
+            order: { date: 'DESC', createdAt: 'DESC' },
         });
     }
 
-    async getReports() {
+    async getReports(clientUserId: string) {
+        const projects = await this.projectRepo.find({ where: { clientUserId }, select: ['id'] });
+        if (projects.length === 0) return [];
         return this.reportRepo.find({
-            where: { status: 'published' },
+            where: { projectId: In(projects.map((p) => p.id)), status: 'published' },
             relations: ['project', 'createdBy'],
             order: { createdAt: 'DESC' },
         });

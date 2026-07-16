@@ -14,6 +14,9 @@ export class Approval {
     @Column()
     requester: string;
 
+    @Column({ nullable: true })
+    requesterId: string;
+
     @Column({ type: 'text' })
     description: string;
 
@@ -31,6 +34,12 @@ export class Approval {
 
     @Column({ type: 'date', nullable: true })
     reviewedAt: string;
+
+    @Column({ nullable: true })
+    reviewedById: string;
+
+    @Column({ nullable: true })
+    reviewedByName: string;
 
     @CreateDateColumn()
     createdAt: Date;

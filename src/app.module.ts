@@ -38,6 +38,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { PermissionsManagementModule } from './modules/permissions-management/permissions-management.module';
 import { ClientPortalModule } from './modules/client-portal/client-portal.module';
+import { PartnerPortalModule } from './modules/partner-portal/partner-portal.module';
 import { SalaryRatesModule } from './modules/salary-rates/salary-rates.module';
 import { ClientReportsModule } from './modules/client-reports/client-reports.module';
 import { DesignReviewsModule } from './modules/design-reviews/design-reviews.module';
@@ -119,6 +120,7 @@ import { EngineeringSubmissionsModule } from './modules/engineering-submissions/
         SettingsModule,
         PermissionsManagementModule,
         ClientPortalModule,
+        PartnerPortalModule,
         SalaryRatesModule,
         ClientReportsModule,
         DesignReviewsModule,
