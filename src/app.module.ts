@@ -43,6 +43,7 @@ import { DesignReviewsModule } from './modules/design-reviews/design-reviews.mod
 import { StockApprovalsModule } from './modules/stock-approvals/stock-approvals.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { EngineeringSubmissionsModule } from './modules/engineering-submissions/engineering-submissions.module';
+import { DailyReportsModule } from './modules/daily-reports/daily-reports.module';
 
 @Module({
     imports: [
@@ -123,6 +124,7 @@ import { EngineeringSubmissionsModule } from './modules/engineering-submissions/
         StockApprovalsModule,
         DashboardModule,
         EngineeringSubmissionsModule,
+        DailyReportsModule,
     ],
     controllers: [AppController],
     providers: [],
