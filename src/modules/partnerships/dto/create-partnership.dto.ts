@@ -1,9 +1,14 @@
 import { IsString, IsNotEmpty, IsOptional, IsEnum, IsEmail, IsDateString, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { PartnershipType, PartnershipStatus } from '../entities/partnership.entity';
+import { PartnershipType, PartnershipStatus, PartnershipEntityKind } from '../entities/partnership.entity';
 
 export class CreatePartnershipDto {
-    @ApiProperty({ example: 'Kigali Cement Ltd', description: 'Company name of the partner' })
+    @ApiProperty({ example: 'company', required: false, description: 'Whether the partner is a registered company or an individual', enum: PartnershipEntityKind })
+    @IsEnum(PartnershipEntityKind, { message: 'entityKind must be a valid entity kind' })
+    @IsOptional()
+    entityKind?: PartnershipEntityKind;
+
+    @ApiProperty({ example: 'Kigali Cement Ltd', description: 'Company name of the partner, or the individual\'s full name when entityKind is "individual"' })
     @IsString({ message: 'companyName must be a string' })
     @IsNotEmpty({ message: 'companyName is required' })
     companyName: string;
@@ -41,6 +46,11 @@ export class CreatePartnershipDto {
     @ApiProperty({ example: 'supplier', description: 'Type of partnership', enum: PartnershipType })
     @IsEnum(PartnershipType, { message: 'partnershipType must be a valid partnership type' })
     partnershipType: PartnershipType;
+
+    @ApiProperty({ example: 'Landowner', required: false, description: 'Free-text description of the relationship, required when partnershipType is "other"' })
+    @IsString({ message: 'otherTypeDescription must be a string' })
+    @IsOptional()
+    otherTypeDescription?: string;
 
     @ApiProperty({ example: 'pending', required: false, description: 'Partnership status', enum: PartnershipStatus })
     @IsEnum(PartnershipStatus, { message: 'status must be a valid partnership status' })

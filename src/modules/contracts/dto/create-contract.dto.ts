@@ -7,6 +7,11 @@ export class CreateContractDto {
     @IsNotEmpty({ message: 'title is required' })
     title: string;
 
+    @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', required: false, description: 'ID of the employee this contract covers' })
+    @IsString({ message: 'employeeId must be a string' })
+    @IsOptional()
+    employeeId?: string;
+
     @ApiProperty({ example: 'John Doe', description: 'Employee name covered by the contract' })
     @IsString({ message: 'employeeName must be a string' })
     @IsNotEmpty({ message: 'employeeName is required' })

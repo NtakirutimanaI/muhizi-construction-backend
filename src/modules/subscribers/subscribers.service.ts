@@ -5,7 +5,6 @@ import { Subscriber } from './entities/subscriber.entity';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
 import { SendUpdateDto } from './dto/send-update.dto';
-import { MlService } from '../ml/ml.service';
 
 @Injectable()
 export class SubscribersService {
@@ -14,7 +13,6 @@ export class SubscribersService {
     constructor(
         @InjectRepository(Subscriber)
         private repo: Repository<Subscriber>,
-        private mlService: MlService,
     ) {}
 
     async subscribe(dto: CreateSubscriberDto): Promise<Subscriber> {
@@ -27,16 +25,7 @@ export class SubscribersService {
             throw new ConflictException('Email already subscribed');
         }
 
-        const mlResult = await this.mlService.validateEmail(dto.email);
-
-        const entity = this.repo.create({
-            email: dto.email,
-            source: dto.source || 'footer',
-            mlScore: mlResult.score,
-            mlCategory: mlResult.category,
-            isActive: mlResult.score >= 20,
-        });
-
+        const entity = this.repo.create({ email: dto.email, isActive: true });
         return this.repo.save(entity);
     }
 
@@ -58,6 +47,13 @@ export class SubscribersService {
     async remove(id: string): Promise<void> {
         const result = await this.repo.delete(id);
         if (result.affected === 0) throw new NotFoundException('Subscriber not found');
+    }
+
+    async unsubscribe(id: string): Promise<Subscriber> {
+        const entity = await this.repo.findOne({ where: { id } });
+        if (!entity) throw new NotFoundException('Subscriber not found');
+        entity.isActive = false;
+        return this.repo.save(entity);
     }
 
     async sendUpdate(dto: SendUpdateDto): Promise<{ sent: number; total: number }> {

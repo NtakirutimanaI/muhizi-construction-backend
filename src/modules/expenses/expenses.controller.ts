@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Query, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
@@ -19,19 +18,19 @@ export class ExpensesController {
 
     @Post()
     @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
-    @RequirePermissions('expenses:create')
     @ApiOperation({ summary: 'Create expense', description: 'Create a new expense' })
     @ApiBody({ type: CreateExpenseDto })
     @ApiResponse({ status: 201, description: 'Expense created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    create(@Body() dto: CreateExpenseDto) {
-        return this.service.create(dto);
+    create(@Body() dto: CreateExpenseDto, @Request() req) {
+        const user = req.user;
+        const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+        return this.service.create(dto, user.id, name);
     }
 
     @Get()
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
-    @RequirePermissions('expenses:read')
     @ApiOperation({ summary: 'Get all expenses', description: 'Retrieve all expenses' })
     @ApiResponse({ status: 200, description: 'All expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -42,7 +41,6 @@ export class ExpensesController {
 
     @Get('total')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
-    @RequirePermissions('expenses:read')
     @ApiOperation({ summary: 'Get total expenses', description: 'Retrieve the total amount of expenses' })
     @ApiResponse({ status: 200, description: 'Total expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -54,7 +52,6 @@ export class ExpensesController {
 
     @Get('range')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
-    @RequirePermissions('expenses:read')
     @ApiOperation({ summary: 'Get expenses by date range', description: 'Retrieve expenses filtered by date range' })
     @ApiResponse({ status: 200, description: 'Expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -65,7 +62,6 @@ export class ExpensesController {
 
     @Get(':id')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
-    @RequirePermissions('expenses:read')
     @ApiOperation({ summary: 'Get expense by ID', description: 'Retrieve an expense by ID' })
     @ApiResponse({ status: 200, description: 'Expense retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -77,7 +73,6 @@ export class ExpensesController {
 
     @Put(':id')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
-    @RequirePermissions('expenses:update')
     @ApiOperation({ summary: 'Update expense', description: 'Update an existing expense' })
     @ApiBody({ type: CreateExpenseDto })
     @ApiResponse({ status: 200, description: 'Expense updated successfully' })
@@ -88,15 +83,6 @@ export class ExpensesController {
         return this.service.update(id, dto);
     }
 
-    @Delete(':id')
-    @Roles(Role.ADMIN)
-    @RequirePermissions('expenses:delete')
-    @ApiOperation({ summary: 'Delete expense', description: 'Delete an expense' })
-    @ApiResponse({ status: 200, description: 'Expense deleted successfully' })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
-    @ApiResponse({ status: 403, description: 'Forbidden' })
-    @ApiResponse({ status: 404, description: 'Not found' })
-    remove(@Param('id') id: string) {
-        return this.service.remove(id);
-    }
+    // Financial records are not hard-deletable — the audit trail depends on every
+    // recorded expense staying on file. Mistakes get fixed via update, not removed.
 }

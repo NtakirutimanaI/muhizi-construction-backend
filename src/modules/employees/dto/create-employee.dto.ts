@@ -23,6 +23,11 @@ export class CreateEmployeeDto {
     @IsOptional()
     phone?: string;
 
+    @ApiProperty({ example: '1198000123456789', required: false, description: 'National ID number — settable once, locked after' })
+    @IsString({ message: 'nationalId must be a string' })
+    @IsOptional()
+    nationalId?: string;
+
     @ApiProperty({ example: 'Site Engineer', required: false, description: 'Employee job position' })
     @IsString({ message: 'position must be a string' })
     @IsOptional()

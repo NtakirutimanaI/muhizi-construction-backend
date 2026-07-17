@@ -3,10 +3,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Subscriber } from './entities/subscriber.entity';
 import { SubscribersController } from './subscribers.controller';
 import { SubscribersService } from './subscribers.service';
-import { MlModule } from '../ml/ml.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Subscriber]), MlModule],
+    imports: [TypeOrmModule.forFeature([Subscriber])],
     controllers: [SubscribersController],
     providers: [SubscribersService],
 })
