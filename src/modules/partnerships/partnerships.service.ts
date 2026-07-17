@@ -12,7 +12,10 @@ export class PartnershipsService {
     ) { }
 
     async create(dto: CreatePartnershipDto): Promise<Partnership> {
-        const partnership = this.repo.create({ ...dto, status: dto.status || PartnershipStatus.PENDING });
+        // Admin is both the sole submitter (data-entry proxy for the external partner) and the
+        // sole reviewer of this record, so there is no one else to move it out of "pending" —
+        // it goes straight to Active unless Admin explicitly requests otherwise.
+        const partnership = this.repo.create({ ...dto, status: dto.status || PartnershipStatus.ACTIVE });
         return this.repo.save(partnership);
     }
 

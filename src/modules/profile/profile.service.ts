@@ -11,7 +11,6 @@ import { EventsGateway } from '../events/events.gateway';
 import { NotificationService } from '../notification/services/notification.service';
 import { NotificationType } from '../notification/entities/notification.entity';
 import { CacheService } from '../cache/cache.service';
-import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class ProfileService {
@@ -25,7 +24,6 @@ export class ProfileService {
         private eventsGateway: EventsGateway,
         private notificationService: NotificationService,
         private cacheService: CacheService,
-        private auditService: AuditService,
     ) { }
 
     async getProfile(userId: string) {
@@ -77,7 +75,7 @@ export class ProfileService {
         return result;
     }
 
-    async updateProfile(userId: string, updateProfileDto: UpdateProfileDto, userEmail?: string, userRole?: string, ipAddress?: string) {
+    async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
         try {
             const profile = await this.getProfile(userId);
             const cleaned = Object.fromEntries(
@@ -109,17 +107,6 @@ export class ProfileService {
             } catch (notifyError) {
                 console.warn('Failed to create internal notification:', notifyError.message);
             }
-
-            this.auditService.log({
-                userId,
-                userEmail,
-                userRole,
-                action: 'profile.update',
-                entity: 'Profile',
-                entityId: profile.id,
-                metadata: { changes: Object.keys(updateProfileDto) },
-                ipAddress,
-            });
 
             if (this.eventsGateway) {
                 try {
@@ -212,8 +199,4 @@ export class ProfileService {
         return this.contactMessageRepository.save(message);
     }
 
-    async deleteAllMessages() {
-        await this.contactMessageRepository.clear();
-        return { message: 'All messages deleted successfully' };
-    }
 }

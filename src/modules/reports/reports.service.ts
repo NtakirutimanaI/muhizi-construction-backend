@@ -42,6 +42,7 @@ export class ReportsService {
             expenseCount: expenses.length,
             incomeByCategory: this.groupBy(incomes, 'category'),
             expenseByCategory: this.groupBy(expenses, 'category'),
+            transactions: this.toTransactions(incomes, expenses),
         };
     }
 
@@ -80,6 +81,7 @@ export class ReportsService {
             totalExpense,
             netProfit: totalIncome - totalExpense,
             monthlyData,
+            transactions: this.toTransactions(incomes, expenses),
         };
     }
 
@@ -89,5 +91,31 @@ export class ReportsService {
             acc[k] = (acc[k] || 0) + Number(item.amount);
             return acc;
         }, {});
+    }
+
+    /** Unifies income/expense records into the line-item detail a report reads out loud:
+     * what was recorded, by whom, for how much — the audit trail behind the summary cards. */
+    private toTransactions(incomes: Income[], expenses: Expense[]) {
+        const incomeRows = incomes.map(i => ({
+            id: i.id,
+            type: 'income' as const,
+            description: i.description,
+            category: i.category,
+            amount: Number(i.amount),
+            date: i.date,
+            party: i.source || null,
+            recordedByName: i.recordedByName || null,
+        }));
+        const expenseRows = expenses.map(e => ({
+            id: e.id,
+            type: 'expense' as const,
+            description: e.description,
+            category: e.category,
+            amount: Number(e.amount),
+            date: e.date,
+            party: e.vendor || null,
+            recordedByName: e.recordedByName || null,
+        }));
+        return [...incomeRows, ...expenseRows].sort((a, b) => b.date.localeCompare(a.date));
     }
 }

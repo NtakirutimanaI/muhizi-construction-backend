@@ -16,8 +16,8 @@ export class ApprovalsController {
     constructor(private readonly service: ApprovalsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
-    @ApiOperation({ summary: 'Create approval', description: 'Create a new approval request' })
+    @Roles(Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER)
+    @ApiOperation({ summary: 'Create approval', description: 'Create a new fund/expense request. Admin is the sole approver and does not submit requests here — Admin records money directly via the Expenses module.' })
     @ApiBody({ type: CreateApprovalDto })
     @ApiResponse({ status: 201, description: 'Approval created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -29,7 +29,7 @@ export class ApprovalsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Get all approvals', description: 'Retrieve all approval requests' })
     @ApiResponse({ status: 200, description: 'All approvals retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -39,7 +39,7 @@ export class ApprovalsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Get approval by ID', description: 'Retrieve an approval request by ID' })
     @ApiResponse({ status: 200, description: 'Approval retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -50,8 +50,8 @@ export class ApprovalsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.MANAGER)
-    @ApiOperation({ summary: 'Update approval', description: 'Update an existing approval request' })
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: 'Update approval', description: 'Approve or reject a fund request. Admin-only: Admin is the top of the reporting chain, so it is the sole approver and cannot submit requests to itself.' })
     @ApiBody({ type: UpdateApprovalDto })
     @ApiResponse({ status: 200, description: 'Approval updated successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

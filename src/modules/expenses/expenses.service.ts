@@ -11,17 +11,17 @@ export class ExpensesService {
         private repo: Repository<Expense>,
     ) { }
 
-    async create(dto: CreateExpenseDto): Promise<Expense> {
-        const expense = this.repo.create(dto);
+    async create(dto: CreateExpenseDto, recordedById?: string, recordedByName?: string): Promise<Expense> {
+        const expense = this.repo.create({ ...dto, recordedById, recordedByName });
         return this.repo.save(expense);
     }
 
     async findAll(): Promise<Expense[]> {
-        return this.repo.find({ order: { date: 'DESC' } });
+        return this.repo.find({ order: { date: 'DESC' }, relations: ['project'] });
     }
 
     async findOne(id: string): Promise<Expense> {
-        const expense = await this.repo.findOne({ where: { id } });
+        const expense = await this.repo.findOne({ where: { id }, relations: ['project'] });
         if (!expense) throw new NotFoundException('Expense record not found');
         return expense;
     }
@@ -36,11 +36,6 @@ export class ExpensesService {
     async update(id: string, dto: Partial<CreateExpenseDto>): Promise<Expense> {
         await this.repo.update(id, dto as any);
         return this.findOne(id);
-    }
-
-    async remove(id: string): Promise<void> {
-        const result = await this.repo.delete(id);
-        if (result.affected === 0) throw new NotFoundException('Expense record not found');
     }
 
     async getTotal(): Promise<number> {

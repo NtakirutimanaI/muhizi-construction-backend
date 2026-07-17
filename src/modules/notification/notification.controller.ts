@@ -14,7 +14,6 @@ import { NotificationService } from './services/notification.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { Role } from '../auth/enums/role.enum';
 
 const TOGGLE_ROLES = [Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO];
@@ -28,7 +27,6 @@ export class NotificationController {
 
     @Get()
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
-    @RequirePermissions('notifications:read')
     @ApiOperation({
         summary: 'Get all notifications',
         description: 'Retrieve all notifications for the authenticated user'
@@ -58,7 +56,6 @@ export class NotificationController {
 
     @Get('unread')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
-    @RequirePermissions('notifications:read')
     @ApiOperation({
         summary: 'Get unread notifications',
         description: 'Retrieve only unread notifications for the authenticated user'
@@ -71,7 +68,6 @@ export class NotificationController {
 
     @Patch(':id/read')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
-    @RequirePermissions('notifications:update')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
         summary: 'Mark notification as read',
@@ -87,7 +83,6 @@ export class NotificationController {
 
     @Patch('read-all')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
-    @RequirePermissions('notifications:update')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
         summary: 'Mark all notifications as read',

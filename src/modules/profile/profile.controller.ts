@@ -19,7 +19,6 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { Role } from '../auth/enums/role.enum';
 
@@ -55,19 +54,12 @@ export class ProfileController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Profile not found' })
     async updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
-        return this.profileService.updateProfile(
-            req.user.id,
-            updateProfileDto,
-            req.user?.email,
-            req.user?.role,
-            req.ip,
-        );
+        return this.profileService.updateProfile(req.user.id, updateProfileDto);
     }
 
     @Delete()
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER)
-    @RequirePermissions('profile:delete')
     @ApiBearerAuth('JWT-auth')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
@@ -114,7 +106,6 @@ export class ProfileController {
     @Get('messages')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER)
-    @RequirePermissions('messages:read')
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Get all contact messages',
@@ -129,7 +120,6 @@ export class ProfileController {
     @Post('messages/:id/read')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER)
-    @RequirePermissions('messages:update')
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Mark message as read',
@@ -143,18 +133,4 @@ export class ProfileController {
         return this.profileService.markMessageAsRead(id);
     }
 
-    @Delete('messages')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO, Role.PARTNER)
-    @RequirePermissions('messages:delete')
-    @ApiBearerAuth('JWT-auth')
-    @ApiOperation({
-        summary: 'Delete all messages',
-        description: 'Delete all contact messages'
-    })
-    @ApiResponse({ status: 200, description: 'Messages deleted successfully' })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async deleteAllMessages(@Request() req) {
-        return this.profileService.deleteAllMessages();
-    }
 }

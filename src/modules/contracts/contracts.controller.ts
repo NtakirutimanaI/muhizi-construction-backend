@@ -15,8 +15,8 @@ export class ContractsController {
     constructor(private readonly service: ContractsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.MANAGER)
-    @ApiOperation({ summary: 'Create contract', description: 'Create a new contract' })
+    @Roles(Role.MANAGING_DIRECTOR)
+    @ApiOperation({ summary: 'Create contract', description: 'Create a new contract. Admin does not manage contracts directly — it sees them as a read-only report scoped to an employee.' })
     @ApiBody({ type: CreateContractDto })
     @ApiResponse({ status: 201, description: 'Contract created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -26,7 +26,7 @@ export class ContractsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Get all contracts', description: 'Retrieve all contracts' })
     @ApiResponse({ status: 200, description: 'All contracts retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -35,8 +35,18 @@ export class ContractsController {
         return this.service.findAll();
     }
 
+    @Get('employee/:employeeId')
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR)
+    @ApiOperation({ summary: 'Get contracts by employee', description: 'Retrieve contracts for a specific employee — the read-only report Admin sees on an employee\'s profile' })
+    @ApiResponse({ status: 200, description: 'Employee contracts retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findByEmployee(@Param('employeeId') employeeId: string) {
+        return this.service.findByEmployee(employeeId);
+    }
+
     @Get(':id')
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR)
     @ApiOperation({ summary: 'Get contract by ID', description: 'Retrieve a contract by ID' })
     @ApiResponse({ status: 200, description: 'Contract retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +57,7 @@ export class ContractsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Update contract', description: 'Update an existing contract' })
     @ApiBody({ type: CreateContractDto })
     @ApiResponse({ status: 200, description: 'Contract updated successfully' })
@@ -59,7 +69,7 @@ export class ContractsController {
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN)
+    @Roles(Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Delete contract', description: 'Delete a contract' })
     @ApiResponse({ status: 200, description: 'Contract deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

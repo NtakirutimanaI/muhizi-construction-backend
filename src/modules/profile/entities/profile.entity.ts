@@ -114,6 +114,7 @@ export class Profile {
         url?: string;
         githubUrl?: string;
         imageUrl?: string;
+        location?: string;
         featured?: boolean;
         category?: 'Backend' | 'Frontend' | 'UI/UX' | 'Fullstack' | 'Other';
         effectiveness?: number;
@@ -141,6 +142,12 @@ export class Profile {
         name: string;
         role: string;
         imageUrl?: string;
+        socialLinks?: {
+            twitter?: string;
+            linkedin?: string;
+            facebook?: string;
+            instagram?: string;
+        };
     }>;
 
     @Column({ type: 'json', nullable: true })
@@ -221,12 +228,20 @@ export class Profile {
                 description: string;
                 tags: string[];
                 color: string;
+                images?: string[];
             }>;
         };
         news?: Array<{
+            slug: string;
             title: string;
             date: string;
+            category: string;
             summary: string;
+            image: string;
+            author: string;
+            comments: number;
+            readTime: string;
+            content: string[];
         }>;
         events?: Array<{
             title: string;
@@ -239,6 +254,27 @@ export class Profile {
             suffix: string;
             label: string;
         }>;
+        aboutPage?: {
+            statNumber?: number;
+            statSuffix?: string;
+            statTitle?: string;
+            statDescription?: string;
+            heading?: string;
+            description?: string;
+            globalReachNumber?: number;
+            globalReachSuffix?: string;
+            globalReachCaption?: string;
+        };
+        commitment?: {
+            anchorImage?: string;
+            anchorTitle?: string;
+            anchorDescription?: string;
+            cards?: Array<{ title: string; description: string }>;
+            imageCardImage?: string;
+        };
+        teamSection?: {
+            brands?: Array<{ name: string; logoUrl?: string }>;
+        };
         mission?: { title: string; text: string; icon: string };
         vision?: { title: string; text: string; icon: string };
         philosophy?: { title: string; text: string; icon: string };
@@ -281,10 +317,15 @@ export class Profile {
             heading?: string;
             subtitle?: string;
         };
+        projectsSection?: {
+            heading?: string;
+            subtitle?: string;
+        };
         footer?: {
             companyDescription?: string;
             copyrightText?: string;
             quickLinks?: Array<{ label: string; url: string }>;
+            servicesList?: Array<{ label: string }>;
             showSocialLinks?: boolean;
             showContactInfo?: boolean;
         };

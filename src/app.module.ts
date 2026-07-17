@@ -13,7 +13,6 @@ import { EventsModule } from './modules/events/events.module';
 import { DatabaseModule } from './database/database.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { CacheModule } from './modules/cache/cache.module';
-import { AuditModule } from './modules/audit/audit.module';
 import { MlModule } from './modules/ml/ml.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { DesignsModule } from './modules/designs/designs.module';
@@ -36,7 +35,6 @@ import { SubscribersModule } from './modules/subscribers/subscribers.module';
 import { StockModule } from './modules/stock/stock.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { SettingsModule } from './modules/settings/settings.module';
-import { PermissionsManagementModule } from './modules/permissions-management/permissions-management.module';
 import { ClientPortalModule } from './modules/client-portal/client-portal.module';
 import { PartnerPortalModule } from './modules/partner-portal/partner-portal.module';
 import { SalaryRatesModule } from './modules/salary-rates/salary-rates.module';
@@ -95,7 +93,6 @@ import { EngineeringSubmissionsModule } from './modules/engineering-submissions/
         DatabaseModule,
         UploadModule,
         CacheModule,
-        AuditModule,
         MlModule,
         ProjectsModule,
         SitesModule,
@@ -118,7 +115,6 @@ import { EngineeringSubmissionsModule } from './modules/engineering-submissions/
         StockModule,
         CategoriesModule,
         SettingsModule,
-        PermissionsManagementModule,
         ClientPortalModule,
         PartnerPortalModule,
         SalaryRatesModule,

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Employee } from './entities/employee.entity';
@@ -29,6 +29,18 @@ export class EmployeesService {
     }
 
     async update(id: string, dto: Partial<CreateEmployeeDto>): Promise<Employee> {
+        const current = await this.findOne(id);
+
+        // Email and National ID are the identity anchors attendance, payroll and assignment
+        // history are matched against — changing them after registration would silently
+        // sever that history from the employee it belongs to.
+        if (dto.email !== undefined && dto.email !== current.email) {
+            throw new BadRequestException('Email cannot be changed after registration — it is used to match this employee\'s attendance, payroll, and assignment history.');
+        }
+        if (dto.nationalId !== undefined && current.nationalId && dto.nationalId !== current.nationalId) {
+            throw new BadRequestException('National ID cannot be changed after registration.');
+        }
+
         await this.repo.update(id, dto as any);
         return this.findOne(id);
     }

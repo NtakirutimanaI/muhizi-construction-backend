@@ -40,6 +40,14 @@ export class SubscribersController {
         return this.service.findOne(id);
     }
 
+    @Public()
+    @Post(':id/unsubscribe')
+    @ApiOperation({ summary: 'Self-service unsubscribe (public, from an email link)' })
+    async unsubscribe(@Param('id') id: string) {
+        await this.service.unsubscribe(id);
+        return { message: 'Unsubscribed' };
+    }
+
     @Patch(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)

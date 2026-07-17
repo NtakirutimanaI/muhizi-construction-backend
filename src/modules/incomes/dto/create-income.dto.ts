@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsDateString, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsDateString, IsArray, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { IncomeCategory } from '../entities/income.entity';
 
@@ -47,4 +47,9 @@ export class CreateIncomeDto {
     @IsString({ message: 'notes must be a string' })
     @IsOptional()
     notes?: string;
+
+    @ApiProperty({ example: [{ description: 'Cement (50 bags)', amount: 750000 }], required: false, description: 'What this income covered — itemized materials/work and their price' })
+    @IsArray({ message: 'items must be an array' })
+    @IsOptional()
+    items?: { description: string; amount: number }[];
 }

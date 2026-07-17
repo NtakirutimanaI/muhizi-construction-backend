@@ -6,6 +6,12 @@ export enum PartnershipType {
     SUBCONTRACTOR = 'subcontractor',
     INVESTOR = 'investor',
     JOINT_VENTURE = 'joint_venture',
+    OTHER = 'other',
+}
+
+export enum PartnershipEntityKind {
+    COMPANY = 'company',
+    INDIVIDUAL = 'individual',
 }
 
 export enum PartnershipStatus {
@@ -20,6 +26,10 @@ export class Partnership {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Column({ type: 'enum', enum: PartnershipEntityKind, default: PartnershipEntityKind.COMPANY })
+    entityKind: PartnershipEntityKind;
+
+    /** Company name, or the individual's full name when entityKind is "individual". */
     @Column()
     companyName: string;
 
@@ -46,6 +56,10 @@ export class Partnership {
     @Column({ type: 'enum', enum: PartnershipType })
     @Index('idx_partnership_type')
     partnershipType: PartnershipType;
+
+    /** Free-text description of the relationship when partnershipType is "other". */
+    @Column({ nullable: true })
+    otherTypeDescription: string;
 
     @Column({ type: 'enum', enum: PartnershipStatus, default: PartnershipStatus.PENDING })
     @Index('idx_partnership_status')

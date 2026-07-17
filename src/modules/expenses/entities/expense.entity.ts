@@ -52,6 +52,18 @@ export class Expense {
     @Column({ type: 'text', nullable: true })
     notes: string;
 
+    /** What this expense actually paid for — itemized goods/work and their price,
+     * so the record is self-explanatory on export rather than just a lump sum. */
+    @Column({ type: 'json', nullable: true })
+    items: { description: string; amount: number }[];
+
+    /** Who recorded this expense — the audit trail the finance reports read from. */
+    @Column({ nullable: true })
+    recordedById: string;
+
+    @Column({ nullable: true })
+    recordedByName: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

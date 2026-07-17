@@ -20,6 +20,10 @@ export class ContractsService {
         return this.repo.find({ order: { createdAt: 'DESC' } });
     }
 
+    async findByEmployee(employeeId: string): Promise<Contract[]> {
+        return this.repo.find({ where: { employeeId }, order: { createdAt: 'DESC' } });
+    }
+
     async findOne(id: string): Promise<Contract> {
         const entity = await this.repo.findOne({ where: { id } });
         if (!entity) throw new NotFoundException('Contract not found');

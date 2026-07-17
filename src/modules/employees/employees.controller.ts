@@ -15,8 +15,8 @@ export class EmployeesController {
     constructor(private readonly service: EmployeesService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
-    @ApiOperation({ summary: 'Create employee', description: 'Creates a new employee record' })
+    @Roles(Role.SITE_MANAGER, Role.SITE_ENGINEER)
+    @ApiOperation({ summary: 'Create employee', description: 'Creates a new employee record. Registration is an HR/field function, not Admin\'s — Admin views the registry read-only.' })
     @ApiBody({ type: CreateEmployeeDto })
     @ApiResponse({ status: 201, description: 'Employee created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +47,7 @@ export class EmployeesController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.SITE_MANAGER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Update employee', description: 'Updates an existing employee by ID' })
     @ApiBody({ type: CreateEmployeeDto })
     @ApiResponse({ status: 200, description: 'Employee updated successfully' })
@@ -59,7 +59,7 @@ export class EmployeesController {
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN)
+    @Roles(Role.SITE_MANAGER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Delete employee', description: 'Deletes an employee by ID' })
     @ApiResponse({ status: 200, description: 'Employee deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
