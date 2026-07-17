@@ -28,7 +28,7 @@ export class MaterialRequestsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.SITE_MANAGER)
     @ApiOperation({ summary: 'Get all material requests', description: 'Retrieves a list of all material requests' })
     @ApiResponse({ status: 200, description: 'All material requests retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -38,7 +38,7 @@ export class MaterialRequestsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.SITE_MANAGER)
     @ApiOperation({ summary: 'Get material request by ID', description: 'Retrieves a single material request by its ID' })
     @ApiResponse({ status: 200, description: 'Material request retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -49,7 +49,7 @@ export class MaterialRequestsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Update material request', description: 'Updates an existing material request by ID' })
     @ApiBody({ type: CreateMaterialRequestDto })
     @ApiResponse({ status: 200, description: 'Material request updated successfully' })
@@ -61,7 +61,7 @@ export class MaterialRequestsController {
     }
 
     @Post(':id/approve')
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Approve material request', description: 'Approves a material request by ID' })
     @ApiResponse({ status: 200, description: 'Material request approved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -74,7 +74,7 @@ export class MaterialRequestsController {
     }
 
     @Post(':id/reject')
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Reject material request', description: 'Rejects a material request by ID with notes' })
     @ApiBody({ type: UpdateMaterialRequestStatusDto })
     @ApiResponse({ status: 200, description: 'Material request rejected successfully' })

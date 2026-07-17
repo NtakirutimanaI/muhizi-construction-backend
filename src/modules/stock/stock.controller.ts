@@ -16,7 +16,7 @@ export class StockController {
     constructor(private readonly service: StockService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.FINANCE_DIRECTOR, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Create stock entry', description: 'Creates a new stock entry' })
     @ApiBody({ type: CreateStockDto })
     @ApiResponse({ status: 201, description: 'Stock entry created successfully' })
@@ -60,7 +60,7 @@ export class StockController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.FINANCE_DIRECTOR, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Update stock entry', description: 'Updates an existing stock entry by ID' })
     @ApiBody({ type: UpdateStockDto })
     @ApiResponse({ status: 200, description: 'Stock entry updated successfully' })

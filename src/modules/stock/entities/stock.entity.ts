@@ -41,6 +41,9 @@ export class Stock {
     @Column({ type: 'text', nullable: true })
     notes: string;
 
+    @Column({ type: 'json', nullable: true })
+    evidenceUrls: string[];
+
     @Column({ nullable: true })
     @Index('idx_stock_created_by')
     createdById: string;

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsIn, Min, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsIn, Min, MaxLength, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateStockDto {
@@ -59,4 +59,10 @@ export class CreateStockDto {
     @IsOptional()
     @MaxLength(1000, { message: 'Notes must not exceed 1000 characters' })
     notes?: string;
+
+    @ApiProperty({ example: ['https://cdn.example.com/receipt1.jpg'], required: false, description: 'Photo evidence URLs (delivery note, goods received/dispatched)' })
+    @IsArray({ message: 'Evidence must be an array of URLs' })
+    @IsString({ each: true, message: 'Each evidence entry must be a URL string' })
+    @IsOptional()
+    evidenceUrls?: string[];
 }
