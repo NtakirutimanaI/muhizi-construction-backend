@@ -147,6 +147,7 @@ export class Profile {
             linkedin?: string;
             facebook?: string;
             instagram?: string;
+            youtube?: string;
         };
     }>;
 
@@ -160,6 +161,7 @@ export class Profile {
         stackoverflow?: string;
         facebook?: string;
         instagram?: string;
+        youtube?: string;
     };
 
     @Column({ nullable: true })
