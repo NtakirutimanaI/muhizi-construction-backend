@@ -28,6 +28,21 @@ export class CreateEmployeeDto {
     @IsOptional()
     nationalId?: string;
 
+    @ApiProperty({ example: 'male', required: false, description: 'Employee gender' })
+    @IsString({ message: 'gender must be a string' })
+    @IsOptional()
+    gender?: string;
+
+    @ApiProperty({ example: 'married', required: false, description: 'Employee marital status' })
+    @IsString({ message: 'maritalStatus must be a string' })
+    @IsOptional()
+    maritalStatus?: string;
+
+    @ApiProperty({ example: "Bachelor's Degree", required: false, description: 'Employee highest education level' })
+    @IsString({ message: 'educationLevel must be a string' })
+    @IsOptional()
+    educationLevel?: string;
+
     @ApiProperty({ example: 'Site Engineer', required: false, description: 'Employee job position' })
     @IsString({ message: 'position must be a string' })
     @IsOptional()
