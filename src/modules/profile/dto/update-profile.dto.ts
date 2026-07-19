@@ -34,6 +34,10 @@ class SocialLinksDto {
     @IsOptional()
     @IsString()
     instagram?: string;
+
+    @IsOptional()
+    @IsString()
+    youtube?: string;
 }
 
 export class UpdateProfileDto {
