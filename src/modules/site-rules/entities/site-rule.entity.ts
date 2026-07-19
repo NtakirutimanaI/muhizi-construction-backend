@@ -15,7 +15,7 @@ export class SiteRule {
     @Column({ nullable: true })
     pinColor: string;
 
-    @Column('simple-array')
+    @Column('text', { array: true, default: '{}' })
     items: string[];
 
     @Column({ type: 'int', default: 0 })
