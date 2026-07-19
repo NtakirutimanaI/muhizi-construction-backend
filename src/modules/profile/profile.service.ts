@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Profile } from './entities/profile.entity';
@@ -176,7 +176,10 @@ export class ProfileService {
             };
         } catch (error) {
             console.error('Contact message error:', error.message);
-            throw error;
+            if (error.code === '23505') {
+                throw new BadRequestException('A message with this email was recently submitted. Please try again later.');
+            }
+            throw new BadRequestException('Failed to send message. Please try again.');
         }
     }
 
