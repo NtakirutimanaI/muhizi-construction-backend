@@ -54,6 +54,13 @@ export class Site {
     @JoinColumn({ name: 'projectId' })
     project: Project;
 
+    @Column({ nullable: true })
+    @Index('idx_site_assigned_engineer')
+    assignedEngineerId?: string;
+
+    @Column({ nullable: true })
+    assignedEngineerName?: string;
+
     @OneToMany(() => SiteRule, (rule) => rule.site, { cascade: true })
     rules: SiteRule[];
 

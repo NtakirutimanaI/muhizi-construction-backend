@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -21,8 +21,9 @@ export class AttendanceController {
     @ApiResponse({ status: 201, description: 'Attendance record created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    create(@Body() dto: CreateAttendanceDto) {
-        return this.service.create(dto);
+    create(@Body() dto: CreateAttendanceDto, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.create(dto, engineerId);
     }
 
     @Get()
@@ -31,8 +32,9 @@ export class AttendanceController {
     @ApiResponse({ status: 200, description: 'All attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAll() {
-        return this.service.findAll();
+    findAll(@Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAll(engineerId);
     }
 
     @Get('stats')
@@ -41,8 +43,9 @@ export class AttendanceController {
     @ApiResponse({ status: 200, description: 'Attendance stats retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    stats() {
-        return this.service.getStats();
+    stats(@Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.getStats(engineerId);
     }
 
     @Get('range')
@@ -51,8 +54,9 @@ export class AttendanceController {
     @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findByDateRange(@Query('start') start: string, @Query('end') end: string) {
-        return this.service.findByDateRange(start, end);
+    findByDateRange(@Query('start') start: string, @Query('end') end: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findByDateRange(start, end, engineerId);
     }
 
     @Get('employee/:employeeId')
@@ -85,8 +89,9 @@ export class AttendanceController {
     @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findByProject(@Param('projectId') projectId: string) {
-        return this.service.findByProject(projectId);
+    findByProject(@Param('projectId') projectId: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findByProject(projectId, engineerId);
     }
 
     @Get('site/:site')
@@ -95,8 +100,9 @@ export class AttendanceController {
     @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findBySite(@Param('site') site: string) {
-        return this.service.findBySite(site);
+    findBySite(@Param('site') site: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findBySite(site, engineerId);
     }
 
     @Get(':id')
@@ -106,8 +112,9 @@ export class AttendanceController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    findOne(@Param('id') id: string) {
-        return this.service.findOne(id);
+    findOne(@Param('id') id: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findOne(id, engineerId);
     }
 
     @Put(':id')
@@ -118,8 +125,9 @@ export class AttendanceController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    update(@Param('id') id: string, @Body() dto: CreateAttendanceDto) {
-        return this.service.update(id, dto);
+    update(@Param('id') id: string, @Body() dto: CreateAttendanceDto, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.update(id, dto, engineerId);
     }
 
     @Delete(':id')

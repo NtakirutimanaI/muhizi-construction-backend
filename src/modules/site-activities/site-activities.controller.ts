@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -16,14 +16,15 @@ export class SiteActivitiesController {
     @Post()
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
-    @ApiOperation({ summary: 'Create a site activity', description: 'Create a new site activity (admin/site manager)' })
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER)
+    @ApiOperation({ summary: 'Create a site activity', description: 'Create a new site activity (admin/site manager/site engineer)' })
     @ApiBody({ type: CreateSiteActivityDto })
     @ApiResponse({ status: 201, description: 'Site activity created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    create(@Body() dto: CreateSiteActivityDto) {
-        return this.service.create(dto);
+    create(@Body() dto: CreateSiteActivityDto, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.create(dto, engineerId);
     }
 
     @Public()
@@ -37,13 +38,14 @@ export class SiteActivitiesController {
     @Get('admin')
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
-    @ApiOperation({ summary: 'Get all site activities (admin)', description: 'Retrieve all site activities with details (admin/site manager)' })
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER)
+    @ApiOperation({ summary: 'Get all site activities (admin)', description: 'Retrieve all site activities with details (admin/site manager/site engineer)' })
     @ApiResponse({ status: 200, description: 'All site activities retrieved successfully (admin)' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAllAdmin() {
-        return this.service.findAllAdmin();
+    findAllAdmin(@Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAllAdmin(engineerId);
     }
 
     @Public()
@@ -58,15 +60,16 @@ export class SiteActivitiesController {
     @Put(':id')
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
-    @ApiOperation({ summary: 'Update a site activity', description: 'Update an existing site activity (admin/site manager)' })
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER)
+    @ApiOperation({ summary: 'Update a site activity', description: 'Update an existing site activity (admin/site manager/site engineer)' })
     @ApiBody({ type: CreateSiteActivityDto })
     @ApiResponse({ status: 200, description: 'Site activity updated successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    update(@Param('id') id: string, @Body() dto: CreateSiteActivityDto) {
-        return this.service.update(id, dto);
+    update(@Param('id') id: string, @Body() dto: CreateSiteActivityDto, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.update(id, dto, engineerId);
     }
 
     @Delete(':id')

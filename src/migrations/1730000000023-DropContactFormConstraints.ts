@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class DropContactFormConstraints1730000000023 implements MigrationInterface {
-    name = '1730000000023-DropContactFormConstraints';
+    name = 'DropContactFormConstraints1730000000023';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Drop the phone CHECK constraint on contact_messages — public forms should accept any phone format

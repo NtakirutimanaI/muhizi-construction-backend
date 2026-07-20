@@ -59,4 +59,14 @@ export class CreateSiteDto {
     @IsUUID('4', { message: 'Project ID must be a valid UUID' })
     @IsOptional()
     projectId?: string;
+
+    @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', required: false, description: 'UUID of the Site Engineer user assigned to this site' })
+    @IsUUID('4', { message: 'Assigned engineer ID must be a valid UUID' })
+    @IsOptional()
+    assignedEngineerId?: string;
+
+    @ApiProperty({ example: 'Jean Mugisha', required: false, description: 'Display name of the assigned Site Engineer' })
+    @IsString({ message: 'Assigned engineer name must be a string' })
+    @IsOptional()
+    assignedEngineerName?: string;
 }

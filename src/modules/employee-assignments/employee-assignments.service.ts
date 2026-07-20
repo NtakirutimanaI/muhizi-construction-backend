@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { EmployeeAssignment } from './entities/employee-assignment.entity';
 import { Employee } from '../employees/entities/employee.entity';
+import { Site } from '../sites/entities/site.entity';
 import { CreateEmployeeAssignmentDto } from './dto/create-employee-assignment.dto';
 import { UpdateEmployeeAssignmentDto } from './dto/update-employee-assignment.dto';
 
@@ -13,6 +14,8 @@ export class EmployeeAssignmentsService {
         private repo: Repository<EmployeeAssignment>,
         @InjectRepository(Employee)
         private employeeRepo: Repository<Employee>,
+        @InjectRepository(Site)
+        private siteRepo: Repository<Site>,
     ) { }
 
     async create(dto: CreateEmployeeAssignmentDto): Promise<EmployeeAssignment> {
@@ -71,7 +74,11 @@ export class EmployeeAssignmentsService {
         });
     }
 
-    async findByProject(projectId: string): Promise<EmployeeAssignment[]> {
+    async findByProject(projectId: string, engineerId?: string): Promise<EmployeeAssignment[]> {
+        if (engineerId) {
+            const assignedSite = await this.siteRepo.findOne({ where: { projectId, assignedEngineerId: engineerId } });
+            if (!assignedSite) throw new ForbiddenException('You are not assigned to this project');
+        }
         return this.repo.find({
             where: { projectId, isActive: true },
             relations: ['employee'],

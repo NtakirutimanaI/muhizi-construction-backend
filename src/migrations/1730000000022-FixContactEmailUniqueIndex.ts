@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class FixContactEmailUniqueIndex1730000000022 implements MigrationInterface {
-    name = '1730000000022-FixContactEmailUniqueIndex';
+    name = 'FixContactEmailUniqueIndex1730000000022';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Drop the UNIQUE index on email — multiple contacts with the same email are valid

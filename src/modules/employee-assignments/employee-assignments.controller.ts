@@ -62,8 +62,9 @@ export class EmployeeAssignmentsController {
     @ApiResponse({ status: 200, description: 'Employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findByProject(@Param('projectId') projectId: string) {
-        return this.service.findByProject(projectId);
+    findByProject(@Param('projectId') projectId: string, @Req() req: any) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findByProject(projectId, engineerId);
     }
 
     @Get(':id')
