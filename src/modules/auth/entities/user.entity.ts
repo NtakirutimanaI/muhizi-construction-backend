@@ -25,9 +25,6 @@ export class User {
     @Index('idx_users_email')
     email: string;
 
-    @Column({ nullable: true })
-    username: string;
-
     @Column({ type: 'text', nullable: true })
     address: string;
 

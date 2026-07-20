@@ -66,7 +66,6 @@ export class DatabaseSeeder {
 
       const user = this.userRepository.create({
         email: 'muhizidesigningacademy@gmail.com',
-        username: 'ceo_muhizi',
         password: hashedPassword,
         isActive: true,
         role: Role.ADMIN,
@@ -120,7 +119,6 @@ export class DatabaseSeeder {
 
         const user = this.userRepository.create({
           email: account.email,
-          username: account.email.split('@')[0],
           password: hashedPassword,
           isActive: true,
           role: account.role,

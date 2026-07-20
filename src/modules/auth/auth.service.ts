@@ -49,11 +49,8 @@ export class AuthService {
 
         const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
-        const username = registerDto.email.split('@')[0] + '_' + crypto.randomInt(1000, 9999);
-
         const user = this.userRepository.create({
             email: registerDto.email,
-            username,
             password: hashedPassword,
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
@@ -312,11 +309,8 @@ export class AuthService {
             return user;
         }
 
-        const username = data.email ? data.email.split('@')[0] + '_' + crypto.randomInt(1000, 9999) : 'google_user_' + crypto.randomInt(100000, 999999);
-
         user = this.userRepository.create({
             email: data.email,
-            username,
             password: null,
             googleId: data.googleId,
             role: 'client',
@@ -390,10 +384,8 @@ export class AuthService {
             }
         }
         const hashedPassword = await bcrypt.hash(dto.password, 10);
-        const username = dto.email.split('@')[0] + '_' + crypto.randomInt(1000, 9999);
         const user = this.userRepository.create({
             email: dto.email,
-            username,
             password: hashedPassword,
             firstName: dto.firstName,
             lastName: dto.lastName,
