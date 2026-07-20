@@ -20,7 +20,6 @@ describe('AuthService', () => {
     const mockUser = {
         id: '1',
         email: 'test@example.com',
-        username: 'testuser',
         password: 'hashedPassword',
         isActive: true,
         refreshToken: null,
@@ -99,7 +98,6 @@ describe('AuthService', () => {
     describe('register', () => {
         const registerDto = {
             email: 'test@example.com',
-            username: 'testuser',
             password: 'password123',
             firstName: 'John',
             lastName: 'Doe',

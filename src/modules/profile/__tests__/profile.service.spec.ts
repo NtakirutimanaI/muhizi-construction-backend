@@ -28,7 +28,6 @@ describe('ProfileService', () => {
         user: {
             id: 'user-1',
             email: 'test@example.com',
-            username: 'testuser',
         },
     };
 
@@ -163,7 +162,6 @@ describe('ProfileService', () => {
                     user: {
                         id: true,
                         email: true,
-                        username: true,
                     },
                 },
             });

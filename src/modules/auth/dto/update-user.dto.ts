@@ -8,11 +8,6 @@ export class UpdateUserDto {
     @IsOptional()
     email?: string;
 
-    @ApiProperty({ example: 'johndoe', required: false })
-    @IsString()
-    @IsOptional()
-    username?: string;
-
     @ApiProperty({ example: 'employee', enum: Object.values(Role), required: false })
     @IsString()
     @IsOptional()

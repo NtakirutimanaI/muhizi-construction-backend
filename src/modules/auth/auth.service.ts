@@ -31,14 +31,11 @@ export class AuthService {
 
     async register(registerDto: RegisterDto) {
         const existingUser = await this.userRepository.findOne({
-            where: [
-                { email: registerDto.email },
-                { username: registerDto.username },
-            ],
+            where: { email: registerDto.email },
         });
 
         if (existingUser) {
-            throw new ConflictException('Email or username already exists');
+            throw new ConflictException('Email already exists');
         }
 
         if (registerDto.phone) {
@@ -54,7 +51,6 @@ export class AuthService {
 
         const user = this.userRepository.create({
             email: registerDto.email,
-            username: registerDto.username,
             password: hashedPassword,
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
@@ -234,7 +230,7 @@ export class AuthService {
 
         await this.emailService.sendPasswordResetEmail(
             user.email,
-            user.username,
+            user.firstName || user.email,
             otp,
         );
 
@@ -313,11 +309,8 @@ export class AuthService {
             return user;
         }
 
-        const username = data.email ? data.email.split('@')[0] + '_' + crypto.randomInt(1000, 9999) : 'google_user_' + crypto.randomInt(100000, 999999);
-
         user = this.userRepository.create({
             email: data.email,
-            username,
             password: null,
             googleId: data.googleId,
             role: 'client',
@@ -374,12 +367,12 @@ export class AuthService {
         });
     }
 
-    async createUser(dto: { email: string; username: string; password: string; firstName: string; lastName: string; role?: string; phone?: string }) {
+    async createUser(dto: { email: string; password: string; firstName: string; lastName: string; role?: string; phone?: string }) {
         const existingUser = await this.userRepository.findOne({
-            where: [{ email: dto.email }, { username: dto.username }],
+            where: { email: dto.email },
         });
         if (existingUser) {
-            throw new ConflictException('Email or username already exists');
+            throw new ConflictException('Email already exists');
         }
 
         if (dto.phone) {
@@ -393,7 +386,6 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(dto.password, 10);
         const user = this.userRepository.create({
             email: dto.email,
-            username: dto.username,
             password: hashedPassword,
             firstName: dto.firstName,
             lastName: dto.lastName,
@@ -411,7 +403,7 @@ export class AuthService {
         return result;
     }
 
-    async updateUser(id: string, dto: { email?: string; username?: string; password?: string; role?: string; isActive?: boolean; firstName?: string; lastName?: string; phone?: string }) {
+    async updateUser(id: string, dto: { email?: string; password?: string; role?: string; isActive?: boolean; firstName?: string; lastName?: string; phone?: string }) {
         const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] });
         if (!user) throw new NotFoundException('User not found');
 
@@ -425,7 +417,6 @@ export class AuthService {
         }
 
         if (dto.email !== undefined) user.email = dto.email;
-        if (dto.username !== undefined) user.username = dto.username;
         if (dto.firstName !== undefined) user.firstName = dto.firstName;
         if (dto.lastName !== undefined) user.lastName = dto.lastName;
         if (dto.role !== undefined) user.role = dto.role;

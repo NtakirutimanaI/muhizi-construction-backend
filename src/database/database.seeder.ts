@@ -66,7 +66,6 @@ export class DatabaseSeeder {
 
       const user = this.userRepository.create({
         email: 'muhizidesigningacademy@gmail.com',
-        username: 'ceo_muhizi',
         password: hashedPassword,
         isActive: true,
         role: Role.ADMIN,
@@ -100,12 +99,12 @@ export class DatabaseSeeder {
     this.logger.log('Seeding role-based accounts...');
 
     const accounts = [
-      { email: 'managing.director@muhizidesigningacademy.com', username: 'managing_director', role: Role.MANAGING_DIRECTOR, firstName: 'KWIHANGANA', lastName: 'Akissa', title: 'Managing Director' },
-      { email: 'finance.director@muhizidesigningacademy.com', username: 'finance_director', role: Role.FINANCE_DIRECTOR, firstName: 'MUTIMUKEYE', lastName: 'Odette', title: 'Finance Director' },
-      { email: 'site.engineer@muhizidesigningacademy.com', username: 'site_engineer', role: Role.SITE_ENGINEER, firstName: 'Site', lastName: 'Engineer', title: 'Site Engineer' },
-      { email: 'engineering@muhizidesigningacademy.com', username: 'engineering_studio', role: Role.ENGINEERING_STUDIO, firstName: 'Engineering', lastName: 'Studio', title: 'Engineering Studio' },
-      { email: 'partner@muhizidesigningacademy.com', username: 'partner', role: Role.PARTNER, firstName: 'Partner', lastName: 'User', title: 'Partner' },
-      { email: 'client@muhizidesigningacademy.com', username: 'client', role: Role.CLIENT, firstName: 'Client', lastName: 'User', title: 'Client' },
+      { email: 'managing.director@muhizidesigningacademy.com', role: Role.MANAGING_DIRECTOR, firstName: 'KWIHANGANA', lastName: 'Akissa', title: 'Managing Director' },
+      { email: 'finance.director@muhizidesigningacademy.com', role: Role.FINANCE_DIRECTOR, firstName: 'MUTIMUKEYE', lastName: 'Odette', title: 'Finance Director' },
+      { email: 'site.engineer@muhizidesigningacademy.com', role: Role.SITE_ENGINEER, firstName: 'Site', lastName: 'Engineer', title: 'Site Engineer' },
+      { email: 'engineering@muhizidesigningacademy.com', role: Role.ENGINEERING_STUDIO, firstName: 'Engineering', lastName: 'Studio', title: 'Engineering Studio' },
+      { email: 'partner@muhizidesigningacademy.com', role: Role.PARTNER, firstName: 'Partner', lastName: 'User', title: 'Partner' },
+      { email: 'client@muhizidesigningacademy.com', role: Role.CLIENT, firstName: 'Client', lastName: 'User', title: 'Client' },
     ];
 
     for (const account of accounts) {
@@ -120,7 +119,6 @@ export class DatabaseSeeder {
 
         const user = this.userRepository.create({
           email: account.email,
-          username: account.username,
           password: hashedPassword,
           isActive: true,
           role: account.role,

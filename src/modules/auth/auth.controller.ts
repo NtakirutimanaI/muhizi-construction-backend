@@ -26,7 +26,7 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({
         summary: 'Register a new user',
-        description: 'Create a new user account with email, username, and password. A profile will be automatically created.'
+        description: 'Create a new user account with email and password. A profile will be automatically created.'
     })
     @ApiBody({ type: RegisterDto })
     @ApiResponse({
@@ -36,14 +36,13 @@ export class AuthController {
             example: {
                 id: '550e8400-e29b-41d4-a716-446655440000',
                 email: 'user@example.com',
-                username: 'johndoe',
                 isActive: true,
                 createdAt: '2024-01-16T10:30:00.000Z',
                 updatedAt: '2024-01-16T10:30:00.000Z'
             }
         }
     })
-    @ApiResponse({ status: 409, description: 'Email or username already exists' })
+    @ApiResponse({ status: 409, description: 'Email already exists' })
     @ApiResponse({ status: 400, description: 'Validation error' })
     async register(@Body() registerDto: RegisterDto) {
         return this.authService.register(registerDto);
@@ -65,7 +64,6 @@ export class AuthController {
                 user: {
                     id: '550e8400-e29b-41d4-a716-446655440000',
                     email: 'user@example.com',
-                    username: 'johndoe',
                     isActive: true,
                     profile: {
                         id: '660e8400-e29b-41d4-a716-446655440001',
@@ -177,7 +175,7 @@ export class AuthController {
     @ApiOperation({ summary: 'Create a new user (admin only)' })
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({ status: 201, description: 'User created successfully' })
-    @ApiResponse({ status: 409, description: 'Email or username already exists' })
+    @ApiResponse({ status: 409, description: 'Email already exists' })
     async createUser(@Body() dto: CreateUserDto) {
         return this.authService.createUser(dto);
     }

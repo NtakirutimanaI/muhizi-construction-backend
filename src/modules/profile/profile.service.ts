@@ -39,28 +39,16 @@ export class ProfileService {
         return profile;
     }
 
-    async getPublicProfile(username?: string) {
-        const cacheKey = `public_profile_${username || 'default'}`;
+    async getPublicProfile() {
+        const cacheKey = 'public_profile_default';
         const cached = this.cacheService.get<any>(cacheKey);
         if (cached) return cached;
 
-        let profile;
-        if (username) {
-            profile = await this.profileRepository.findOne({
-                where: { user: { username }, isPublic: true },
-                relations: ['user'],
-            });
-        } else {
-            // No username given (e.g. the marketing site's public homepage):
-            // serve the single admin/site-owner account, not just whichever
-            // public profile happens to have been touched most recently —
-            // this repo has many seeded test accounts marked isPublic too.
-            profile = await this.profileRepository.findOne({
-                where: { user: { role: Role.ADMIN }, isPublic: true },
-                relations: ['user'],
-                order: { updatedAt: 'DESC' },
-            });
-        }
+        const profile = await this.profileRepository.findOne({
+            where: { user: { role: Role.ADMIN }, isPublic: true },
+            relations: ['user'],
+            order: { updatedAt: 'DESC' },
+        });
         if (!profile) {
             throw new NotFoundException('Profile not found');
         }
@@ -68,7 +56,6 @@ export class ProfileService {
         const { user, ...profileData } = profile;
         const result = {
             ...profileData,
-            username: user.username,
         };
 
         this.cacheService.set(cacheKey, result, 300);
@@ -94,7 +81,6 @@ export class ProfileService {
             const updatedProfile = await this.profileRepository.save(profile);
 
             this.cacheService.del('public_profile_default');
-            this.cacheService.del(`public_profile_${profile.user?.username}`);
 
             try {
                 await this.notificationService.create({
