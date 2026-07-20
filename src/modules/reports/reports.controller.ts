@@ -7,6 +7,7 @@ import { Role } from '../auth/enums/role.enum';
 import { ReportsService } from './reports.service';
 
 const TOGGLE_ROLES = [Role.FINANCE_DIRECTOR];
+const READ_ROLES = [Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
 
 @ApiTags('Reports')
 @ApiBearerAuth('JWT-auth')
@@ -16,7 +17,7 @@ export class ReportsController {
     constructor(private readonly service: ReportsService) { }
 
     @Get('monthly/:year/:month')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get monthly report', description: 'Retrieves the monthly report for given year and month' })
     @ApiResponse({ status: 200, description: 'Monthly report retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -27,7 +28,7 @@ export class ReportsController {
     }
 
     @Get('yearly/:year')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get yearly report', description: 'Retrieves the yearly report for the given year' })
     @ApiResponse({ status: 200, description: 'Yearly report retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
