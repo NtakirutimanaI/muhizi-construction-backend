@@ -13,12 +13,12 @@ export class RegisterDto {
 
     @ApiProperty({
         example: 'johndoe',
-        description: 'Username (unique)',
-        required: true,
+        description: 'Username (unique, auto-generated from email if not provided)',
+        required: false,
     })
     @IsString()
-    @IsNotEmpty()
-    username: string;
+    @IsOptional()
+    username?: string;
 
     @ApiProperty({
         example: 'Password123!',

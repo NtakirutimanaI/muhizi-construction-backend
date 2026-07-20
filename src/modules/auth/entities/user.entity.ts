@@ -25,7 +25,7 @@ export class User {
     @Index('idx_users_email')
     email: string;
 
-    @Column({ unique: true })
+    @Column()
     @Index('idx_users_username')
     username: string;
 
