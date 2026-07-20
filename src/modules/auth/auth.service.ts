@@ -65,7 +65,7 @@ export class AuthService {
         const profile = this.profileRepository.create({
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
-            phone: registerDto.phone,
+            phone: registerDto.phone || undefined,
             user: user,
         });
 
@@ -403,7 +403,7 @@ export class AuthService {
         const profile = this.profileRepository.create({
             firstName: dto.firstName,
             lastName: dto.lastName,
-            phone: dto.phone,
+            phone: dto.phone || undefined,
             user: user,
         });
         await this.profileRepository.save(profile);
