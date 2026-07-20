@@ -57,7 +57,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Get('project/:projectId')
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get assignments by project', description: 'Retrieve employee assignments for a specific project' })
     @ApiResponse({ status: 200, description: 'Employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

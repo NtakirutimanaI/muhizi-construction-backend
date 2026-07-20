@@ -15,7 +15,7 @@ export class AttendanceController {
     constructor(private readonly service: AttendanceService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Create attendance', description: 'Create a new attendance record' })
     @ApiBody({ type: CreateAttendanceDto })
     @ApiResponse({ status: 201, description: 'Attendance record created successfully' })
@@ -26,7 +26,7 @@ export class AttendanceController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get all attendance', description: 'Retrieve all attendance records' })
     @ApiResponse({ status: 200, description: 'All attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +36,7 @@ export class AttendanceController {
     }
 
     @Get('stats')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get attendance stats', description: 'Retrieve attendance statistics' })
     @ApiResponse({ status: 200, description: 'Attendance stats retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -46,7 +46,7 @@ export class AttendanceController {
     }
 
     @Get('range')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get attendance by date range', description: 'Retrieve attendance records filtered by date range' })
     @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -80,7 +80,7 @@ export class AttendanceController {
     }
 
     @Get('project/:projectId')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get attendance by project', description: 'Retrieve attendance records for a specific project' })
     @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -90,7 +90,7 @@ export class AttendanceController {
     }
 
     @Get('site/:site')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get attendance by site', description: 'Retrieve attendance records for a specific site' })
     @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -100,7 +100,7 @@ export class AttendanceController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get attendance by ID', description: 'Retrieve an attendance record by ID' })
     @ApiResponse({ status: 200, description: 'Attendance record retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -111,7 +111,7 @@ export class AttendanceController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Update attendance', description: 'Update an existing attendance record' })
     @ApiBody({ type: CreateAttendanceDto })
     @ApiResponse({ status: 200, description: 'Attendance record updated successfully' })
