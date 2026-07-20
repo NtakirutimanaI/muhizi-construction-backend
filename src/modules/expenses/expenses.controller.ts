@@ -8,6 +8,7 @@ import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 
 const TOGGLE_ROLES = [Role.FINANCE_DIRECTOR];
+const READ_ROLES = [Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
 
 @ApiTags('Expenses')
 @ApiBearerAuth('JWT-auth')
@@ -30,7 +31,7 @@ export class ExpensesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get all expenses', description: 'Retrieve all expenses' })
     @ApiResponse({ status: 200, description: 'All expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -40,7 +41,7 @@ export class ExpensesController {
     }
 
     @Get('total')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get total expenses', description: 'Retrieve the total amount of expenses' })
     @ApiResponse({ status: 200, description: 'Total expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -51,7 +52,7 @@ export class ExpensesController {
     }
 
     @Get('range')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get expenses by date range', description: 'Retrieve expenses filtered by date range' })
     @ApiResponse({ status: 200, description: 'Expenses retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -61,7 +62,7 @@ export class ExpensesController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get expense by ID', description: 'Retrieve an expense by ID' })
     @ApiResponse({ status: 200, description: 'Expense retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

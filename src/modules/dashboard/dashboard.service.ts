@@ -38,13 +38,16 @@ export class DashboardService {
     }
 
     async getManagingDirectorKpi() {
-        const [stockAlerts, pendingRequests, activeSites, recentEvidence] = await Promise.all([
+        const [stockAlerts, pendingRequests, activeSites, recentEvidence, mtdIncomes, mtdExpenses] = await Promise.all([
             this.stockRepo.count({ where: { quantity: 0 as any } }),
             this.mrRepo.count({ where: { status: 'pending' } }),
             this.siteRepo.count({ where: { status: SiteStatus.ACTIVE } }),
             this.evidenceRepo.count(),
+            this.sumIncomesMonthToDate(),
+            this.sumExpensesMonthToDate(),
         ]);
-        return { stockAlerts, pendingRequests, activeSites, recentEvidence };
+        const cashFlow = mtdIncomes - mtdExpenses;
+        return { stockAlerts, pendingRequests, activeSites, recentEvidence, mtdIncomes, mtdExpenses, cashFlow };
     }
 
     async getFinanceDirectorKpi() {

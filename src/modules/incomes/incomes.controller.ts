@@ -8,6 +8,7 @@ import { IncomesService } from './incomes.service';
 import { CreateIncomeDto } from './dto/create-income.dto';
 
 const TOGGLE_ROLES = [Role.FINANCE_DIRECTOR];
+const READ_ROLES = [Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
 
 @ApiTags('Incomes')
 @ApiBearerAuth('JWT-auth')
@@ -30,7 +31,7 @@ export class IncomesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get all incomes', description: 'Retrieve all income records' })
     @ApiResponse({ status: 200, description: 'All incomes retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -40,7 +41,7 @@ export class IncomesController {
     }
 
     @Get('total')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get total incomes', description: 'Retrieve the total amount of incomes' })
     @ApiResponse({ status: 200, description: 'Total incomes retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -51,7 +52,7 @@ export class IncomesController {
     }
 
     @Get('range')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get incomes by date range', description: 'Retrieve incomes filtered by date range' })
     @ApiResponse({ status: 200, description: 'Incomes retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -61,7 +62,7 @@ export class IncomesController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(...READ_ROLES)
     @ApiOperation({ summary: 'Get income by ID', description: 'Retrieve an income record by ID' })
     @ApiResponse({ status: 200, description: 'Income retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
