@@ -37,4 +37,63 @@ export class CreateUserDto {
     @IsString()
     @IsOptional()
     phone?: string;
+
+    @ApiProperty({ example: 'Kigali, Rwanda', required: false })
+    @IsString()
+    @IsOptional()
+    address?: string;
+
+    @ApiProperty({ example: 'Male', required: false })
+    @IsString()
+    @IsOptional()
+    gender?: string;
+
+    @ApiProperty({ example: 'Single', required: false })
+    @IsString()
+    @IsOptional()
+    maritalStatus?: string;
+
+    @ApiProperty({ example: '1199980012345678', required: false })
+    @IsString()
+    @IsOptional()
+    nationalId?: string;
+
+    @ApiProperty({ example: 'Bachelor\'s Degree', required: false })
+    @IsString()
+    @IsOptional()
+    educationLevel?: string;
+
+    @ApiProperty({ example: 'RSSB', required: false })
+    @IsString()
+    @IsOptional()
+    medicalInsurance?: string;
+
+    @ApiProperty({ example: 'https://cloudinary.com/contract.pdf', required: false })
+    @IsString()
+    @IsOptional()
+    contractUrl?: string;
+
+    @ApiProperty({ example: 'BK:00986883, Equity:08788888', required: false })
+    @IsString()
+    @IsOptional()
+    bankAccount?: string;
+
+    @ApiProperty({ example: 'employed', required: false })
+    @IsString()
+    @IsOptional()
+    employmentStatus?: string;
+
+    @ApiProperty({ example: 'Masonry', required: false })
+    @IsString()
+    @IsOptional()
+    employmentCategory?: string;
+
+    @ApiProperty({ example: 'day', required: false })
+    @IsString()
+    @IsOptional()
+    workShift?: string;
+
+    @ApiProperty({ example: 500000, required: false, description: 'Basic salary in RWF' })
+    @IsOptional()
+    basicSalary?: number;
 }

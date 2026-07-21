@@ -16,7 +16,7 @@ export class EmployeeAssignmentsController {
     constructor(private readonly service: EmployeeAssignmentsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Create employee assignment', description: 'Create a new employee assignment' })
     @ApiBody({ type: CreateEmployeeAssignmentDto })
     @ApiResponse({ status: 201, description: 'Employee assignment created successfully' })
@@ -27,7 +27,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get all employee assignments', description: 'Retrieve all employee assignments' })
     @ApiResponse({ status: 200, description: 'All employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -37,7 +37,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Get('my-team')
-    @Roles(Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.STOREKEEPER, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get my team assignments', description: 'Retrieve assignments for the current user\'s team' })
     @ApiResponse({ status: 200, description: 'Team assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +47,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Get('employee/:employeeId')
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
     @ApiOperation({ summary: 'Get assignments by employee', description: 'Retrieve employee assignments for a specific employee' })
     @ApiResponse({ status: 200, description: 'Employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -57,7 +57,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Get('project/:projectId')
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get assignments by project', description: 'Retrieve employee assignments for a specific project' })
     @ApiResponse({ status: 200, description: 'Employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -67,7 +67,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get employee assignment by ID', description: 'Retrieve an employee assignment by ID' })
     @ApiResponse({ status: 200, description: 'Employee assignment retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -78,7 +78,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Update employee assignment', description: 'Update an existing employee assignment' })
     @ApiBody({ type: UpdateEmployeeAssignmentDto })
     @ApiResponse({ status: 200, description: 'Employee assignment updated successfully' })

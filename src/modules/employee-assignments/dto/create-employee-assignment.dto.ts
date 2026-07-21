@@ -24,7 +24,7 @@ export class CreateEmployeeAssignmentDto {
     task?: string;
 
     @ApiProperty({ example: AssignmentRole.WORKER, enum: AssignmentRole, enumName: 'AssignmentRole', description: 'Role of the employee in this assignment', required: false })
-    @IsEnum(AssignmentRole, { message: 'role must be a valid AssignmentRole value (manager, site_manager, worker, supervisor)' })
+    @IsEnum(AssignmentRole, { message: 'role must be a valid AssignmentRole value (storekeeper, worker, supervisor)' })
     @IsOptional()
     role?: AssignmentRole;
 

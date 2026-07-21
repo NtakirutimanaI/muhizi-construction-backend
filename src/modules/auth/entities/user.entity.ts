@@ -43,6 +43,27 @@ export class User {
     @Column({ nullable: true })
     educationLevel: string;
 
+    @Column({ nullable: true })
+    medicalInsurance: string;
+
+    @Column({ type: 'text', nullable: true })
+    contractUrl: string;
+
+    @Column({ type: 'text', nullable: true })
+    bankAccount: string;
+
+    @Column({ nullable: true })
+    employmentStatus: string;
+
+    @Column({ nullable: true })
+    employmentCategory: string;
+
+    @Column({ nullable: true })
+    workShift: string;
+
+    @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+    basicSalary: number;
+
     @Column({ type: 'varchar', default: 'admin' })
     @Index('idx_users_role')
     role: string;

@@ -8,7 +8,7 @@ import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 
 const TOGGLE_ROLES = [Role.FINANCE_DIRECTOR];
-const READ_ROLES = [Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
+const READ_ROLES = [Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
 
 @ApiTags('Expenses')
 @ApiBearerAuth('JWT-auth')
@@ -18,7 +18,7 @@ export class ExpensesController {
     constructor(private readonly service: ExpensesService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Create expense', description: 'Create a new expense' })
     @ApiBody({ type: CreateExpenseDto })
     @ApiResponse({ status: 201, description: 'Expense created successfully' })
@@ -73,7 +73,7 @@ export class ExpensesController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Update expense', description: 'Update an existing expense' })
     @ApiBody({ type: CreateExpenseDto })
     @ApiResponse({ status: 200, description: 'Expense updated successfully' })

@@ -26,7 +26,7 @@ export class NotificationController {
     constructor(private readonly notificationService: NotificationService) { }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({
         summary: 'Get all notifications',
         description: 'Retrieve all notifications for the authenticated user'
@@ -55,7 +55,7 @@ export class NotificationController {
     }
 
     @Get('unread')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({
         summary: 'Get unread notifications',
         description: 'Retrieve only unread notifications for the authenticated user'
@@ -67,7 +67,7 @@ export class NotificationController {
     }
 
     @Patch(':id/read')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
         summary: 'Mark notification as read',
@@ -82,7 +82,7 @@ export class NotificationController {
     }
 
     @Patch('read-all')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
         summary: 'Mark all notifications as read',
@@ -103,7 +103,7 @@ export class NotificationController {
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
         summary: 'Delete notification',

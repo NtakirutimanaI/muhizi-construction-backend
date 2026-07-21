@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { Employee } from '../../employees/entities/employee.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 @Entity('contracts')
 export class Contract {
@@ -13,12 +12,6 @@ export class Contract {
     @Index('idx_contract_employee')
     employeeId: string;
 
-    @ManyToOne(() => Employee, { onDelete: 'SET NULL', nullable: true })
-    @JoinColumn({ name: 'employeeId' })
-    employee: Employee;
-
-    /** Denormalized snapshot of the employee's name at signing time — kept so the contract
-     * still reads correctly if the employee record is later removed. */
     @Column()
     employeeName: string;
 
@@ -36,6 +29,18 @@ export class Contract {
 
     @Column({ type: 'date', nullable: true })
     endDate: string;
+
+    @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+    basicSalary: number;
+
+    @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+    netSalary: number;
+
+    @Column({ nullable: true })
+    paymentFrequency: string;
+
+    @Column({ type: 'text', nullable: true })
+    workingConditions: string;
 
     @Column({ nullable: true })
     fileUrl: string;

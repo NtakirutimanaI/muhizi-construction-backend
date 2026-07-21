@@ -15,7 +15,7 @@ export class ProjectEvidenceController {
     constructor(private readonly service: ProjectEvidenceService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Create project evidence', description: 'Creates a new project evidence record' })
     @ApiBody({ type: CreateProjectEvidenceDto })
     @ApiResponse({ status: 201, description: 'Project evidence created successfully' })
@@ -26,7 +26,7 @@ export class ProjectEvidenceController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.PARTNER, Role.CLIENT)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.PARTNER, Role.CLIENT)
     @ApiOperation({ summary: 'Get all project evidence', description: 'Retrieves a list of all project evidence' })
     @ApiResponse({ status: 200, description: 'All project evidence retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +36,7 @@ export class ProjectEvidenceController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.MANAGER, Role.SITE_MANAGER, Role.CLIENT)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.CLIENT)
     @ApiOperation({ summary: 'Get project evidence by ID', description: 'Retrieves a single project evidence record by its ID' })
     @ApiResponse({ status: 200, description: 'Project evidence retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +47,7 @@ export class ProjectEvidenceController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Update project evidence', description: 'Updates an existing project evidence record by ID' })
     @ApiBody({ type: CreateProjectEvidenceDto })
     @ApiResponse({ status: 200, description: 'Project evidence updated successfully' })

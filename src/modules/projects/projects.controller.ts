@@ -28,7 +28,7 @@ export class ProjectsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get all projects', description: 'Retrieves a list of all projects' })
     @ApiResponse({ status: 200, description: 'All projects retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -38,7 +38,7 @@ export class ProjectsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get project by ID', description: 'Retrieves a single project by its ID' })
     @ApiResponse({ status: 200, description: 'Project retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

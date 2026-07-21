@@ -15,7 +15,7 @@ export class PartnershipsController {
     constructor(private readonly service: PartnershipsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Create partnership', description: 'Create a new partnership' })
     @ApiBody({ type: CreatePartnershipDto })
     @ApiResponse({ status: 201, description: 'Partnership created successfully' })
@@ -26,7 +26,7 @@ export class PartnershipsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
     @ApiOperation({ summary: 'Get all partnerships', description: 'Retrieve all partnerships' })
     @ApiResponse({ status: 200, description: 'All partnerships retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +36,7 @@ export class PartnershipsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
     @ApiOperation({ summary: 'Get partnership by ID', description: 'Retrieve a partnership by ID' })
     @ApiResponse({ status: 200, description: 'Partnership retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +47,7 @@ export class PartnershipsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGING_DIRECTOR)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Update partnership', description: 'Update an existing partnership. Moving status out of "pending" records the reviewer automatically.' })
     @ApiBody({ type: CreatePartnershipDto })
     @ApiResponse({ status: 200, description: 'Partnership updated successfully' })

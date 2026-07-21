@@ -15,7 +15,7 @@ export class EmployeesController {
     constructor(private readonly service: EmployeesService) { }
 
     @Post()
-    @Roles(Role.SITE_MANAGER, Role.SITE_ENGINEER)
+    @Roles(Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Create employee', description: 'Creates a new employee record. Registration is an HR/field function, not Admin\'s — Admin views the registry read-only.' })
     @ApiBody({ type: CreateEmployeeDto })
     @ApiResponse({ status: 201, description: 'Employee created successfully' })
@@ -26,7 +26,7 @@ export class EmployeesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
     @ApiOperation({ summary: 'Get all employees', description: 'Retrieves a list of all employees' })
     @ApiResponse({ status: 200, description: 'All employees retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +36,7 @@ export class EmployeesController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
     @ApiOperation({ summary: 'Get employee by ID', description: 'Retrieves a single employee by its ID' })
     @ApiResponse({ status: 200, description: 'Employee retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -47,7 +47,7 @@ export class EmployeesController {
     }
 
     @Put(':id')
-    @Roles(Role.SITE_MANAGER, Role.SITE_ENGINEER)
+    @Roles(Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Update employee', description: 'Updates an existing employee by ID' })
     @ApiBody({ type: CreateEmployeeDto })
     @ApiResponse({ status: 200, description: 'Employee updated successfully' })
@@ -59,7 +59,7 @@ export class EmployeesController {
     }
 
     @Delete(':id')
-    @Roles(Role.SITE_MANAGER, Role.SITE_ENGINEER)
+    @Roles(Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Delete employee', description: 'Deletes an employee by ID' })
     @ApiResponse({ status: 200, description: 'Employee deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
