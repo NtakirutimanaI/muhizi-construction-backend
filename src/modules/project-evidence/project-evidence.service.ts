@@ -4,6 +4,7 @@ import { Repository, In } from 'typeorm';
 import { ProjectEvidence } from './entities/project-evidence.entity';
 import { Site } from '../sites/entities/site.entity';
 import { CreateProjectEvidenceDto } from './dto/create-project-evidence.dto';
+import { UpdateProjectEvidenceDto } from './dto/update-project-evidence.dto';
 
 @Injectable()
 export class ProjectEvidenceService {
@@ -51,7 +52,7 @@ export class ProjectEvidenceService {
         return entity;
     }
 
-    async update(id: string, dto: Partial<CreateProjectEvidenceDto>, engineerId?: string): Promise<ProjectEvidence> {
+    async update(id: string, dto: UpdateProjectEvidenceDto, engineerId?: string): Promise<ProjectEvidence> {
         if (engineerId) {
             const existing = await this.findOne(id, engineerId);
             await this.assertSiteAssigned(engineerId, dto.siteId || existing.siteId);

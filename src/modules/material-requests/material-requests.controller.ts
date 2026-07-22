@@ -29,12 +29,13 @@ export class MaterialRequestsController {
 
     @Get()
     @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.SITE_MANAGER)
-    @ApiOperation({ summary: 'Get all material requests', description: 'Retrieves a list of all material requests' })
+    @ApiOperation({ summary: 'Get all material requests', description: 'Retrieves material requests — Admin and Managing Director (reviewers) see all; Site Manager (requester) sees only their own submissions' })
     @ApiResponse({ status: 200, description: 'All material requests retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAll() {
-        return this.service.findAll();
+    findAll(@Request() req) {
+        const userId = req.user.role === Role.SITE_MANAGER ? req.user.id : undefined;
+        return this.service.findAll(userId);
     }
 
     @Get(':id')
@@ -44,8 +45,9 @@ export class MaterialRequestsController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    findOne(@Param('id') id: string) {
-        return this.service.findOne(id);
+    findOne(@Param('id') id: string, @Request() req) {
+        const userId = req.user.role === Role.SITE_MANAGER ? req.user.id : undefined;
+        return this.service.findOne(id, userId);
     }
 
     @Put(':id')

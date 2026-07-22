@@ -27,7 +27,7 @@ export class UploadController {
 
     @Post()
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload a single file to Cloudinary' })
     @ApiConsumes('multipart/form-data')
@@ -46,7 +46,7 @@ export class UploadController {
 
     @Post('base64')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
+    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload a file via base64 JSON (works on serverless)' })
     @ApiResponse({ status: 201, description: 'File uploaded successfully' })

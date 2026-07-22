@@ -4,6 +4,7 @@ import { Repository, In } from 'typeorm';
 import { SiteActivity } from './entities/site-activity.entity';
 import { Site } from '../sites/entities/site.entity';
 import { CreateSiteActivityDto } from './dto/create-site-activity.dto';
+import { UpdateSiteActivityDto } from './dto/update-site-activity.dto';
 
 @Injectable()
 export class SiteActivitiesService {
@@ -59,7 +60,7 @@ export class SiteActivitiesService {
         return activity;
     }
 
-    async update(id: string, dto: Partial<CreateSiteActivityDto>, engineerId?: string): Promise<SiteActivity> {
+    async update(id: string, dto: UpdateSiteActivityDto, engineerId?: string): Promise<SiteActivity> {
         if (engineerId) {
             const existing = await this.findOne(id, engineerId);
             await this.assertSiteAssigned(engineerId, dto.siteId || existing.siteId);

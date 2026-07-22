@@ -7,6 +7,7 @@ import { Public } from '../auth/decorators/public.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { SiteActivitiesService } from './site-activities.service';
 import { CreateSiteActivityDto } from './dto/create-site-activity.dto';
+import { UpdateSiteActivityDto } from './dto/update-site-activity.dto';
 
 @ApiTags('Site Activities')
 @Controller('site-activities')
@@ -61,13 +62,13 @@ export class SiteActivitiesController {
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER)
-    @ApiOperation({ summary: 'Update a site activity', description: 'Update an existing site activity (admin/site manager/site engineer)' })
-    @ApiBody({ type: CreateSiteActivityDto })
+    @ApiOperation({ summary: 'Update a site activity', description: 'Update an existing site activity (admin/site manager/site engineer), partial update supported' })
+    @ApiBody({ type: UpdateSiteActivityDto })
     @ApiResponse({ status: 200, description: 'Site activity updated successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    update(@Param('id') id: string, @Body() dto: CreateSiteActivityDto, @Request() req) {
+    update(@Param('id') id: string, @Body() dto: UpdateSiteActivityDto, @Request() req) {
         const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
         return this.service.update(id, dto, engineerId);
     }

@@ -6,6 +6,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { ProjectEvidenceService } from './project-evidence.service';
 import { CreateProjectEvidenceDto } from './dto/create-project-evidence.dto';
+import { UpdateProjectEvidenceDto } from './dto/update-project-evidence.dto';
 
 @ApiTags('Project Evidence')
 @ApiBearerAuth('JWT-auth')
@@ -51,13 +52,13 @@ export class ProjectEvidenceController {
 
     @Put(':id')
     @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER)
-    @ApiOperation({ summary: 'Update project evidence', description: 'Updates an existing project evidence record by ID' })
-    @ApiBody({ type: CreateProjectEvidenceDto })
+    @ApiOperation({ summary: 'Update project evidence', description: 'Updates an existing project evidence record by ID (partial update supported)' })
+    @ApiBody({ type: UpdateProjectEvidenceDto })
     @ApiResponse({ status: 200, description: 'Project evidence updated successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    update(@Param('id') id: string, @Body() dto: CreateProjectEvidenceDto, @Request() req) {
+    update(@Param('id') id: string, @Body() dto: UpdateProjectEvidenceDto, @Request() req) {
         const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
         return this.service.update(id, dto, engineerId);
     }
