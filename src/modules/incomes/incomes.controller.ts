@@ -8,7 +8,7 @@ import { IncomesService } from './incomes.service';
 import { CreateIncomeDto } from './dto/create-income.dto';
 
 const TOGGLE_ROLES = [Role.FINANCE_DIRECTOR];
-const READ_ROLES = [Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
+const READ_ROLES = [Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
 
 @ApiTags('Incomes')
 @ApiBearerAuth('JWT-auth')
@@ -18,7 +18,7 @@ export class IncomesController {
     constructor(private readonly service: IncomesService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Create income', description: 'Create a new income record' })
     @ApiBody({ type: CreateIncomeDto })
     @ApiResponse({ status: 201, description: 'Income created successfully' })
@@ -73,7 +73,7 @@ export class IncomesController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Update income', description: 'Update an existing income record' })
     @ApiBody({ type: CreateIncomeDto })
     @ApiResponse({ status: 200, description: 'Income updated successfully' })

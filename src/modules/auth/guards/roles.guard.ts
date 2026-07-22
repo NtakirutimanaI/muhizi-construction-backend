@@ -4,9 +4,9 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
 
 const ROLE_ALIASES: Partial<Record<Role, Role[]>> = {
-    [Role.MANAGING_DIRECTOR]: [Role.MANAGER, Role.MANAGING_DIRECTOR],
-    [Role.FINANCE_DIRECTOR]: [Role.SITE_MANAGER, Role.MANAGER, Role.FINANCE_DIRECTOR],
-    [Role.SITE_ENGINEER]: [Role.SITE_MANAGER, Role.SITE_ENGINEER],
+    [Role.MANAGING_DIRECTOR]: [Role.STOREKEEPER, Role.MANAGING_DIRECTOR],
+    [Role.FINANCE_DIRECTOR]: [Role.STOREKEEPER, Role.FINANCE_DIRECTOR],
+    [Role.SITE_ENGINEER]: [Role.STOREKEEPER, Role.SITE_ENGINEER],
     [Role.ENGINEERING_STUDIO]: [Role.EMPLOYEE, Role.ENGINEERING_STUDIO],
 };
 
