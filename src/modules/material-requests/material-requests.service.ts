@@ -45,13 +45,14 @@ export class MaterialRequestsService {
         return saved;
     }
 
-    async findAll(): Promise<MaterialRequest[]> {
-        return this.repo.find({ order: { date: 'DESC', createdAt: 'DESC' } });
+    async findAll(userId?: string): Promise<MaterialRequest[]> {
+        return this.repo.find({ where: userId ? { createdById: userId } : {}, order: { date: 'DESC', createdAt: 'DESC' } });
     }
 
-    async findOne(id: string): Promise<MaterialRequest> {
+    async findOne(id: string, userId?: string): Promise<MaterialRequest> {
         const entity = await this.repo.findOne({ where: { id } });
         if (!entity) throw new NotFoundException('Material request not found');
+        if (userId && entity.createdById !== userId) throw new NotFoundException('Material request not found');
         return entity;
     }
 

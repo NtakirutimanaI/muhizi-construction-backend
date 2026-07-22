@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -33,8 +33,9 @@ export class ProjectsController {
     @ApiResponse({ status: 200, description: 'All projects retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAll() {
-        return this.service.findAll();
+    findAll(@Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAll(engineerId);
     }
 
     @Get(':id')
@@ -44,8 +45,9 @@ export class ProjectsController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    findOne(@Param('id') id: string) {
-        return this.service.findOne(id);
+    findOne(@Param('id') id: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findOne(id, engineerId);
     }
 
     @Put(':id')
