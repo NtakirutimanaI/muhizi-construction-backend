@@ -45,6 +45,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { EngineeringSubmissionsModule } from './modules/engineering-submissions/engineering-submissions.module';
 import { DailyReportsModule } from './modules/daily-reports/daily-reports.module';
 import { InsuranceModule } from './modules/insurance/insurance.module';
+import { MoneyRequisitionsModule } from './modules/money-requisitions/money-requisitions.module';
+import { UpdatesModule } from './modules/updates/updates.module';
 
 @Module({
     imports: [
@@ -127,6 +129,8 @@ import { InsuranceModule } from './modules/insurance/insurance.module';
         EngineeringSubmissionsModule,
         DailyReportsModule,
         InsuranceModule,
+        MoneyRequisitionsModule,
+        UpdatesModule,
     ],
     controllers: [AppController],
     providers: [],
