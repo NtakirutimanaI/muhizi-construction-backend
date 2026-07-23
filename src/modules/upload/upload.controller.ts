@@ -27,7 +27,7 @@ export class UploadController {
 
     @Post()
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload a single file to Cloudinary' })
     @ApiConsumes('multipart/form-data')
@@ -46,7 +46,7 @@ export class UploadController {
 
     @Post('base64')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.SITE_ENGINEER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload a file via base64 JSON (works on serverless)' })
     @ApiResponse({ status: 201, description: 'File uploaded successfully' })
@@ -63,7 +63,7 @@ export class UploadController {
 
     @Post('multiple')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload multiple files to Cloudinary' })
     @ApiConsumes('multipart/form-data')
@@ -78,7 +78,7 @@ export class UploadController {
 
     @Get('files')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Get all uploaded files records' })
     @ApiResponse({ status: 200, description: 'Files retrieved successfully' })
@@ -112,7 +112,7 @@ export class UploadController {
 
     @Post('store-bill')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload store bill', description: 'Upload a store bill document for products in/out tracking' })
     @ApiConsumes('multipart/form-data')
@@ -125,7 +125,7 @@ export class UploadController {
 
     @Post('material-evidence')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload material evidence', description: 'Upload evidence photo or PDF for used construction materials' })
     @ApiConsumes('multipart/form-data')
@@ -151,7 +151,7 @@ export class UploadController {
 
     @Post('contract-document')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.MANAGER, Role.FINANCE_DIRECTOR)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.FINANCE_DIRECTOR)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload contract document', description: 'Upload a contract document (PDF, Word, or other format)' })
     @ApiConsumes('multipart/form-data')

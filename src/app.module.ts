@@ -44,6 +44,7 @@ import { StockApprovalsModule } from './modules/stock-approvals/stock-approvals.
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { EngineeringSubmissionsModule } from './modules/engineering-submissions/engineering-submissions.module';
 import { DailyReportsModule } from './modules/daily-reports/daily-reports.module';
+import { InsuranceModule } from './modules/insurance/insurance.module';
 
 @Module({
     imports: [
@@ -125,6 +126,7 @@ import { DailyReportsModule } from './modules/daily-reports/daily-reports.module
         DashboardModule,
         EngineeringSubmissionsModule,
         DailyReportsModule,
+        InsuranceModule,
     ],
     controllers: [AppController],
     providers: [],

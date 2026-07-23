@@ -33,7 +33,7 @@ export class CategoriesController {
 
     @Post()
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Create a category', description: 'Create a new category (admin/site manager)' })
     @ApiBody({ type: CreateCategoryDto })
@@ -46,7 +46,7 @@ export class CategoriesController {
 
     @Put(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Update a category', description: 'Update an existing category (admin/site manager)' })
     @ApiBody({ type: UpdateCategoryDto })

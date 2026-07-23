@@ -17,7 +17,7 @@ export class DesignsController {
     constructor(private readonly service: DesignsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Create design', description: 'Create a new design' })
     @ApiBody({ type: CreateDesignDto })
     @ApiResponse({ status: 201, description: 'Design created successfully' })
@@ -28,7 +28,7 @@ export class DesignsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get all designs', description: 'Retrieve all designs' })
     @ApiResponse({ status: 200, description: 'All designs retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -38,7 +38,7 @@ export class DesignsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get design by ID', description: 'Retrieve a design by ID' })
     @ApiResponse({ status: 200, description: 'Design retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -49,7 +49,7 @@ export class DesignsController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Update design', description: 'Update an existing design' })
     @ApiBody({ type: CreateDesignDto })
     @ApiResponse({ status: 200, description: 'Design updated successfully' })

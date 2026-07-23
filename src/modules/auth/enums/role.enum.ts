@@ -1,10 +1,9 @@
 export enum Role {
     ADMIN = 'admin',
-    SITE_MANAGER = 'site_manager',
     EMPLOYEE = 'employee',
     CLIENT = 'client',
     PARTNER = 'partner',
-    MANAGER = 'manager',
+    STOREKEEPER = 'storekeeper',
     MANAGING_DIRECTOR = 'managing_director',
     FINANCE_DIRECTOR = 'finance_director',
     SITE_ENGINEER = 'site_engineer',
