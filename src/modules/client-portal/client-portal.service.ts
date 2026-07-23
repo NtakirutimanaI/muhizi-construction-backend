@@ -1,9 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { FindOptionsSelect, In, Repository } from 'typeorm';
 import { Project } from '../projects/entities/project.entity';
 import { ProjectEvidence } from '../project-evidence/entities/project-evidence.entity';
 import { ClientReport } from '../client-reports/entities/client-report.entity';
+
+// Explicit allowlist — a client must never receive budget/spent (internal financials)
+// or partner/contact linkage fields, even accidentally via a future relation/column add.
+const PROJECT_SELECT: FindOptionsSelect<Project> = {
+    id: true, name: true, description: true, type: true, status: true, location: true,
+    startDate: true, endDate: true, progress: true, images: true, createdAt: true, updatedAt: true,
+    sites: {
+        id: true, name: true, description: true, location: true, status: true,
+        startDate: true, endDate: true, progress: true, images: true, projectId: true,
+        createdAt: true, updatedAt: true,
+    },
+};
 
 @Injectable()
 export class ClientPortalService {
@@ -20,6 +32,7 @@ export class ClientPortalService {
         return this.projectRepo.find({
             where: { clientUserId },
             relations: ['sites'],
+            select: PROJECT_SELECT,
             order: { createdAt: 'DESC' },
         });
     }
@@ -29,6 +42,7 @@ export class ClientPortalService {
         const project = await this.projectRepo.findOne({
             where: { id: projectId, clientUserId },
             relations: ['sites'],
+            select: PROJECT_SELECT,
         });
         if (!project) throw new NotFoundException('Project not found');
         return project;
@@ -60,6 +74,14 @@ export class ClientPortalService {
         return this.reportRepo.find({
             where: { projectId: In(projects.map((p) => p.id)), status: 'published' },
             relations: ['project', 'createdBy'],
+            select: {
+                id: true, title: true, description: true, progressPercentage: true, status: true,
+                projectId: true, createdById: true, createdAt: true, updatedAt: true,
+                project: PROJECT_SELECT,
+                // createdBy is a full User relation — never let password/refreshToken/otpCode
+                // leave the server (see the app-wide note flagged separately).
+                createdBy: { id: true, firstName: true, lastName: true },
+            },
             order: { createdAt: 'DESC' },
         });
     }
