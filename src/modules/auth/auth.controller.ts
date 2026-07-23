@@ -159,9 +159,9 @@ export class AuthController {
 
     @Get('users')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR)
     @ApiBearerAuth('JWT-auth')
-    @ApiOperation({ summary: 'Get all registered users (admin only)' })
+    @ApiOperation({ summary: 'Get all registered users (admin/managing director only)' })
     @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
     @ApiResponse({ status: 403, description: 'Forbidden - admin only' })
     async getAllUsers(@Request() req) {

@@ -19,6 +19,9 @@ export class ClientReport {
     @Column({ default: 'draft' })
     status: string;
 
+    @Column({ type: 'json', nullable: true })
+    media: { url: string; type: 'image' | 'video' }[];
+
     @Column()
     projectId: string;
 

@@ -76,7 +76,7 @@ export class ClientPortalService {
             relations: ['project', 'createdBy'],
             select: {
                 id: true, title: true, description: true, progressPercentage: true, status: true,
-                projectId: true, createdById: true, createdAt: true, updatedAt: true,
+                projectId: true, createdById: true, createdAt: true, updatedAt: true, media: true,
                 project: PROJECT_SELECT,
                 // createdBy is a full User relation — never let password/refreshToken/otpCode
                 // leave the server (see the app-wide note flagged separately).
