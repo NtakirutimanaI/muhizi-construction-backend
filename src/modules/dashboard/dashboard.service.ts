@@ -10,6 +10,9 @@ import { Stock } from '../stock/entities/stock.entity';
 import { MaterialRequest } from '../material-requests/entities/material-request.entity';
 import { Site, SiteStatus } from '../sites/entities/site.entity';
 import { ProjectEvidence } from '../project-evidence/entities/project-evidence.entity';
+import { Design } from '../designs/entities/design.entity';
+import { EngineeringSubmission } from '../engineering-submissions/entities/engineering-submission.entity';
+import { Task } from '../tasks/entities/task.entity';
 
 @Injectable()
 export class DashboardService {
@@ -23,6 +26,9 @@ export class DashboardService {
         @InjectRepository(MaterialRequest) private mrRepo: Repository<MaterialRequest>,
         @InjectRepository(Site) private siteRepo: Repository<Site>,
         @InjectRepository(ProjectEvidence) private evidenceRepo: Repository<ProjectEvidence>,
+        @InjectRepository(Design) private designRepo: Repository<Design>,
+        @InjectRepository(EngineeringSubmission) private submissionRepo: Repository<EngineeringSubmission>,
+        @InjectRepository(Task) private taskRepo: Repository<Task>,
     ) {}
 
     async getAdminKpi() {
@@ -68,8 +74,39 @@ export class DashboardService {
         return { assignedSites: assignedSites.length, pendingRequests };
     }
 
-    async getEngineeringStudioKpi() {
-        return { assignedDesigns: 0, pendingSubmissions: 0 };
+    async getEngineeringStudioKpi(userId: string) {
+        const [
+            totalDesigns,
+            approvedDesigns,
+            mySubmissions,
+            pendingSubmissions,
+            approvedSubmissions,
+            rejectedSubmissions,
+            myTasks,
+            pendingTasks,
+            completedTasks,
+        ] = await Promise.all([
+            this.designRepo.count(),
+            this.designRepo.count({ where: { status: 'approved' as any } }),
+            this.submissionRepo.count({ where: { submittedBy: userId } }),
+            this.submissionRepo.count({ where: { submittedBy: userId, status: 'submitted' as any } }),
+            this.submissionRepo.count({ where: { submittedBy: userId, status: 'approved' as any } }),
+            this.submissionRepo.count({ where: { submittedBy: userId, status: 'rejected' as any } }),
+            this.taskRepo.count({ where: { assignedTo: userId } }),
+            this.taskRepo.count({ where: { assignedTo: userId, status: 'pending' as any } }),
+            this.taskRepo.count({ where: { assignedTo: userId, status: 'completed' as any } }),
+        ]);
+        return {
+            totalDesigns,
+            approvedDesigns,
+            mySubmissions,
+            pendingSubmissions,
+            approvedSubmissions,
+            rejectedSubmissions,
+            myTasks,
+            pendingTasks,
+            completedTasks,
+        };
     }
 
     async getPartnerKpi() {

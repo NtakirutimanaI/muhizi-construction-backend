@@ -158,12 +158,10 @@ export class AuthController {
     }
 
     @Get('users')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
+    @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('JWT-auth')
-    @ApiOperation({ summary: 'Get all registered users (admin / finance director)' })
+    @ApiOperation({ summary: 'Get all registered users' })
     @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
-    @ApiResponse({ status: 403, description: 'Forbidden - admin / finance director only' })
     async getAllUsers(@Request() req) {
         return this.authService.getAllUsers(req.user.id);
     }

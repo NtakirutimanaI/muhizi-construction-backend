@@ -34,7 +34,7 @@ export class MaterialRequestsController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     findAll(@Request() req) {
-        const userId = req.user.role === Role.SITE_MANAGER ? req.user.id : undefined;
+        const userId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
         return this.service.findAll(userId);
     }
 
@@ -46,7 +46,7 @@ export class MaterialRequestsController {
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
     findOne(@Param('id') id: string, @Request() req) {
-        const userId = req.user.role === Role.SITE_MANAGER ? req.user.id : undefined;
+        const userId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
         return this.service.findOne(id, userId);
     }
 
