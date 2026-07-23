@@ -47,6 +47,8 @@ import { DailyReportsModule } from './modules/daily-reports/daily-reports.module
 import { InsuranceModule } from './modules/insurance/insurance.module';
 import { MoneyRequisitionsModule } from './modules/money-requisitions/money-requisitions.module';
 import { UpdatesModule } from './modules/updates/updates.module';
+import { TasksModule } from './modules/tasks/tasks.module';
+import { SharedFilesModule } from './modules/shared-files/shared-files.module';
 
 @Module({
     imports: [
@@ -131,6 +133,8 @@ import { UpdatesModule } from './modules/updates/updates.module';
         InsuranceModule,
         MoneyRequisitionsModule,
         UpdatesModule,
+        TasksModule,
+        SharedFilesModule,
     ],
     controllers: [AppController],
     providers: [],

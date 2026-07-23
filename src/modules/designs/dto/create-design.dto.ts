@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { DesignType, DesignStatus } from '../entities/design.entity';
+import { DesignType, DesignStatus, DesignSource } from '../entities/design.entity';
 
 export class CreateDesignDto {
     @ApiProperty({ example: 'Modern Villa Design', description: 'Design title' })
@@ -23,6 +23,11 @@ export class CreateDesignDto {
     @IsOptional()
     status?: DesignStatus;
 
+    @ApiProperty({ example: DesignSource.EXTERNAL, enum: DesignSource, enumName: 'DesignSource', description: 'Design source', required: false })
+    @IsEnum(DesignSource, { message: 'source must be a valid DesignSource value (submission, external)' })
+    @IsOptional()
+    source?: DesignSource;
+
     @ApiProperty({ example: 'https://example.com/designs/design-123.pdf', description: 'URL to the design file', required: false })
     @IsString({ message: 'fileUrl must be a string' })
     @IsOptional()
@@ -41,4 +46,9 @@ export class CreateDesignDto {
     @ApiProperty({ example: { architect: 'Jane Smith', scale: '1:100', version: 'v2', dimensions: 'A0' }, description: 'Additional design metadata', required: false })
     @IsOptional()
     metadata?: { architect?: string; scale?: string; version?: string; dimensions?: string };
+
+    @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', description: 'UUID of the user who saved this design', required: false })
+    @IsString({ message: 'savedBy must be a string' })
+    @IsOptional()
+    savedBy?: string;
 }
