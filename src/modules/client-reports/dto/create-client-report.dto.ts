@@ -1,5 +1,16 @@
-import { IsString, IsOptional, IsNumber, IsUUID } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsUUID, IsArray, ValidateNested, IsIn, IsUrl } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+
+export class ClientReportMediaDto {
+    @ApiProperty({ example: 'https://res.cloudinary.com/.../photo.jpg', description: 'Cloudinary URL of the uploaded photo or video' })
+    @IsUrl({}, { message: 'url must be a valid URL' })
+    url: string;
+
+    @ApiProperty({ example: 'image', enum: ['image', 'video'] })
+    @IsIn(['image', 'video'], { message: 'type must be image or video' })
+    type: 'image' | 'video';
+}
 
 export class CreateClientReportDto {
     @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', description: 'UUID of the project this report belongs to' })
@@ -24,6 +35,13 @@ export class CreateClientReportDto {
     @IsOptional()
     @IsString({ message: 'status must be a string' })
     status?: string;
+
+    @ApiProperty({ type: [ClientReportMediaDto], description: 'Photos/videos attached to this report', required: false })
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ClientReportMediaDto)
+    media?: ClientReportMediaDto[];
 }
 
 export class UpdateClientReportDto {
@@ -46,4 +64,11 @@ export class UpdateClientReportDto {
     @IsOptional()
     @IsString({ message: 'status must be a string' })
     status?: string;
+
+    @ApiProperty({ type: [ClientReportMediaDto], description: 'Photos/videos attached to this report', required: false })
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ClientReportMediaDto)
+    media?: ClientReportMediaDto[];
 }
