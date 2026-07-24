@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MoneyRequisition } from './entities/money-requisition.entity';
 import { CreateMoneyRequisitionDto } from './dto/create-money-requisition.dto';
+import { UpdateMoneyRequisitionDto } from './dto/update-money-requisition.dto';
 import { ReviewMoneyRequisitionDto } from './dto/review-money-requisition.dto';
 import { NotificationService } from '../notification/services/notification.service';
 import { NotificationType } from '../notification/entities/notification.entity';
@@ -23,8 +24,32 @@ export class MoneyRequisitionsService {
             ...dto,
             requesterId: userId,
             requesterName: userName,
-            status: 'pending',
+            status: dto.status || 'draft',
         });
+        const saved = await this.repo.save(entity);
+
+        if ((dto.status || 'draft') === 'pending') {
+            const admins = await this.userRepo.find({ where: { role: 'admin' } });
+            for (const admin of admins) {
+                await this.notificationService.create({
+                    type: NotificationType.SYSTEM,
+                    title: 'New Money Requisition',
+                    message: `${userName} requested RWF ${Number(dto.amount).toLocaleString()} — ${dto.title}`,
+                    user: { id: admin.id },
+                    metadata: { moneyRequisitionId: saved.id },
+                });
+            }
+        }
+
+        return saved;
+    }
+
+    async submit(id: string, userId: string, userName: string): Promise<MoneyRequisition> {
+        const entity = await this.findOne(id);
+        if (entity.requesterId !== userId) throw new BadRequestException('Only the requester can submit');
+        if (entity.status !== 'draft') throw new BadRequestException('Only draft requisitions can be submitted');
+
+        entity.status = 'pending';
         const saved = await this.repo.save(entity);
 
         const admins = await this.userRepo.find({ where: { role: 'admin' } });
@@ -32,7 +57,7 @@ export class MoneyRequisitionsService {
             await this.notificationService.create({
                 type: NotificationType.SYSTEM,
                 title: 'New Money Requisition',
-                message: `${userName} requested RWF ${Number(dto.amount).toLocaleString()} — ${dto.title}`,
+                message: `${userName} submitted requisition for RWF ${Number(entity.amount).toLocaleString()} — ${entity.title}`,
                 user: { id: admin.id },
                 metadata: { moneyRequisitionId: saved.id },
             });
@@ -67,6 +92,12 @@ export class MoneyRequisitionsService {
         entity.reviewedAt = new Date().toISOString().split('T')[0];
 
         if (dto.notes) entity.adminNotes = dto.notes;
+        if (dto.authorizedByName) entity.authorizedByName = dto.authorizedByName;
+        if (dto.authorizedByPosition) entity.authorizedByPosition = dto.authorizedByPosition;
+        if (dto.authorizedBySignature) entity.authorizedBySignature = dto.authorizedBySignature;
+        if (dto.authorizationDate) entity.authorizationDate = dto.authorizationDate;
+        entity.authorizationStatus = dto.status;
+        if (dto.stampUrl) entity.stampUrl = dto.stampUrl;
 
         if (dto.modifiedAmount !== undefined && dto.modifiedAmount !== Number(entity.amount)) {
             entity.adminNotes = [
@@ -90,6 +121,19 @@ export class MoneyRequisitionsService {
         }
 
         return saved;
+    }
+
+    async update(id: string, dto: UpdateMoneyRequisitionDto): Promise<MoneyRequisition> {
+        const entity = await this.findOne(id);
+        if (dto.title !== undefined) entity.title = dto.title;
+        if (dto.description !== undefined) entity.description = dto.description;
+        if (dto.amount !== undefined) entity.amount = dto.amount;
+        if (dto.requestedAt !== undefined) entity.requestedAt = dto.requestedAt;
+        if (dto.department !== undefined) entity.department = dto.department;
+        if (dto.reason !== undefined) entity.reason = dto.reason;
+        if (dto.requestedDisbursementDate !== undefined) entity.requestedDisbursementDate = dto.requestedDisbursementDate;
+        if (dto.status !== undefined) entity.status = dto.status as any;
+        return this.repo.save(entity);
     }
 
     async remove(id: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -6,6 +6,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { MoneyRequisitionsService } from './money-requisitions.service';
 import { CreateMoneyRequisitionDto } from './dto/create-money-requisition.dto';
+import { UpdateMoneyRequisitionDto } from './dto/update-money-requisition.dto';
 import { ReviewMoneyRequisitionDto } from './dto/review-money-requisition.dto';
 
 @ApiTags('Money Requisitions')
@@ -59,8 +60,28 @@ export class MoneyRequisitionsController {
         return this.service.review(id, dto, user.id, name);
     }
 
-    @Delete(':id')
+    @Post(':id/submit')
     @Roles(Role.FINANCE_DIRECTOR)
+    @ApiOperation({ summary: 'Submit draft to admin', description: 'Finance Director submits a draft requisition for admin review' })
+    @ApiResponse({ status: 200, description: 'Requisition submitted for review' })
+    @ApiResponse({ status: 400, description: 'Not a draft' })
+    submit(@Param('id') id: string, @Request() req) {
+        const user = req.user;
+        const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+        return this.service.submit(id, user.id, name);
+    }
+
+    @Patch(':id')
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
+    @ApiOperation({ summary: 'Update money requisition', description: 'Admin or Finance Director edits a requisition' })
+    @ApiBody({ type: UpdateMoneyRequisitionDto })
+    @ApiResponse({ status: 200, description: 'Requisition updated' })
+    update(@Param('id') id: string, @Body() dto: UpdateMoneyRequisitionDto) {
+        return this.service.update(id, dto);
+    }
+
+    @Delete(':id')
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
     @ApiOperation({ summary: 'Delete money requisition' })
     @ApiResponse({ status: 200, description: 'Requisition deleted' })
     remove(@Param('id') id: string) {
