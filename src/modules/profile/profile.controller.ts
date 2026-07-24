@@ -105,7 +105,7 @@ export class ProfileController {
     // Admin message endpoints
     @Get('messages')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Get all contact messages',
@@ -119,7 +119,7 @@ export class ProfileController {
 
     @Post('messages/:id/read')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER, Role.SITE_MANAGER, Role.MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({
         summary: 'Mark message as read',

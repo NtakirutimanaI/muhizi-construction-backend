@@ -15,7 +15,7 @@ export class PettyCashFundController {
     constructor(private readonly service: PettyCashFundService) {}
 
     @Post()
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Create petty cash fund' })
     @ApiBody({ type: CreatePettyCashFundDto })
     @ApiResponse({ status: 201, description: 'Fund created' })
@@ -26,7 +26,7 @@ export class PettyCashFundController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get all petty cash funds' })
     @ApiResponse({ status: 200, description: 'List of funds' })
     findAll() {
@@ -42,7 +42,7 @@ export class PettyCashFundController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get petty cash fund by ID' })
     @ApiResponse({ status: 200, description: 'Fund details' })
     @ApiResponse({ status: 404, description: 'Not found' })

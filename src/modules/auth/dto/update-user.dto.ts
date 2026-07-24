@@ -8,7 +8,7 @@ export class UpdateUserDto {
     @IsOptional()
     email?: string;
 
-    @ApiProperty({ example: 'employee', enum: Object.values(Role), required: false })
+    @ApiProperty({ example: 'storekeeper', enum: Object.values(Role), required: false })
     @IsString()
     @IsOptional()
     @IsIn(Object.values(Role))

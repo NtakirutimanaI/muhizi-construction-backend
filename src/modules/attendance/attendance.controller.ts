@@ -27,7 +27,7 @@ export class AttendanceController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get all attendance', description: 'Retrieve all attendance records' })
     @ApiResponse({ status: 200, description: 'All attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -60,7 +60,7 @@ export class AttendanceController {
     }
 
     @Get('employee/:employeeId')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get attendance by employee', description: 'Retrieve attendance records for a specific employee' })
     @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -70,7 +70,7 @@ export class AttendanceController {
     }
 
     @Get('employee/:employeeId/month')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get attendance by employee and month', description: 'Retrieve attendance records for a specific employee in a given month' })
     @ApiResponse({ status: 200, description: 'Attendance records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -106,7 +106,7 @@ export class AttendanceController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER, Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Get attendance by ID', description: 'Retrieve an attendance record by ID' })
     @ApiResponse({ status: 200, description: 'Attendance record retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

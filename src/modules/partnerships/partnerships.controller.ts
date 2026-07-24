@@ -26,7 +26,7 @@ export class PartnershipsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get all partnerships', description: 'Retrieve all partnerships' })
     @ApiResponse({ status: 200, description: 'All partnerships retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +36,7 @@ export class PartnershipsController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get partnership by ID', description: 'Retrieve a partnership by ID' })
     @ApiResponse({ status: 200, description: 'Partnership retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

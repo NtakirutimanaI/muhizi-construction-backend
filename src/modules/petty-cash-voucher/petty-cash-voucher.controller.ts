@@ -15,7 +15,7 @@ export class PettyCashVoucherController {
     constructor(private readonly service: PettyCashVoucherService) {}
 
     @Post()
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE, Role.SITE_ENGINEER, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Create petty cash voucher' })
     @ApiBody({ type: CreatePettyCashVoucherDto })
     @ApiResponse({ status: 201, description: 'Voucher created' })
@@ -26,7 +26,7 @@ export class PettyCashVoucherController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Get all petty cash vouchers' })
     @ApiResponse({ status: 200, description: 'List of vouchers' })
     findAll() {
@@ -42,7 +42,7 @@ export class PettyCashVoucherController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE, Role.MANAGING_DIRECTOR)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Get petty cash voucher by ID' })
     @ApiResponse({ status: 200, description: 'Voucher details' })
     @ApiResponse({ status: 404, description: 'Not found' })
@@ -51,7 +51,7 @@ export class PettyCashVoucherController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
     @ApiOperation({ summary: 'Update petty cash voucher' })
     @ApiBody({ type: CreatePettyCashVoucherDto })
     @ApiResponse({ status: 200, description: 'Voucher updated' })
@@ -62,7 +62,7 @@ export class PettyCashVoucherController {
     }
 
     @Post(':id/submit')
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE, Role.SITE_ENGINEER, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Submit voucher for approval' })
     @ApiResponse({ status: 200, description: 'Voucher submitted' })
     submit(@Param('id') id: string) {

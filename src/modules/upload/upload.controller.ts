@@ -78,7 +78,7 @@ export class UploadController {
 
     @Get('files')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Get all uploaded files records' })
     @ApiResponse({ status: 200, description: 'Files retrieved successfully' })
@@ -99,7 +99,7 @@ export class UploadController {
 
     @Post('national-id')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.EMPLOYEE, Role.SITE_ENGINEER, Role.ADMIN)
+    @Roles(Role.SITE_ENGINEER, Role.ADMIN)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Upload National ID document', description: 'Upload a National ID image or document for attendance/employee records' })
     @ApiConsumes('multipart/form-data')

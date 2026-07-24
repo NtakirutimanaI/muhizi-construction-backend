@@ -47,7 +47,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Get('employee/:employeeId')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get assignments by employee', description: 'Retrieve employee assignments for a specific employee' })
     @ApiResponse({ status: 200, description: 'Employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

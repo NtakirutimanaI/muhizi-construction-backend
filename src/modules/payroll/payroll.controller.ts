@@ -49,7 +49,7 @@ export class PayrollController {
     }
 
     @Get('employee/:employeeId')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get payroll by employee', description: 'Retrieves payroll records for a specific employee — self-service, not permission-gated' })
     @ApiResponse({ status: 200, description: 'Payroll records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

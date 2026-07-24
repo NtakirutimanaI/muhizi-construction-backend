@@ -22,7 +22,7 @@ export class InsuranceController {
     }
 
     @Get('active')
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE, Role.SITE_ENGINEER)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Get active insurance settings' })
     findActive() {
         return this.service.findActive();

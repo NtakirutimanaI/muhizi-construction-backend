@@ -7,7 +7,7 @@ export class UpdateMaterialRequestStatusDto {
     @IsNotEmpty({ message: 'status is required' })
     status: 'approved' | 'rejected';
 
-    @ApiProperty({ example: 'Approved by site manager', required: false, description: 'Notes about the status change' })
+    @ApiProperty({ example: 'Approved by site engineer', required: false, description: 'Notes about the status change' })
     @IsString({ message: 'notes must be a string' })
     @IsOptional()
     notes?: string;

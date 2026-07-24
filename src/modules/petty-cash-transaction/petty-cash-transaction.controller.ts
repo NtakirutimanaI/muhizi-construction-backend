@@ -15,7 +15,7 @@ export class PettyCashTransactionController {
     constructor(private readonly service: PettyCashTransactionService) {}
 
     @Post()
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.EMPLOYEE, Role.SITE_ENGINEER, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.SITE_ENGINEER, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Create petty cash transaction' })
     @ApiBody({ type: CreatePettyCashTransactionDto })
     @ApiResponse({ status: 201, description: 'Transaction created' })
@@ -26,7 +26,7 @@ export class PettyCashTransactionController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Get all petty cash transactions' })
     @ApiQuery({ name: 'fundId', required: false, description: 'Filter by fund ID' })
     @ApiResponse({ status: 200, description: 'List of transactions' })
@@ -35,7 +35,7 @@ export class PettyCashTransactionController {
     }
 
     @Get('fund/:fundId')
-    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Get transactions by fund' })
     @ApiResponse({ status: 200, description: 'List of transactions for a fund' })
     findByFund(@Param('fundId') fundId: string) {

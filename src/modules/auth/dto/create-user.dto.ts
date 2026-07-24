@@ -27,7 +27,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     lastName: string;
 
-    @ApiProperty({ example: 'employee', enum: Object.values(Role), default: 'employee' })
+    @ApiProperty({ example: 'storekeeper', enum: Object.values(Role), default: 'storekeeper' })
     @IsString()
     @IsOptional()
     @IsIn(Object.values(Role))

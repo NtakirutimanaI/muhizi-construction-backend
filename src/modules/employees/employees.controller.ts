@@ -26,7 +26,7 @@ export class EmployeesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get all employees', description: 'Retrieves a list of all employees' })
     @ApiResponse({ status: 200, description: 'All employees retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,7 +36,7 @@ export class EmployeesController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get employee by ID', description: 'Retrieves a single employee by its ID' })
     @ApiResponse({ status: 200, description: 'Employee retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

@@ -24,7 +24,7 @@ export class ResourcesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get all resources' })
     findAll() {
         return this.service.findAll();
