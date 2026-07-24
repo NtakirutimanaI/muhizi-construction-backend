@@ -159,12 +159,22 @@ export class AuthController {
 
     @Get('users')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR)
     @ApiBearerAuth('JWT-auth')
-    @ApiOperation({ summary: 'Get all registered users (admin/managing director only)' })
+    @ApiOperation({ summary: 'Get all registered users (admin/managing director/finance director)' })
     @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
     async getAllUsers(@Request() req) {
         return this.authService.getAllUsers(req.user.id);
+    }
+
+    @Get('users/employed')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.STOREKEEPER, Role.SITE_ENGINEER)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Get employed users — internal administration staff' })
+    @ApiResponse({ status: 200, description: 'Employed users retrieved successfully' })
+    async getEmployedUsers() {
+        return this.authService.getEmployedUsers();
     }
 
     @Post('users')
