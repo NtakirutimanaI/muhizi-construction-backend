@@ -203,5 +203,13 @@ export class UpdateProfileDto {
     @IsOptional()
     @IsString()
     company?: string;
+
+    @IsOptional()
+    @IsString()
+    digitalSignature?: string;
+
+    @IsOptional()
+    @IsString()
+    stampUrl?: string;
 }
 

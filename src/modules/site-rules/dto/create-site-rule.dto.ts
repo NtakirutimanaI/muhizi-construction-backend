@@ -22,6 +22,11 @@ export class CreateSiteRuleDto {
     @IsString({ each: true, message: 'Each item must be a string' })
     items: string[];
 
+    @ApiProperty({ example: 'Safety', required: false, description: 'Category/kind of this rule (e.g. Safety, Security, Operating)' })
+    @IsString({ message: 'Category must be a string' })
+    @IsOptional()
+    category?: string;
+
     @ApiProperty({ example: 1, required: false, description: 'Display order priority (lower = higher)' })
     @IsNumber({}, { message: 'Order must be a number' })
     @IsOptional()
