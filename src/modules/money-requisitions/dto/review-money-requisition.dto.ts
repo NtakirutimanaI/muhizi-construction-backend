@@ -20,4 +20,29 @@ export class ReviewMoneyRequisitionDto {
     @IsString()
     @IsOptional()
     modificationReason?: string;
+
+    @ApiProperty({ example: 'Papias UWIMANA', required: false, description: 'Name of the authorizer' })
+    @IsString()
+    @IsOptional()
+    authorizedByName?: string;
+
+    @ApiProperty({ example: 'CEO/Founder', required: false, description: 'Position of the authorizer' })
+    @IsString()
+    @IsOptional()
+    authorizedByPosition?: string;
+
+    @ApiProperty({ required: false, description: 'Authorizer signature (base64 or URL)' })
+    @IsString()
+    @IsOptional()
+    authorizedBySignature?: string;
+
+    @ApiProperty({ example: '2026-07-23', required: false, description: 'Date of authorization' })
+    @IsString()
+    @IsOptional()
+    authorizationDate?: string;
+
+    @ApiProperty({ required: false, description: 'Stamp image (base64 or URL)' })
+    @IsString()
+    @IsOptional()
+    stampUrl?: string;
 }

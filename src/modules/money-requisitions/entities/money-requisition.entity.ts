@@ -38,6 +38,36 @@ export class MoneyRequisition {
     @Column({ type: 'text', nullable: true })
     adminNotes: string;
 
+    @Column({ nullable: true })
+    department: string;
+
+    @Column({ nullable: true })
+    reason: string;
+
+    @Column({ type: 'date', nullable: true })
+    requestedDisbursementDate: string;
+
+    @Column({ nullable: true })
+    requesterSignature: string;
+
+    @Column({ nullable: true })
+    authorizationStatus: string;
+
+    @Column({ nullable: true })
+    authorizedByName: string;
+
+    @Column({ nullable: true })
+    authorizedByPosition: string;
+
+    @Column({ nullable: true })
+    authorizedBySignature: string;
+
+    @Column({ type: 'text', nullable: true })
+    stampUrl: string;
+
+    @Column({ type: 'date', nullable: true })
+    authorizationDate: string;
+
     @CreateDateColumn()
     createdAt: Date;
 
