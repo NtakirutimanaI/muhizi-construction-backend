@@ -30,27 +30,28 @@ export class AuthService {
     ) { }
 
     async register(registerDto: RegisterDto) {
-        const existingUser = await this.userRepository.findOne({
-            where: { email: registerDto.email },
-        });
+        const [existingUser, existingPhone] = await Promise.all([
+            this.userRepository.findOne({ where: { email: registerDto.email } }),
+            registerDto.phone
+                ? this.profileRepository.findOne({ where: { phone: registerDto.phone } })
+                : Promise.resolve(null),
+        ]);
 
         if (existingUser) {
             throw new ConflictException('Email already exists');
         }
 
-        if (registerDto.phone) {
-            const existingPhone = await this.profileRepository.findOne({
-                where: { phone: registerDto.phone },
-            });
-            if (existingPhone) {
-                throw new ConflictException('Phone number already exists');
-            }
+        if (existingPhone) {
+            throw new ConflictException('Phone number already exists');
         }
 
-        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+        const hashedPassword = await bcrypt.hash(registerDto.password, 6);
+
+        const username = registerDto.username || registerDto.email.split('@')[0] + '_' + crypto.randomInt(1000, 9999);
 
         const user = this.userRepository.create({
             email: registerDto.email,
+            username,
             password: hashedPassword,
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
