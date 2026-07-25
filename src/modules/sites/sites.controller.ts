@@ -27,7 +27,7 @@ export class SitesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiOperation({ summary: 'Get all sites', description: 'Retrieves a list of all sites' })
     @ApiResponse({ status: 200, description: 'All sites retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -37,8 +37,16 @@ export class SitesController {
         return this.service.findAll(engineerId);
     }
 
+    @Get('my-assigned')
+    @Roles(Role.SITE_ENGINEER)
+    @ApiOperation({ summary: 'Get my assigned sites', description: 'Retrieve sites assigned to the current site engineer, with project info' })
+    @ApiResponse({ status: 200, description: 'Assigned sites retrieved successfully' })
+    findMyAssigned(@Request() req) {
+        return this.service.findAll(req.user.id);
+    }
+
     @Get('project/:projectId')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiOperation({ summary: 'Get sites by project', description: 'Retrieves all sites for a given project' })
     @ApiResponse({ status: 200, description: 'Sites retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -50,7 +58,7 @@ export class SitesController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiOperation({ summary: 'Get site by ID', description: 'Retrieves a single site by its ID' })
     @ApiResponse({ status: 200, description: 'Site retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

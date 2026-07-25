@@ -12,8 +12,10 @@ export class EmployeesService {
     ) { }
 
     async create(dto: CreateEmployeeDto): Promise<Employee> {
-        const existing = await this.repo.findOne({ where: { email: dto.email } });
-        if (existing) throw new ConflictException('Email already exists');
+        if (dto.email) {
+            const existing = await this.repo.findOne({ where: { email: dto.email } });
+            if (existing) throw new ConflictException('Email already exists');
+        }
         const employee = this.repo.create(dto);
         return this.repo.save(employee);
     }

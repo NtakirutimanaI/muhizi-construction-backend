@@ -14,9 +14,11 @@ import { ProjectEvidence } from '../project-evidence/entities/project-evidence.e
 import { Design } from '../designs/entities/design.entity';
 import { EngineeringSubmission } from '../engineering-submissions/entities/engineering-submission.entity';
 import { Task } from '../tasks/entities/task.entity';
+import { Attendance } from '../attendance/entities/attendance.entity';
+import { EmployeeAssignment } from '../employee-assignments/entities/employee-assignment.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Project, Approval, Employee, Expense, Income, Stock, MaterialRequest, Site, ProjectEvidence, Design, EngineeringSubmission, Task])],
+    imports: [TypeOrmModule.forFeature([Project, Approval, Employee, Expense, Income, Stock, MaterialRequest, Site, ProjectEvidence, Design, EngineeringSubmission, Task, Attendance, EmployeeAssignment])],
     controllers: [DashboardController],
     providers: [DashboardService],
     exports: [DashboardService],

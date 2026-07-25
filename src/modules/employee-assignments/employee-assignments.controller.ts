@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -7,22 +7,33 @@ import { Role } from '../auth/enums/role.enum';
 import { EmployeeAssignmentsService } from './employee-assignments.service';
 import { CreateEmployeeAssignmentDto } from './dto/create-employee-assignment.dto';
 import { UpdateEmployeeAssignmentDto } from './dto/update-employee-assignment.dto';
+import { SitesService } from '../sites/sites.service';
 
 @ApiTags('Employee Assignments')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('employee-assignments')
 export class EmployeeAssignmentsController {
-    constructor(private readonly service: EmployeeAssignmentsService) { }
+    constructor(
+        private readonly service: EmployeeAssignmentsService,
+        private readonly sitesService: SitesService,
+    ) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Create employee assignment', description: 'Create a new employee assignment' })
     @ApiBody({ type: CreateEmployeeAssignmentDto })
     @ApiResponse({ status: 201, description: 'Employee assignment created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    create(@Body() dto: CreateEmployeeAssignmentDto) {
+    async create(@Body() dto: CreateEmployeeAssignmentDto, @Req() req: any) {
+        if (req.user.role === Role.SITE_ENGINEER) {
+            const sites = await this.sitesService.findAll(req.user.id);
+            const allowedProjectIds = [...new Set(sites.map(s => s.projectId).filter(Boolean))];
+            if (!allowedProjectIds.includes(dto.projectId)) {
+                throw new ForbiddenException('You can only assign workers to your own projects');
+            }
+        }
         return this.service.create(dto);
     }
 
@@ -37,17 +48,30 @@ export class EmployeeAssignmentsController {
     }
 
     @Get('my-team')
-    @Roles(Role.STOREKEEPER, Role.STOREKEEPER)
+    @Roles(Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Get my team assignments', description: 'Retrieve assignments for the current user\'s team' })
     @ApiResponse({ status: 200, description: 'Team assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     findMyTeam(@Req() req: any) {
+        if (req.user.role === Role.SITE_ENGINEER) {
+            return this.service.findByEngineer(req.user.id);
+        }
         return this.service.findMyTeam(req.user.email);
     }
 
+    @Get('my-recruits')
+    @Roles(Role.SITE_ENGINEER)
+    @ApiOperation({ summary: 'Get my recruited workers', description: 'Retrieve assignments for workers recruited by the current site engineer' })
+    @ApiResponse({ status: 200, description: 'Recruited workers retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    findMyRecruits(@Req() req: any) {
+        return this.service.findMyRecruits(req.user.id);
+    }
+
     @Get('employee/:employeeId')
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get assignments by employee', description: 'Retrieve employee assignments for a specific employee' })
     @ApiResponse({ status: 200, description: 'Employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -91,13 +115,19 @@ export class EmployeeAssignmentsController {
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Delete employee assignment', description: 'Delete an employee assignment' })
     @ApiResponse({ status: 200, description: 'Employee assignment deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    @ApiResponse({ status: 404, description: 'Not found' })
-    remove(@Param('id') id: string) {
+    async remove(@Param('id') id: string, @Req() req: any) {
+        if (req.user.role === Role.SITE_ENGINEER) {
+            const assignment = await this.service.findOne(id);
+            const employee = await this.service['employeeRepo'].findOne({ where: { id: assignment.employeeId } });
+            if (!employee || employee.recruitedBy !== req.user.id) {
+                throw new ForbiddenException('You can only remove workers you recruited');
+            }
+        }
         return this.service.remove(id);
     }
 }
