@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, IsNotEmpty, IsOptional, IsIn, Matches } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsNotEmpty, IsOptional, IsIn, Matches, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../enums/role.enum';
 
@@ -53,9 +53,10 @@ export class CreateUserDto {
     @IsOptional()
     maritalStatus?: string;
 
-    @ApiProperty({ example: '1199980012345678', required: false })
+    @ApiProperty({ example: '1199980012345678', required: false, description: 'Rwandan National ID (16 digits)' })
     @IsString()
     @IsOptional()
+    @Matches(/^\d{16}$/, { message: 'National ID must be exactly 16 digits' })
     nationalId?: string;
 
     @ApiProperty({ example: 'Bachelor\'s Degree', required: false })
@@ -96,4 +97,9 @@ export class CreateUserDto {
     @ApiProperty({ example: 500000, required: false, description: 'Basic salary in RWF' })
     @IsOptional()
     basicSalary?: number;
+
+    @ApiProperty({ example: 'https://example.com/avatar.jpg', required: false, description: 'Profile picture URL or base64 data URI' })
+    @IsString()
+    @IsOptional()
+    avatar?: string;
 }

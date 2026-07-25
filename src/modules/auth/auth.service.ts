@@ -401,7 +401,21 @@ export class AuthService {
         });
     }
 
-    async createUser(dto: { email: string; password: string; firstName: string; lastName: string; role?: string; phone?: string; address?: string; gender?: string; maritalStatus?: string; nationalId?: string; educationLevel?: string; medicalInsurance?: string; contractUrl?: string; bankAccount?: string; employmentStatus?: string; employmentCategory?: string; workShift?: string; basicSalary?: number }) {
+    async getWageWorkers(recruitedBy?: string) {
+        const where: any = { employmentStatus: 'wage_worker' };
+        if (recruitedBy) where.recruitedBy = recruitedBy;
+        const users = await this.userRepository.find({
+            where,
+            relations: ['profile'],
+            order: { createdAt: 'DESC' },
+        });
+        return users.map(u => {
+            const { password, refreshToken, ...userData } = u;
+            return userData;
+        });
+    }
+
+    async createUser(dto: { email: string; password: string; firstName: string; lastName: string; role?: string; phone?: string; address?: string; gender?: string; maritalStatus?: string; nationalId?: string; educationLevel?: string; medicalInsurance?: string; contractUrl?: string; bankAccount?: string; employmentStatus?: string; employmentCategory?: string; workShift?: string; basicSalary?: number; recruitedBy?: string; avatar?: string }) {
         const existingUser = await this.userRepository.findOne({
             where: { email: dto.email },
         });
@@ -437,12 +451,14 @@ export class AuthService {
             employmentCategory: dto.employmentCategory || undefined,
             workShift: dto.workShift || undefined,
             basicSalary: dto.basicSalary || 0,
+            recruitedBy: dto.recruitedBy || undefined,
         });
         await this.userRepository.save(user);
         const profile = this.profileRepository.create({
             firstName: cap2(dto.firstName),
             lastName: cap2(dto.lastName),
             phone: dto.phone || undefined,
+            avatar: dto.avatar || undefined,
             user: user,
         });
         await this.profileRepository.save(profile);
@@ -450,7 +466,7 @@ export class AuthService {
         return result;
     }
 
-    async updateUser(id: string, dto: { email?: string; password?: string; role?: string; isActive?: boolean; firstName?: string; lastName?: string; phone?: string; address?: string; gender?: string; maritalStatus?: string; nationalId?: string; educationLevel?: string; medicalInsurance?: string; contractUrl?: string; bankAccount?: string; employmentStatus?: string; employmentCategory?: string; workShift?: string; basicSalary?: number }) {
+    async updateUser(id: string, dto: { email?: string; password?: string; role?: string; isActive?: boolean; firstName?: string; lastName?: string; phone?: string; address?: string; gender?: string; maritalStatus?: string; nationalId?: string; educationLevel?: string; medicalInsurance?: string; contractUrl?: string; bankAccount?: string; employmentStatus?: string; employmentCategory?: string; workShift?: string; basicSalary?: number; recruitedBy?: string }) {
         const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] });
         if (!user) throw new NotFoundException('User not found');
 
@@ -481,6 +497,7 @@ export class AuthService {
         if (dto.employmentCategory !== undefined) user.employmentCategory = dto.employmentCategory;
         if (dto.workShift !== undefined) user.workShift = dto.workShift;
         if (dto.basicSalary !== undefined) user.basicSalary = dto.basicSalary;
+        if (dto.recruitedBy !== undefined) user.recruitedBy = dto.recruitedBy;
         if (dto.password) user.password = await bcrypt.hash(dto.password, 10);
 
         await this.userRepository.save(user);

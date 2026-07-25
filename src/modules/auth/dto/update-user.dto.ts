@@ -58,9 +58,10 @@ export class UpdateUserDto {
     @IsOptional()
     maritalStatus?: string;
 
-    @ApiProperty({ example: '1199980012345678', required: false })
+    @ApiProperty({ example: '1199980012345678', required: false, description: 'Rwandan National ID (16 digits)' })
     @IsString()
     @IsOptional()
+    @Matches(/^\d{16}$/, { message: 'National ID must be exactly 16 digits' })
     nationalId?: string;
 
     @ApiProperty({ example: "Bachelor's Degree", required: false })

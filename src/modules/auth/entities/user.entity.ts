@@ -61,6 +61,9 @@ export class User {
     @Column({ nullable: true })
     workShift: string;
 
+    @Column({ nullable: true })
+    recruitedBy: string;
+
     @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
     basicSalary: number;
 

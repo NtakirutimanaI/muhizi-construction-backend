@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, HttpCode, HttpStatus, UseGuards, Request, Param, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, HttpCode, HttpStatus, UseGuards, Request, Param, Req, Res, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -175,6 +175,15 @@ export class AuthController {
     @ApiResponse({ status: 200, description: 'Employed users retrieved successfully' })
     async getEmployedUsers() {
         return this.authService.getEmployedUsers();
+    }
+
+    @Get('users/wage-workers')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Get wage workers, optionally filtered by recruiter' })
+    @ApiResponse({ status: 200, description: 'Wage workers retrieved successfully' })
+    async getWageWorkers(@Query('recruitedBy') recruitedBy?: string) {
+        return this.authService.getWageWorkers(recruitedBy);
     }
 
     @Post('users')
