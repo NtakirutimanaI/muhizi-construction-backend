@@ -86,6 +86,36 @@ export class EmployeeAssignmentsService {
         });
     }
 
+    async findMyRecruits(engineerId?: string): Promise<any[]> {
+        const assignments = await this.repo.find({
+            relations: ['employee', 'project', 'site'],
+            order: { createdAt: 'DESC' },
+        });
+
+        const assignedEmployeeIds = new Set(assignments.map(a => a.employeeId).filter(Boolean));
+
+        const allEmployees = await this.employeeRepo.find({
+            order: { createdAt: 'DESC' },
+        });
+
+        const unassignedEmployees = allEmployees.filter(emp => !assignedEmployeeIds.has(emp.id));
+
+        const syntheticAssignments = unassignedEmployees.map(emp => ({
+            id: `emp-${emp.id}`,
+            employeeId: emp.id,
+            employee: emp,
+            projectId: '',
+            siteId: '',
+            task: emp.position || 'Worker',
+            role: 'worker',
+            startDate: emp.createdAt ? new Date(emp.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            isActive: true,
+            createdAt: emp.createdAt,
+        }));
+
+        return [...assignments, ...syntheticAssignments];
+    }
+
     async update(id: string, dto: UpdateEmployeeAssignmentDto): Promise<EmployeeAssignment> {
         await this.repo.update(id, dto as any);
         return this.findOne(id);

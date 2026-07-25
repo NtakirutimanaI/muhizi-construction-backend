@@ -16,7 +16,7 @@ export class EmployeeAssignmentsController {
     constructor(private readonly service: EmployeeAssignmentsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Create employee assignment', description: 'Create a new employee assignment' })
     @ApiBody({ type: CreateEmployeeAssignmentDto })
     @ApiResponse({ status: 201, description: 'Employee assignment created successfully' })
@@ -27,7 +27,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Get all employee assignments', description: 'Retrieve all employee assignments' })
     @ApiResponse({ status: 200, description: 'All employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -37,13 +37,23 @@ export class EmployeeAssignmentsController {
     }
 
     @Get('my-team')
-    @Roles(Role.STOREKEEPER, Role.STOREKEEPER)
+    @Roles(Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Get my team assignments', description: 'Retrieve assignments for the current user\'s team' })
     @ApiResponse({ status: 200, description: 'Team assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     findMyTeam(@Req() req: any) {
         return this.service.findMyTeam(req.user.email);
+    }
+
+    @Get('my-recruits')
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER, Role.MANAGING_DIRECTOR, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO)
+    @ApiOperation({ summary: 'Get my recruits', description: 'Retrieve recruited workers and assignments' })
+    @ApiResponse({ status: 200, description: 'Recruits retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    findMyRecruits(@Req() req: any) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findMyRecruits(engineerId);
     }
 
     @Get('employee/:employeeId')
@@ -91,7 +101,7 @@ export class EmployeeAssignmentsController {
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Delete employee assignment', description: 'Delete an employee assignment' })
     @ApiResponse({ status: 200, description: 'Employee assignment deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })

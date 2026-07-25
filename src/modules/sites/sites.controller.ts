@@ -37,6 +37,16 @@ export class SitesController {
         return this.service.findAll(engineerId);
     }
 
+    @Get('my-assigned')
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @ApiOperation({ summary: 'Get my assigned sites', description: 'Retrieves sites assigned to current engineer or user' })
+    @ApiResponse({ status: 200, description: 'Assigned sites retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    findMyAssigned(@Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAll(engineerId);
+    }
+
     @Get('project/:projectId')
     @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiOperation({ summary: 'Get sites by project', description: 'Retrieves all sites for a given project' })
