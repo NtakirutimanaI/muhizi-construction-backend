@@ -13,10 +13,10 @@ export class CreateEmployeeDto {
     @IsNotEmpty({ message: 'lastName is required' })
     lastName: string;
 
-    @ApiProperty({ example: 'john.doe@example.com', description: 'Employee email address' })
+    @ApiProperty({ example: 'john.doe@example.com', description: 'Employee email address', required: false })
     @IsEmail({}, { message: 'email must be a valid email address' })
-    @IsNotEmpty({ message: 'email is required' })
-    email: string;
+    @IsOptional()
+    email?: string;
 
     @ApiProperty({ example: '+250-788-000-000', required: false, description: 'Employee phone number' })
     @IsString({ message: 'phone must be a string' })
@@ -47,6 +47,11 @@ export class CreateEmployeeDto {
     @IsString({ message: 'position must be a string' })
     @IsOptional()
     position?: string;
+
+    @ApiProperty({ example: 'day', required: false, description: 'Work shift: day or night' })
+    @IsString({ message: 'workShift must be a string' })
+    @IsOptional()
+    workShift?: string;
 
     @ApiProperty({ example: 'engineering', required: false, description: 'Employee department', enum: Department })
     @IsEnum(Department, { message: 'department must be a valid department' })
@@ -88,4 +93,14 @@ export class CreateEmployeeDto {
     @IsArray({ message: 'documents must be an array' })
     @IsOptional()
     documents?: { name: string; url: string }[];
+
+    @ApiProperty({ example: 'wage_worker', required: false, description: 'Employment status (e.g. wage_worker, permanent, contract)' })
+    @IsString({ message: 'employmentStatus must be a string' })
+    @IsOptional()
+    employmentStatus?: string;
+
+    @ApiProperty({ description: 'UUID of the user who recruited this employee', required: false })
+    @IsString({ message: 'recruitedBy must be a string' })
+    @IsOptional()
+    recruitedBy?: string;
 }

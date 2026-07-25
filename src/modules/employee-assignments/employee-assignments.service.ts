@@ -86,6 +86,32 @@ export class EmployeeAssignmentsService {
         });
     }
 
+    async findByEngineer(engineerId: string): Promise<EmployeeAssignment[]> {
+        const sites = await this.siteRepo.find({ where: { assignedEngineerId: engineerId } });
+        const projectIds = [...new Set(sites.map(s => s.projectId).filter(Boolean))] as string[];
+        const siteIds = sites.map(s => s.id);
+        if (projectIds.length === 0 && siteIds.length === 0) return [];
+        const where: any[] = [];
+        if (projectIds.length > 0) where.push({ projectId: In(projectIds), isActive: true });
+        if (siteIds.length > 0) where.push({ siteId: In(siteIds), isActive: true });
+        return this.repo.find({
+            where: where.length === 1 ? where[0] : where,
+            relations: ['employee', 'project', 'site'],
+            order: { createdAt: 'DESC' },
+        });
+    }
+
+    async findMyRecruits(engineerId: string): Promise<EmployeeAssignment[]> {
+        const recruits = await this.employeeRepo.find({ where: { recruitedBy: engineerId } });
+        if (recruits.length === 0) return [];
+        const employeeIds = recruits.map(e => e.id);
+        return this.repo.find({
+            where: { employeeId: In(employeeIds), isActive: true },
+            relations: ['employee', 'project', 'site'],
+            order: { createdAt: 'DESC' },
+        });
+    }
+
     async update(id: string, dto: UpdateEmployeeAssignmentDto): Promise<EmployeeAssignment> {
         await this.repo.update(id, dto as any);
         return this.findOne(id);

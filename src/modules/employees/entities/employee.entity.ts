@@ -28,7 +28,7 @@ export class Employee {
     @Column()
     lastName: string;
 
-    @Column({ unique: true })
+    @Column({ unique: true, nullable: true })
     @Index('idx_employee_email', { unique: true })
     email: string;
 
@@ -53,6 +53,9 @@ export class Employee {
     @Column({ nullable: true })
     position: string;
 
+    @Column({ nullable: true })
+    workShift: string;
+
     @Column({ type: 'enum', enum: Department, default: Department.OTHER })
     @Index('idx_employee_department')
     department: Department;
@@ -75,6 +78,13 @@ export class Employee {
 
     @Column({ type: 'json', nullable: true })
     documents: { name: string; url: string }[];
+
+    @Column({ nullable: true })
+    employmentStatus: string;
+
+    @Column({ nullable: true })
+    @Index('idx_employee_recruited_by')
+    recruitedBy: string;
 
     @CreateDateColumn()
     @Index('idx_employee_created')
