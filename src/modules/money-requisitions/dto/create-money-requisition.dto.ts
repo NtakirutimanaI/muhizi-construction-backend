@@ -21,4 +21,29 @@ export class CreateMoneyRequisitionDto {
     @IsString()
     @IsNotEmpty()
     requestedAt: string;
+
+    @ApiProperty({ example: 'Finance', required: false, description: 'Department of the requester' })
+    @IsString()
+    @IsOptional()
+    department?: string;
+
+    @ApiProperty({ example: 'Urgent material purchase', required: false, description: 'Reason for the request' })
+    @IsString()
+    @IsOptional()
+    reason?: string;
+
+    @ApiProperty({ example: '2026-07-25', required: false, description: 'Requested disbursement date' })
+    @IsString()
+    @IsOptional()
+    requestedDisbursementDate?: string;
+
+    @ApiProperty({ required: false, description: 'Requester signature (base64 or URL)' })
+    @IsString()
+    @IsOptional()
+    requesterSignature?: string;
+
+    @ApiProperty({ example: 'draft', required: false, description: 'Initial status: draft or pending' })
+    @IsString()
+    @IsOptional()
+    status?: string;
 }
