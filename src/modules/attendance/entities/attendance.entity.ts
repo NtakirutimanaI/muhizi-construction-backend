@@ -13,6 +13,8 @@ export enum AttendanceStatus {
 }
 
 @Entity('attendance')
+@Index('idx_attendance_employee_date', ['employeeId', 'date'], { unique: true })
+@Index('idx_attendance_submitted_by_date', ['submittedById', 'date'], { unique: true })
 export class Attendance {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -44,6 +46,9 @@ export class Attendance {
 
     @Column({ nullable: true })
     projectId: string;
+
+    @Column({ nullable: true })
+    submittedById: string;
 
     @ManyToOne(() => Project, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'projectId' })

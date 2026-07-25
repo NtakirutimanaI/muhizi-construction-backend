@@ -23,7 +23,8 @@ export class AttendanceController {
     @ApiResponse({ status: 403, description: 'Forbidden' })
     create(@Body() dto: CreateAttendanceDto, @Request() req) {
         const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
-        return this.service.create(dto, engineerId);
+        const submittedById = req.user.id;
+        return this.service.create(dto, engineerId, submittedById);
     }
 
     @Get()
@@ -127,7 +128,8 @@ export class AttendanceController {
     @ApiResponse({ status: 404, description: 'Not found' })
     update(@Param('id') id: string, @Body() dto: CreateAttendanceDto, @Request() req) {
         const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
-        return this.service.update(id, dto, engineerId);
+        const submittedById = req.user.id;
+        return this.service.update(id, dto, engineerId, submittedById);
     }
 
     @Delete(':id')

@@ -25,16 +25,34 @@ export class AttendanceService {
         if (!projectIds.includes(projectId)) throw new ForbiddenException('You are not assigned to this project');
     }
 
-    async create(dto: CreateAttendanceDto, engineerId?: string): Promise<Attendance> {
+    private async assertUniqueAttendance(dto: Partial<CreateAttendanceDto>, submittedById?: string): Promise<void> {
+        if (!dto.employeeId || !dto.date) return;
+        const existingByEmployee = await this.repo.findOne({ where: { employeeId: dto.employeeId, date: dto.date } });
+        if (existingByEmployee) {
+            throw new BadRequestException('Attendance already exists for this employee on the selected date');
+        }
+        if (submittedById) {
+            const existingByAccount = await this.repo.findOne({ where: { submittedById, date: dto.date } });
+            if (existingByAccount) {
+                throw new BadRequestException('Only one attendance report is allowed per account per day');
+            }
+        }
+    }
+
+    async create(dto: CreateAttendanceDto, engineerId?: string, submittedById?: string): Promise<Attendance> {
         if (engineerId) await this.assertProjectAssigned(engineerId, dto.projectId);
         try {
-            const attendance = this.repo.create(dto);
+            await this.assertUniqueAttendance(dto, submittedById);
+            const attendance = this.repo.create({ ...dto, submittedById });
             const saved = await this.repo.save(attendance);
             return saved;
         } catch (error: any) {
             console.error('=== ATTENDANCE CREATE ERROR ===', error?.code, error?.message);
             if (error?.message?.includes('violates foreign key') || error?.code === '23503') {
                 throw new BadRequestException('Referenced employee or project not found');
+            }
+            if (error instanceof BadRequestException) {
+                throw error;
             }
             throw new BadRequestException('Invalid attendance data: ' + (error?.message || 'unknown error'));
         }
@@ -131,12 +149,29 @@ export class AttendanceService {
         });
     }
 
-    async update(id: string, dto: Partial<CreateAttendanceDto>, engineerId?: string): Promise<Attendance> {
+    async update(id: string, dto: Partial<CreateAttendanceDto>, engineerId?: string, submittedById?: string): Promise<Attendance> {
         if (engineerId) {
             const existing = await this.findOne(id, engineerId);
             await this.assertProjectAssigned(engineerId, dto.projectId || existing.projectId);
         }
-        await this.repo.update(id, dto as any);
+        const existing = await this.repo.findOne({ where: { id } });
+        if (!existing) throw new NotFoundException('Attendance record not found');
+        if (dto.employeeId || dto.date || submittedById) {
+            const nextEmployeeId = dto.employeeId || existing.employeeId;
+            const nextDate = dto.date || existing.date;
+            const nextSubmittedById = submittedById || existing.submittedById;
+            const duplicateByEmployee = await this.repo.findOne({ where: { employeeId: nextEmployeeId, date: nextDate } });
+            if (duplicateByEmployee && duplicateByEmployee.id !== id) {
+                throw new BadRequestException('Attendance already exists for this employee on the selected date');
+            }
+            if (nextSubmittedById) {
+                const duplicateByAccount = await this.repo.findOne({ where: { submittedById: nextSubmittedById, date: nextDate } });
+                if (duplicateByAccount && duplicateByAccount.id !== id) {
+                    throw new BadRequestException('Only one attendance report is allowed per account per day');
+                }
+            }
+        }
+        await this.repo.update(id, { ...dto, submittedById: submittedById ?? existing.submittedById } as any);
         return this.findOne(id);
     }
 
