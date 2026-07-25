@@ -47,11 +47,8 @@ export class AuthService {
 
         const hashedPassword = await bcrypt.hash(registerDto.password, 6);
 
-        const username = registerDto.username || registerDto.email.split('@')[0] + '_' + crypto.randomInt(1000, 9999);
-
         const user = this.userRepository.create({
             email: registerDto.email,
-            username,
             password: hashedPassword,
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
@@ -368,6 +365,18 @@ export class AuthService {
         });
     }
 
+    async getEmployedUsers() {
+        const users = await this.userRepository.find({
+            where: { employmentStatus: 'employed' },
+            relations: ['profile'],
+            order: { createdAt: 'DESC' },
+        });
+        return users.map(u => {
+            const { password, refreshToken, ...userData } = u;
+            return userData;
+        });
+    }
+
     async createUser(dto: { email: string; password: string; firstName: string; lastName: string; role?: string; phone?: string; address?: string; gender?: string; maritalStatus?: string; nationalId?: string; educationLevel?: string; medicalInsurance?: string; contractUrl?: string; bankAccount?: string; employmentStatus?: string; employmentCategory?: string; workShift?: string; basicSalary?: number }) {
         const existingUser = await this.userRepository.findOne({
             where: { email: dto.email },
@@ -390,7 +399,7 @@ export class AuthService {
             password: hashedPassword,
             firstName: dto.firstName,
             lastName: dto.lastName,
-            role: dto.role || 'employee',
+            role: dto.role || 'storekeeper',
             address: dto.address || undefined,
             gender: dto.gender || undefined,
             maritalStatus: dto.maritalStatus || undefined,

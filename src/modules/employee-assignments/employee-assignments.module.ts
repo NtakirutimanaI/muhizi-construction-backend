@@ -5,9 +5,10 @@ import { Site } from '../sites/entities/site.entity';
 import { Employee } from '../employees/entities/employee.entity';
 import { EmployeeAssignmentsController } from './employee-assignments.controller';
 import { EmployeeAssignmentsService } from './employee-assignments.service';
+import { SitesModule } from '../sites/sites.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([EmployeeAssignment, Site, Employee])],
+    imports: [TypeOrmModule.forFeature([EmployeeAssignment, Site, Employee]), SitesModule],
     controllers: [EmployeeAssignmentsController],
     providers: [EmployeeAssignmentsService],
     exports: [EmployeeAssignmentsService],
