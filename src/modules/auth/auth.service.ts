@@ -46,20 +46,21 @@ export class AuthService {
         }
 
         const hashedPassword = await bcrypt.hash(registerDto.password, 6);
+        const cap = (s: string) => s ? s.replace(/\b\w/g, c => c.toUpperCase()) : s;
 
         const user = this.userRepository.create({
             email: registerDto.email,
             password: hashedPassword,
-            firstName: registerDto.firstName,
-            lastName: registerDto.lastName,
+            firstName: cap(registerDto.firstName),
+            lastName: cap(registerDto.lastName),
             role: 'client',
         });
 
         await this.userRepository.save(user);
 
         const profile = this.profileRepository.create({
-            firstName: registerDto.firstName,
-            lastName: registerDto.lastName,
+            firstName: cap(registerDto.firstName),
+            lastName: cap(registerDto.lastName),
             phone: registerDto.phone || undefined,
             user: user,
         });
@@ -365,6 +366,29 @@ export class AuthService {
         });
     }
 
+    async capitalizeAllNames() {
+        const cap = (s: string) => s ? s.replace(/\b\w/g, c => c.toUpperCase()) : s;
+        let updated = 0;
+        const users = await this.userRepository.find({ relations: ['profile'] });
+        for (const u of users) {
+            const newFirst = u.firstName ? cap(u.firstName) : u.firstName;
+            const newLast = u.lastName ? cap(u.lastName) : u.lastName;
+            const profileNewFirst = u.profile?.firstName ? cap(u.profile.firstName) : u.profile?.firstName;
+            const profileNewLast = u.profile?.lastName ? cap(u.profile.lastName) : u.profile?.lastName;
+            let changed = false;
+            if (u.firstName !== newFirst) { u.firstName = newFirst; changed = true; }
+            if (u.lastName !== newLast) { u.lastName = newLast; changed = true; }
+            if (changed) { await this.userRepository.save(u); updated++; }
+            if (u.profile) {
+                let pChanged = false;
+                if (u.profile.firstName !== profileNewFirst) { u.profile.firstName = profileNewFirst; pChanged = true; }
+                if (u.profile.lastName !== profileNewLast) { u.profile.lastName = profileNewLast; pChanged = true; }
+                if (pChanged) { await this.profileRepository.save(u.profile); }
+            }
+        }
+        return { updated };
+    }
+
     async getEmployedUsers() {
         const users = await this.userRepository.find({
             where: { employmentStatus: 'employed' },
@@ -394,11 +418,12 @@ export class AuthService {
             }
         }
         const hashedPassword = await bcrypt.hash(dto.password, 10);
+        const cap2 = (s: string) => s ? s.replace(/\b\w/g, c => c.toUpperCase()) : s;
         const user = this.userRepository.create({
             email: dto.email,
             password: hashedPassword,
-            firstName: dto.firstName,
-            lastName: dto.lastName,
+            firstName: cap2(dto.firstName),
+            lastName: cap2(dto.lastName),
             role: dto.role || 'storekeeper',
             address: dto.address || undefined,
             gender: dto.gender || undefined,
@@ -415,8 +440,8 @@ export class AuthService {
         });
         await this.userRepository.save(user);
         const profile = this.profileRepository.create({
-            firstName: dto.firstName,
-            lastName: dto.lastName,
+            firstName: cap2(dto.firstName),
+            lastName: cap2(dto.lastName),
             phone: dto.phone || undefined,
             user: user,
         });
@@ -439,8 +464,9 @@ export class AuthService {
         }
 
         if (dto.email !== undefined) user.email = dto.email;
-        if (dto.firstName !== undefined) user.firstName = dto.firstName;
-        if (dto.lastName !== undefined) user.lastName = dto.lastName;
+        const cap = (s: string) => s ? s.replace(/\b\w/g, c => c.toUpperCase()) : s;
+        if (dto.firstName !== undefined) user.firstName = cap(dto.firstName);
+        if (dto.lastName !== undefined) user.lastName = cap(dto.lastName);
         if (dto.role !== undefined) user.role = dto.role;
         if (dto.isActive !== undefined) user.isActive = dto.isActive;
         if (dto.address !== undefined) user.address = dto.address;
@@ -460,8 +486,8 @@ export class AuthService {
         await this.userRepository.save(user);
 
         if (user.profile && (dto.firstName !== undefined || dto.lastName !== undefined || dto.phone !== undefined)) {
-            if (dto.firstName !== undefined) user.profile.firstName = dto.firstName;
-            if (dto.lastName !== undefined) user.profile.lastName = dto.lastName;
+            if (dto.firstName !== undefined) user.profile.firstName = cap(dto.firstName);
+            if (dto.lastName !== undefined) user.profile.lastName = cap(dto.lastName);
             if (dto.phone !== undefined) user.profile.phone = dto.phone || (null as any);
             await this.profileRepository.save(user.profile);
         }

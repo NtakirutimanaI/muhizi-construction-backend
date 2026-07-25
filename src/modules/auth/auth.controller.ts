@@ -210,6 +210,15 @@ export class AuthController {
         return this.authService.updateUser(id, dto);
     }
 
+    @Post('users/capitalize-names')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({ summary: 'Capitalize first letter of all user names' })
+    async capitalizeNames() {
+        return this.authService.capitalizeAllNames();
+    }
+
     @Delete('users/:id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
