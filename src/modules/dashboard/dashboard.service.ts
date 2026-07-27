@@ -10,6 +10,7 @@ import { Stock } from '../stock/entities/stock.entity';
 import { MaterialRequest } from '../material-requests/entities/material-request.entity';
 import { Site, SiteStatus } from '../sites/entities/site.entity';
 import { ProjectEvidence } from '../project-evidence/entities/project-evidence.entity';
+import { Attendance } from '../attendance/entities/attendance.entity';
 
 @Injectable()
 export class DashboardService {
@@ -23,18 +24,20 @@ export class DashboardService {
         @InjectRepository(MaterialRequest) private mrRepo: Repository<MaterialRequest>,
         @InjectRepository(Site) private siteRepo: Repository<Site>,
         @InjectRepository(ProjectEvidence) private evidenceRepo: Repository<ProjectEvidence>,
+        @InjectRepository(Attendance) private attendanceRepo: Repository<Attendance>,
     ) {}
 
     async getAdminKpi() {
-        const [activeProjects, pendingApprovals, totalEmployees, mtdExpenses, mtdIncomes, stockAlerts] = await Promise.all([
+        const [activeProjects, pendingApprovals, totalEmployees, mtdExpenses, mtdIncomes, stockAlerts, attendanceToday] = await Promise.all([
             this.projectRepo.count({ where: { status: ProjectStatus.IN_PROGRESS } }),
             this.approvalRepo.count({ where: { status: 'pending' } }),
             this.employeeRepo.count(),
             this.sumExpensesMonthToDate(),
             this.sumIncomesMonthToDate(),
             this.stockRepo.count({ where: { quantity: 0 as any } }),
+            this.getTodayAttendanceStats(),
         ]);
-        return { activeProjects, pendingApprovals, totalEmployees, mtdExpenses, mtdIncomes, stockAlerts };
+        return { activeProjects, pendingApprovals, totalEmployees, mtdExpenses, mtdIncomes, stockAlerts, ...attendanceToday };
     }
 
     async getManagingDirectorKpi() {
@@ -51,13 +54,14 @@ export class DashboardService {
     }
 
     async getFinanceDirectorKpi() {
-        const [mtdIncomes, mtdExpenses, pendingPayments] = await Promise.all([
+        const [mtdIncomes, mtdExpenses, pendingPayments, attendanceToday] = await Promise.all([
             this.sumIncomesMonthToDate(),
             this.sumExpensesMonthToDate(),
             this.approvalRepo.count({ where: { status: 'pending' } }),
+            this.getTodayAttendanceStats(),
         ]);
         const cashFlow = mtdIncomes - mtdExpenses;
-        return { mtdIncomes, mtdExpenses, cashFlow, pendingPayments };
+        return { mtdIncomes, mtdExpenses, cashFlow, pendingPayments, ...attendanceToday };
     }
 
     async getSiteEngineerKpi(userId: string) {
@@ -89,5 +93,31 @@ export class DashboardService {
             `SELECT COALESCE(SUM(amount), 0) as total FROM incomes WHERE EXTRACT(MONTH FROM "createdAt") = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM "createdAt") = EXTRACT(YEAR FROM CURRENT_DATE)`
         );
         return parseFloat(result[0]?.total || '0');
+    }
+
+    private async getTodayAttendanceStats() {
+        const today = new Date().toISOString().split('T')[0];
+        const todayRecords = await this.attendanceRepo.find({
+            where: { date: today },
+            relations: ['employee', 'project'],
+            order: { createdAt: 'DESC' },
+        });
+        return {
+            todayPresent: todayRecords.filter(a => a.status === 'present').length,
+            todayAbsent: todayRecords.filter(a => a.status === 'absent').length,
+            todayLate: todayRecords.filter(a => a.status === 'late').length,
+            todayHalfDay: todayRecords.filter(a => a.status === 'half_day').length,
+            todayOnLeave: todayRecords.filter(a => a.status === 'on_leave').length,
+            recentAttendance: todayRecords.slice(0, 10).map(a => ({
+                id: a.id,
+                employeeName: a.employee ? `${a.employee.firstName} ${a.employee.lastName}` : a.employeeId,
+                projectName: a.project?.name || 'General',
+                status: a.status,
+                checkIn: a.checkIn || null,
+                checkOut: a.checkOut || null,
+                site: a.site || null,
+                date: a.date,
+            })),
+        };
     }
 }
