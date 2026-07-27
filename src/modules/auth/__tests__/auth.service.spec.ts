@@ -7,7 +7,7 @@ import { User } from '../entities/user.entity';
 import { Profile } from '../../profile/entities/profile.entity';
 import { EventsGateway } from '../../events/events.gateway';
 import { Queue } from 'bull';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 describe('AuthService', () => {
     let service: AuthService;
