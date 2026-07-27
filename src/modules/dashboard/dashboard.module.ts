@@ -12,15 +12,12 @@ import { MaterialRequest } from '../material-requests/entities/material-request.
 import { Site } from '../sites/entities/site.entity';
 import { ProjectEvidence } from '../project-evidence/entities/project-evidence.entity';
 import { Attendance } from '../attendance/entities/attendance.entity';
-
-@Module({
-    imports: [TypeOrmModule.forFeature([Project, Approval, Employee, Expense, Income, Stock, MaterialRequest, Site, ProjectEvidence, Attendance])],
 import { Design } from '../designs/entities/design.entity';
 import { EngineeringSubmission } from '../engineering-submissions/entities/engineering-submission.entity';
 import { Task } from '../tasks/entities/task.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Project, Approval, Employee, Expense, Income, Stock, MaterialRequest, Site, ProjectEvidence, Design, EngineeringSubmission, Task])],
+    imports: [TypeOrmModule.forFeature([Project, Approval, Employee, Expense, Income, Stock, MaterialRequest, Site, ProjectEvidence, Attendance, Design, EngineeringSubmission, Task])],
     controllers: [DashboardController],
     providers: [DashboardService],
     exports: [DashboardService],
