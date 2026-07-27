@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -28,24 +28,26 @@ export class ProjectsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get all projects', description: 'Retrieves a list of all projects' })
     @ApiResponse({ status: 200, description: 'All projects retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAll() {
-        return this.service.findAll();
+    findAll(@Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAll(engineerId);
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get project by ID', description: 'Retrieves a single project by its ID' })
     @ApiResponse({ status: 200, description: 'Project retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    findOne(@Param('id') id: string) {
-        return this.service.findOne(id);
+    findOne(@Param('id') id: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findOne(id, engineerId);
     }
 
     @Put(':id')

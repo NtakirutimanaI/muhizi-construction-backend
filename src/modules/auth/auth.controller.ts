@@ -163,16 +163,15 @@ export class AuthController {
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Get all registered users (admin/managing director only)' })
     @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
-    @ApiResponse({ status: 403, description: 'Forbidden - admin only' })
     async getAllUsers(@Request() req) {
         return this.authService.getAllUsers(req.user.id);
     }
 
     @Post('users')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
     @ApiBearerAuth('JWT-auth')
-    @ApiOperation({ summary: 'Create a new user (admin only)' })
+    @ApiOperation({ summary: 'Create a new user (admin / finance director)' })
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({ status: 201, description: 'User created successfully' })
     @ApiResponse({ status: 409, description: 'Email already exists' })
@@ -182,9 +181,9 @@ export class AuthController {
 
     @Get('users/:id')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
     @ApiBearerAuth('JWT-auth')
-    @ApiOperation({ summary: 'Get a single user by ID (admin only)' })
+    @ApiOperation({ summary: 'Get a single user by ID (admin / finance director)' })
     async getUser(@Param('id') id: string) {
         const user = await this.authService.validateUser(id);
         const { password, refreshToken, ...result } = user;
@@ -193,9 +192,9 @@ export class AuthController {
 
     @Patch('users/:id')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
     @ApiBearerAuth('JWT-auth')
-    @ApiOperation({ summary: 'Update a user (admin only)' })
+    @ApiOperation({ summary: 'Update a user (admin / finance director)' })
     @ApiBody({ type: UpdateUserDto })
     async updateUser(@Param('id') id: string, @Body() dto: UpdateUserDto) {
         return this.authService.updateUser(id, dto);
@@ -203,9 +202,9 @@ export class AuthController {
 
     @Delete('users/:id')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.FINANCE_DIRECTOR)
     @ApiBearerAuth('JWT-auth')
-    @ApiOperation({ summary: 'Delete a user (admin only)' })
+    @ApiOperation({ summary: 'Delete a user (admin / finance director)' })
     async deleteUser(@Param('id') id: string) {
         return this.authService.removeUser(id);
     }

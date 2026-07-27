@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, In } from 'typeorm';
 import { Attendance } from './entities/attendance.entity';
+import { Site } from '../sites/entities/site.entity';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 
 @Injectable()
@@ -9,11 +10,40 @@ export class AttendanceService {
     constructor(
         @InjectRepository(Attendance)
         private repo: Repository<Attendance>,
+        @InjectRepository(Site)
+        private siteRepo: Repository<Site>,
     ) { }
 
-    async create(dto: CreateAttendanceDto): Promise<Attendance> {
+    private async assignedProjectIds(engineerId: string): Promise<string[]> {
+        const sites = await this.siteRepo.find({ where: { assignedEngineerId: engineerId } });
+        return [...new Set(sites.map(s => s.projectId).filter((id): id is string => !!id))];
+    }
+
+    private async assertProjectAssigned(engineerId: string, projectId?: string): Promise<void> {
+        if (!projectId) throw new ForbiddenException('A project is required');
+        const projectIds = await this.assignedProjectIds(engineerId);
+        if (!projectIds.includes(projectId)) throw new ForbiddenException('You are not assigned to this project');
+    }
+
+    private async assertUniqueAttendance(dto: Partial<CreateAttendanceDto>, submittedById?: string): Promise<void> {
+        if (!dto.employeeId || !dto.date) return;
+        const existingByEmployee = await this.repo.findOne({ where: { employeeId: dto.employeeId, date: dto.date } });
+        if (existingByEmployee) {
+            throw new BadRequestException('Attendance already exists for this employee on the selected date');
+        }
+        if (submittedById) {
+            const existingByAccount = await this.repo.findOne({ where: { submittedById, date: dto.date } });
+            if (existingByAccount) {
+                throw new BadRequestException('Only one attendance report is allowed per account per day');
+            }
+        }
+    }
+
+    async create(dto: CreateAttendanceDto, engineerId?: string, submittedById?: string): Promise<Attendance> {
+        if (engineerId) await this.assertProjectAssigned(engineerId, dto.projectId);
         try {
-            const attendance = this.repo.create(dto);
+            await this.assertUniqueAttendance(dto, submittedById);
+            const attendance = this.repo.create({ ...dto, submittedById });
             const saved = await this.repo.save(attendance);
             return saved;
         } catch (error: any) {
@@ -21,24 +51,51 @@ export class AttendanceService {
             if (error?.message?.includes('violates foreign key') || error?.code === '23503') {
                 throw new BadRequestException('Referenced employee or project not found');
             }
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
             throw new BadRequestException('Invalid attendance data: ' + (error?.message || 'unknown error'));
         }
     }
 
-    async findAll(): Promise<Attendance[]> {
+    async findAll(engineerId?: string): Promise<Attendance[]> {
+        if (engineerId) {
+            const projectIds = await this.assignedProjectIds(engineerId);
+            if (projectIds.length === 0) return [];
+            return this.repo.find({
+                where: { projectId: In(projectIds) },
+                order: { date: 'DESC', checkIn: 'DESC' },
+                relations: ['employee', 'project'],
+            });
+        }
         return this.repo.find({
             order: { date: 'DESC', checkIn: 'DESC' },
             relations: ['employee', 'project'],
         });
     }
 
-    async findOne(id: string): Promise<Attendance> {
+    async findOne(id: string, engineerId?: string): Promise<Attendance> {
         const attendance = await this.repo.findOne({ where: { id }, relations: ['employee', 'project'] });
         if (!attendance) throw new NotFoundException('Attendance record not found');
+        if (engineerId) {
+            const projectIds = await this.assignedProjectIds(engineerId);
+            if (!attendance.projectId || !projectIds.includes(attendance.projectId)) {
+                throw new NotFoundException('Attendance record not found');
+            }
+        }
         return attendance;
     }
 
-    async findByDateRange(start: string, end: string): Promise<Attendance[]> {
+    async findByDateRange(start: string, end: string, engineerId?: string): Promise<Attendance[]> {
+        if (engineerId) {
+            const projectIds = await this.assignedProjectIds(engineerId);
+            if (projectIds.length === 0) return [];
+            return this.repo.find({
+                where: { date: Between(start, end), projectId: In(projectIds) },
+                order: { date: 'DESC' },
+                relations: ['employee', 'project'],
+            });
+        }
         return this.repo.find({
             where: { date: Between(start, end) },
             order: { date: 'DESC' },
@@ -54,7 +111,8 @@ export class AttendanceService {
         });
     }
 
-    async findByProject(projectId: string): Promise<Attendance[]> {
+    async findByProject(projectId: string, engineerId?: string): Promise<Attendance[]> {
+        if (engineerId) await this.assertProjectAssigned(engineerId, projectId);
         return this.repo.find({
             where: { projectId },
             order: { date: 'DESC', checkIn: 'DESC' },
@@ -62,7 +120,11 @@ export class AttendanceService {
         });
     }
 
-    async findBySite(site: string): Promise<Attendance[]> {
+    async findBySite(site: string, engineerId?: string): Promise<Attendance[]> {
+        if (engineerId) {
+            const siteRecord = await this.siteRepo.findOne({ where: { name: site } });
+            if (!siteRecord || siteRecord.assignedEngineerId !== engineerId) return [];
+        }
         return this.repo.find({
             where: { site },
             order: { date: 'DESC', checkIn: 'DESC' },
@@ -87,8 +149,29 @@ export class AttendanceService {
         });
     }
 
-    async update(id: string, dto: Partial<CreateAttendanceDto>): Promise<Attendance> {
-        await this.repo.update(id, dto as any);
+    async update(id: string, dto: Partial<CreateAttendanceDto>, engineerId?: string, submittedById?: string): Promise<Attendance> {
+        if (engineerId) {
+            const existing = await this.findOne(id, engineerId);
+            await this.assertProjectAssigned(engineerId, dto.projectId || existing.projectId);
+        }
+        const existing = await this.repo.findOne({ where: { id } });
+        if (!existing) throw new NotFoundException('Attendance record not found');
+        if (dto.employeeId || dto.date || submittedById) {
+            const nextEmployeeId = dto.employeeId || existing.employeeId;
+            const nextDate = dto.date || existing.date;
+            const nextSubmittedById = submittedById || existing.submittedById;
+            const duplicateByEmployee = await this.repo.findOne({ where: { employeeId: nextEmployeeId, date: nextDate } });
+            if (duplicateByEmployee && duplicateByEmployee.id !== id) {
+                throw new BadRequestException('Attendance already exists for this employee on the selected date');
+            }
+            if (nextSubmittedById) {
+                const duplicateByAccount = await this.repo.findOne({ where: { submittedById: nextSubmittedById, date: nextDate } });
+                if (duplicateByAccount && duplicateByAccount.id !== id) {
+                    throw new BadRequestException('Only one attendance report is allowed per account per day');
+                }
+            }
+        }
+        await this.repo.update(id, { ...dto, submittedById: submittedById ?? existing.submittedById } as any);
         return this.findOne(id);
     }
 
@@ -97,12 +180,18 @@ export class AttendanceService {
         if (result.affected === 0) throw new NotFoundException('Attendance record not found');
     }
 
-    async getStats(): Promise<any> {
+    async getStats(engineerId?: string): Promise<any> {
         const today = new Date().toISOString().split('T')[0];
-        const allToday = await this.repo.find({
-            where: { date: today },
-            relations: ['project'],
-        });
+        const allToday = engineerId
+            ? await (async () => {
+                const projectIds = await this.assignedProjectIds(engineerId);
+                if (projectIds.length === 0) return [];
+                return this.repo.find({ where: { date: today, projectId: In(projectIds) }, relations: ['project'] });
+            })()
+            : await this.repo.find({
+                where: { date: today },
+                relations: ['project'],
+            });
         return {
             total: allToday.length,
             present: allToday.filter(a => a.status === 'present').length,

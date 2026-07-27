@@ -1,4 +1,4 @@
-import { IsString, IsBoolean, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsBoolean, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProjectEvidenceDto {
@@ -6,6 +6,11 @@ export class CreateProjectEvidenceDto {
     @IsString({ message: 'project must be a string' })
     @IsNotEmpty({ message: 'project is required' })
     project: string;
+
+    @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', required: false, description: 'UUID of the site this evidence belongs to' })
+    @IsUUID('4', { message: 'Site ID must be a valid UUID' })
+    @IsOptional()
+    siteId?: string;
 
     @ApiProperty({ example: 'photo', description: 'Type of evidence (photo, document, video, etc.)' })
     @IsString({ message: 'type must be a string' })

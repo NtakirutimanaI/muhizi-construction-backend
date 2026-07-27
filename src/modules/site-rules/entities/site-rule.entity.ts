@@ -25,6 +25,9 @@ export class SiteRule {
     isActive: boolean;
 
     @Column({ nullable: true })
+    category: string;
+
+    @Column({ nullable: true })
     @Index('idx_rule_site')
     siteId: string;
 

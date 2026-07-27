@@ -14,6 +14,11 @@ export enum DesignType {
     LANDSCAPE = 'landscape',
 }
 
+export enum DesignSource {
+    SUBMISSION = 'submission',
+    EXTERNAL = 'external',
+}
+
 @Entity('designs')
 export class Design {
     @PrimaryGeneratedColumn('uuid')
@@ -33,6 +38,10 @@ export class Design {
     @Index('idx_design_status')
     status: DesignStatus;
 
+    @Column({ type: 'enum', enum: DesignSource, default: DesignSource.EXTERNAL })
+    @Index('idx_design_source')
+    source: DesignSource;
+
     @Column({ nullable: true })
     fileUrl: string;
 
@@ -45,6 +54,10 @@ export class Design {
     @ManyToOne(() => Project, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'projectId' })
     project: Project;
+
+    @Column({ nullable: true, name: 'savedby' })
+    @Index('idx_design_saved_by')
+    savedBy: string;
 
     @Column({ type: 'json', nullable: true })
     metadata: {

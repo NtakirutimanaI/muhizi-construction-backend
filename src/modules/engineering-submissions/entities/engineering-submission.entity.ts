@@ -5,6 +5,7 @@ export enum SubmissionStatus {
     REVIEWED = 'reviewed',
     APPROVED = 'approved',
     REJECTED = 'rejected',
+    CORRECTIONS_REQUESTED = 'corrections_requested',
 }
 
 @Entity('engineering_submissions')
@@ -32,6 +33,15 @@ export class EngineeringSubmission {
 
     @Column({ type: 'text', nullable: true })
     reviewNotes: string;
+
+    @Column({ nullable: true })
+    taskId: string;
+
+    @Column({ type: 'boolean', default: false, name: 'submittedtoadmin' })
+    submittedToAdmin: boolean;
+
+    @Column({ type: 'text', nullable: true, name: 'submission_notes' })
+    submissionNotes: string | null;
 
     @CreateDateColumn()
     createdAt: Date;

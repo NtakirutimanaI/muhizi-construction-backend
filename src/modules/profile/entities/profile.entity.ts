@@ -172,6 +172,12 @@ export class Profile {
     companyLogo: string;
 
     @Column({ type: 'text', nullable: true })
+    digitalSignature: string;
+
+    @Column({ type: 'text', nullable: true })
+    stampUrl: string;
+
+    @Column({ type: 'text', nullable: true })
     cvUrl: string;
 
     @Column({ type: 'text', nullable: true })

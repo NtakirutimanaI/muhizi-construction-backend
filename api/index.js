@@ -1,1 +1,1 @@
-module.exports = require('../dist/lambda').default;
+module.exports = require('../dist/src/lambda').default;

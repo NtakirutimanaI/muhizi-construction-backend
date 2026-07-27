@@ -30,27 +30,28 @@ export class AuthService {
     ) { }
 
     async register(registerDto: RegisterDto) {
-        const existingUser = await this.userRepository.findOne({
-            where: { email: registerDto.email },
-        });
+        const [existingUser, existingPhone] = await Promise.all([
+            this.userRepository.findOne({ where: { email: registerDto.email } }),
+            registerDto.phone
+                ? this.profileRepository.findOne({ where: { phone: registerDto.phone } })
+                : Promise.resolve(null),
+        ]);
 
         if (existingUser) {
             throw new ConflictException('Email already exists');
         }
 
-        if (registerDto.phone) {
-            const existingPhone = await this.profileRepository.findOne({
-                where: { phone: registerDto.phone },
-            });
-            if (existingPhone) {
-                throw new ConflictException('Phone number already exists');
-            }
+        if (existingPhone) {
+            throw new ConflictException('Phone number already exists');
         }
 
-        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+        const hashedPassword = await bcrypt.hash(registerDto.password, 6);
+
+        const username = registerDto.username || registerDto.email.split('@')[0] + '_' + crypto.randomInt(1000, 9999);
 
         const user = this.userRepository.create({
             email: registerDto.email,
+            username,
             password: hashedPassword,
             firstName: registerDto.firstName,
             lastName: registerDto.lastName,
@@ -367,7 +368,7 @@ export class AuthService {
         });
     }
 
-    async createUser(dto: { email: string; password: string; firstName: string; lastName: string; role?: string; phone?: string }) {
+    async createUser(dto: { email: string; password: string; firstName: string; lastName: string; role?: string; phone?: string; address?: string; gender?: string; maritalStatus?: string; nationalId?: string; educationLevel?: string; medicalInsurance?: string; contractUrl?: string; bankAccount?: string; employmentStatus?: string; employmentCategory?: string; workShift?: string; basicSalary?: number }) {
         const existingUser = await this.userRepository.findOne({
             where: { email: dto.email },
         });
@@ -390,6 +391,18 @@ export class AuthService {
             firstName: dto.firstName,
             lastName: dto.lastName,
             role: dto.role || 'employee',
+            address: dto.address || undefined,
+            gender: dto.gender || undefined,
+            maritalStatus: dto.maritalStatus || undefined,
+            nationalId: dto.nationalId || undefined,
+            educationLevel: dto.educationLevel || undefined,
+            medicalInsurance: dto.medicalInsurance || undefined,
+            contractUrl: dto.contractUrl || undefined,
+            bankAccount: dto.bankAccount || undefined,
+            employmentStatus: dto.employmentStatus || undefined,
+            employmentCategory: dto.employmentCategory || undefined,
+            workShift: dto.workShift || undefined,
+            basicSalary: dto.basicSalary || 0,
         });
         await this.userRepository.save(user);
         const profile = this.profileRepository.create({
@@ -403,7 +416,7 @@ export class AuthService {
         return result;
     }
 
-    async updateUser(id: string, dto: { email?: string; password?: string; role?: string; isActive?: boolean; firstName?: string; lastName?: string; phone?: string }) {
+    async updateUser(id: string, dto: { email?: string; password?: string; role?: string; isActive?: boolean; firstName?: string; lastName?: string; phone?: string; address?: string; gender?: string; maritalStatus?: string; nationalId?: string; educationLevel?: string; medicalInsurance?: string; contractUrl?: string; bankAccount?: string; employmentStatus?: string; employmentCategory?: string; workShift?: string; basicSalary?: number }) {
         const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] });
         if (!user) throw new NotFoundException('User not found');
 
@@ -421,6 +434,18 @@ export class AuthService {
         if (dto.lastName !== undefined) user.lastName = dto.lastName;
         if (dto.role !== undefined) user.role = dto.role;
         if (dto.isActive !== undefined) user.isActive = dto.isActive;
+        if (dto.address !== undefined) user.address = dto.address;
+        if (dto.gender !== undefined) user.gender = dto.gender;
+        if (dto.maritalStatus !== undefined) user.maritalStatus = dto.maritalStatus;
+        if (dto.nationalId !== undefined) user.nationalId = dto.nationalId;
+        if (dto.educationLevel !== undefined) user.educationLevel = dto.educationLevel;
+        if (dto.medicalInsurance !== undefined) user.medicalInsurance = dto.medicalInsurance;
+        if (dto.contractUrl !== undefined) user.contractUrl = dto.contractUrl;
+        if (dto.bankAccount !== undefined) user.bankAccount = dto.bankAccount;
+        if (dto.employmentStatus !== undefined) user.employmentStatus = dto.employmentStatus;
+        if (dto.employmentCategory !== undefined) user.employmentCategory = dto.employmentCategory;
+        if (dto.workShift !== undefined) user.workShift = dto.workShift;
+        if (dto.basicSalary !== undefined) user.basicSalary = dto.basicSalary;
         if (dto.password) user.password = await bcrypt.hash(dto.password, 10);
 
         await this.userRepository.save(user);
@@ -428,7 +453,7 @@ export class AuthService {
         if (user.profile && (dto.firstName !== undefined || dto.lastName !== undefined || dto.phone !== undefined)) {
             if (dto.firstName !== undefined) user.profile.firstName = dto.firstName;
             if (dto.lastName !== undefined) user.profile.lastName = dto.lastName;
-            if (dto.phone !== undefined) user.profile.phone = dto.phone;
+            if (dto.phone !== undefined) user.profile.phone = dto.phone || (null as any);
             await this.profileRepository.save(user.profile);
         }
 

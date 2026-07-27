@@ -17,21 +17,21 @@ export class ResourcesController {
     constructor(private readonly service: ResourcesService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Create a resource' })
     create(@Body() dto: CreateResourceDto) {
         return this.service.create(dto);
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get all resources' })
     findAll() {
         return this.service.findAll();
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Update a resource' })
     update(@Param('id') id: string, @Body() dto: CreateResourceDto) {
         return this.service.update(id, dto);

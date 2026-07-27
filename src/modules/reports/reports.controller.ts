@@ -7,7 +7,7 @@ import { Role } from '../auth/enums/role.enum';
 import { ReportsService } from './reports.service';
 
 const TOGGLE_ROLES = [Role.FINANCE_DIRECTOR];
-const READ_ROLES = [Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
+const READ_ROLES = [Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.MANAGING_DIRECTOR, ...TOGGLE_ROLES];
 
 @ApiTags('Reports')
 @ApiBearerAuth('JWT-auth')

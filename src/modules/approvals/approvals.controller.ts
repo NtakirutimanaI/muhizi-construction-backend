@@ -30,12 +30,13 @@ export class ApprovalsController {
 
     @Get()
     @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER)
-    @ApiOperation({ summary: 'Get all approvals', description: 'Retrieve all approval requests' })
+    @ApiOperation({ summary: 'Get all approvals', description: "Retrieve approval requests — Admin (the sole approver) sees all; requesters (Managing Director, Site Engineer) see only their own submissions" })
     @ApiResponse({ status: 200, description: 'All approvals retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAll() {
-        return this.service.findAll();
+    findAll(@Request() req) {
+        const requesterId = req.user.role === Role.ADMIN ? undefined : req.user.id;
+        return this.service.findAll(requesterId);
     }
 
     @Get(':id')
@@ -45,8 +46,9 @@ export class ApprovalsController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    findOne(@Param('id') id: string) {
-        return this.service.findOne(id);
+    findOne(@Param('id') id: string, @Request() req) {
+        const requesterId = req.user.role === Role.ADMIN ? undefined : req.user.id;
+        return this.service.findOne(id, requesterId);
     }
 
     @Put(':id')

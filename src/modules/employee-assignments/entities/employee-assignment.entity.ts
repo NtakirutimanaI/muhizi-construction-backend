@@ -4,8 +4,7 @@ import { Project } from '../../projects/entities/project.entity';
 import { Site } from '../../sites/entities/site.entity';
 
 export enum AssignmentRole {
-    MANAGER = 'manager',
-    SITE_MANAGER = 'site_manager',
+    STOREKEEPER = 'storekeeper',
     WORKER = 'worker',
     SUPERVISOR = 'supervisor',
 }

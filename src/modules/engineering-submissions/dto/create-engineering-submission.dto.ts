@@ -16,4 +16,9 @@ export class CreateEngineeringSubmissionDto {
     @IsArray({ message: 'documentUrls must be an array' })
     @IsOptional()
     documentUrls?: { name: string; url: string; type: string }[];
+
+    @ApiProperty({ example: 'uuid-of-task', description: 'Link to assigned task', required: false })
+    @IsString()
+    @IsOptional()
+    taskId?: string;
 }

@@ -16,13 +16,14 @@ export class ApprovalsService {
         return this.repo.save(entity);
     }
 
-    async findAll(): Promise<Approval[]> {
-        return this.repo.find({ order: { requestedAt: 'DESC', createdAt: 'DESC' } });
+    async findAll(requesterId?: string): Promise<Approval[]> {
+        return this.repo.find({ where: requesterId ? { requesterId } : {}, order: { requestedAt: 'DESC', createdAt: 'DESC' } });
     }
 
-    async findOne(id: string): Promise<Approval> {
+    async findOne(id: string, requesterId?: string): Promise<Approval> {
         const entity = await this.repo.findOne({ where: { id } });
         if (!entity) throw new NotFoundException('Approval not found');
+        if (requesterId && entity.requesterId !== requesterId) throw new NotFoundException('Approval not found');
         return entity;
     }
 

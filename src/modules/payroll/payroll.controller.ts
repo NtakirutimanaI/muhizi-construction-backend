@@ -17,7 +17,7 @@ export class PayrollController {
     constructor(private readonly service: PayrollService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Create payroll record', description: 'Creates a new payroll record' })
     @ApiBody({ type: CreatePayrollDto })
     @ApiResponse({ status: 201, description: 'Payroll record created successfully' })
@@ -28,7 +28,7 @@ export class PayrollController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get all payroll records', description: 'Retrieves a list of all payroll records' })
     @ApiResponse({ status: 200, description: 'All payroll records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -38,7 +38,7 @@ export class PayrollController {
     }
 
     @Get('period')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get payroll by period', description: 'Retrieves payroll records for a given month and year' })
     @ApiResponse({ status: 200, description: 'Payroll records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -49,7 +49,7 @@ export class PayrollController {
     }
 
     @Get('employee/:employeeId')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE)
     @ApiOperation({ summary: 'Get payroll by employee', description: 'Retrieves payroll records for a specific employee — self-service, not permission-gated' })
     @ApiResponse({ status: 200, description: 'Payroll records retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -60,7 +60,7 @@ export class PayrollController {
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Get payroll record by ID', description: 'Retrieves a single payroll record by its ID' })
     @ApiResponse({ status: 200, description: 'Payroll record retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -71,7 +71,7 @@ export class PayrollController {
     }
 
     @Put(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, ...TOGGLE_ROLES)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, ...TOGGLE_ROLES)
     @ApiOperation({ summary: 'Update payroll record', description: 'Updates an existing payroll record by ID' })
     @ApiBody({ type: CreatePayrollDto })
     @ApiResponse({ status: 200, description: 'Payroll record updated successfully' })

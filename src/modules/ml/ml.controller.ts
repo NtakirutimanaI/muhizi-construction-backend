@@ -14,7 +14,7 @@ export class MlController {
     constructor(private readonly mlService: MlService) { }
 
     @Post('lead-score')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Score a lead/contact message using ML' })
     async scoreLead(@Body() data: any) {
         return this.mlService.scoreLead(data);

@@ -16,7 +16,7 @@ export class MaterialRequestsController {
     constructor(private readonly service: MaterialRequestsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Create material request', description: 'Creates a new material request' })
     @ApiBody({ type: CreateMaterialRequestDto })
     @ApiResponse({ status: 201, description: 'Material request created successfully' })
@@ -28,24 +28,26 @@ export class MaterialRequestsController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get all material requests', description: 'Retrieves a list of all material requests' })
     @ApiResponse({ status: 200, description: 'All material requests retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAll() {
-        return this.service.findAll();
+    findAll(@Request() req) {
+        const userId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAll(userId);
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Get material request by ID', description: 'Retrieves a single material request by its ID' })
     @ApiResponse({ status: 200, description: 'Material request retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    findOne(@Param('id') id: string) {
-        return this.service.findOne(id);
+    findOne(@Param('id') id: string, @Request() req) {
+        const userId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findOne(id, userId);
     }
 
     @Put(':id')

@@ -44,6 +44,15 @@ import { StockApprovalsModule } from './modules/stock-approvals/stock-approvals.
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { EngineeringSubmissionsModule } from './modules/engineering-submissions/engineering-submissions.module';
 import { DailyReportsModule } from './modules/daily-reports/daily-reports.module';
+import { InsuranceModule } from './modules/insurance/insurance.module';
+import { MoneyRequisitionsModule } from './modules/money-requisitions/money-requisitions.module';
+import { PettyCashModule } from './modules/petty-cash/petty-cash.module';
+import { PettyCashVoucherModule } from './modules/petty-cash-voucher/petty-cash-voucher.module';
+import { PettyCashFundModule } from './modules/petty-cash-fund/petty-cash-fund.module';
+import { PettyCashTransactionModule } from './modules/petty-cash-transaction/petty-cash-transaction.module';
+import { UpdatesModule } from './modules/updates/updates.module';
+import { TasksModule } from './modules/tasks/tasks.module';
+import { SharedFilesModule } from './modules/shared-files/shared-files.module';
 
 @Module({
     imports: [
@@ -125,6 +134,15 @@ import { DailyReportsModule } from './modules/daily-reports/daily-reports.module
         DashboardModule,
         EngineeringSubmissionsModule,
         DailyReportsModule,
+        InsuranceModule,
+        MoneyRequisitionsModule,
+        PettyCashModule,
+        PettyCashVoucherModule,
+        PettyCashFundModule,
+        PettyCashTransactionModule,
+        UpdatesModule,
+        TasksModule,
+        SharedFilesModule,
     ],
     controllers: [AppController],
     providers: [],

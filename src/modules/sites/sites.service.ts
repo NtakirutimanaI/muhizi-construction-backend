@@ -22,27 +22,29 @@ export class SitesService {
         return this.repo.save(site);
     }
 
-    async findAll(): Promise<Site[]> {
+    async findAll(engineerId?: string): Promise<Site[]> {
         return this.repo.find({
+            where: engineerId ? { assignedEngineerId: engineerId } : {},
             relations: ['project'],
             order: { createdAt: 'DESC' },
         });
     }
 
-    async findByProject(projectId: string): Promise<Site[]> {
+    async findByProject(projectId: string, engineerId?: string): Promise<Site[]> {
         return this.repo.find({
-            where: { projectId },
+            where: engineerId ? { projectId, assignedEngineerId: engineerId } : { projectId },
             relations: ['rules', 'activities', 'evidence'],
             order: { createdAt: 'DESC' },
         });
     }
 
-    async findOne(id: string): Promise<Site> {
+    async findOne(id: string, engineerId?: string): Promise<Site> {
         const site = await this.repo.findOne({
             where: { id },
             relations: ['project', 'rules', 'activities', 'evidence'],
         });
         if (!site) throw new NotFoundException('Site not found');
+        if (engineerId && site.assignedEngineerId !== engineerId) throw new NotFoundException('Site not found');
         return site;
     }
 

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSiteActivityDto {
@@ -6,6 +6,11 @@ export class CreateSiteActivityDto {
     @IsString({ message: 'Project must be a string' })
     @IsNotEmpty({ message: 'Project is required' })
     project: string;
+
+    @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000', required: false, description: 'UUID of the site this activity happened at' })
+    @IsUUID('4', { message: 'Site ID must be a valid UUID' })
+    @IsOptional()
+    siteId?: string;
 
     @ApiProperty({ example: '2025-06-15', description: 'Date of the activity' })
     @IsString({ message: 'Date must be a string' })

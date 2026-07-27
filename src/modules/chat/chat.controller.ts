@@ -29,7 +29,7 @@ export class ChatController {
 
     @Get('admin/conversations')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN, Role.SITE_MANAGER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER)
     @ApiBearerAuth('JWT-auth')
     @ApiOperation({ summary: 'Get all conversations (admin)' })
     async getAllConversations() {

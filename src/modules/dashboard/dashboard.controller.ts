@@ -44,8 +44,8 @@ export class DashboardController {
     @Get('engineering-studio')
     @Roles(Role.ENGINEERING_STUDIO)
     @ApiOperation({ summary: 'Engineering Studio dashboard KPIs' })
-    getEngineeringStudioKpi() {
-        return this.service.getEngineeringStudioKpi();
+    getEngineeringStudioKpi(@Request() req) {
+        return this.service.getEngineeringStudioKpi(req.user.id);
     }
 
     @Get('partner')

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -27,35 +27,48 @@ export class SitesController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiOperation({ summary: 'Get all sites', description: 'Retrieves a list of all sites' })
     @ApiResponse({ status: 200, description: 'All sites retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAll() {
-        return this.service.findAll();
+    findAll(@Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAll(engineerId);
+    }
+
+    @Get('my-assigned')
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @ApiOperation({ summary: 'Get my assigned sites', description: 'Retrieves sites assigned to current engineer or user' })
+    @ApiResponse({ status: 200, description: 'Assigned sites retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    findMyAssigned(@Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAll(engineerId);
     }
 
     @Get('project/:projectId')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiOperation({ summary: 'Get sites by project', description: 'Retrieves all sites for a given project' })
     @ApiResponse({ status: 200, description: 'Sites retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    findByProject(@Param('projectId') projectId: string) {
-        return this.service.findByProject(projectId);
+    findByProject(@Param('projectId') projectId: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findByProject(projectId, engineerId);
     }
 
     @Get(':id')
-    @Roles(Role.ADMIN, Role.SITE_MANAGER, Role.MANAGER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.EMPLOYEE, Role.CLIENT, Role.MANAGING_DIRECTOR, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.ENGINEERING_STUDIO, Role.PARTNER)
     @ApiOperation({ summary: 'Get site by ID', description: 'Retrieves a single site by its ID' })
     @ApiResponse({ status: 200, description: 'Site retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    findOne(@Param('id') id: string) {
-        return this.service.findOne(id);
+    findOne(@Param('id') id: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findOne(id, engineerId);
     }
 
     @Put(':id')
