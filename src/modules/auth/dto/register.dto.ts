@@ -12,15 +12,6 @@ export class RegisterDto {
     email: string;
 
     @ApiProperty({
-        example: 'johndoe',
-        description: 'Username (unique, auto-generated from email if not provided)',
-        required: false,
-    })
-    @IsString()
-    @IsOptional()
-    username?: string;
-
-    @ApiProperty({
         example: 'Password123!',
         description: 'User password (minimum 8 characters, 1 capital, 1 lowercase, 1 special character)',
         minLength: 8,
