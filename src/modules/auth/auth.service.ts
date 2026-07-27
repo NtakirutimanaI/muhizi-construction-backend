@@ -75,47 +75,57 @@ export class AuthService {
     }
 
     async login(loginDto: LoginDto) {
-        const user = await this.userRepository.findOne({
-            where: { email: loginDto.email },
-            relations: ['profile'],
-        });
+    this.logger.debug('Login attempt for email: ' + loginDto.email);
+    try {
+      const user = await this.userRepository.findOne({
+        where: { email: loginDto.email },
+        relations: ['profile'],
+      });
 
-        if (!user) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
+      if (!user) {
+        this.logger.warn('User not found for email: ' + loginDto.email);
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
-        if (!user.password) {
-            throw new UnauthorizedException('Account registered via Google. Please use Google login.');
-        }
+      if (!user.password) {
+        this.logger.warn('User has no password (Google login) for email: ' + loginDto.email);
+        throw new UnauthorizedException('Account registered via Google. Please use Google login.');
+      }
 
-        const isPasswordValid = await bcrypt.compare(
-            loginDto.password,
-            user.password,
-        );
+      const isPasswordValid = await bcrypt.compare(
+        loginDto.password,
+        user.password,
+      );
 
-        if (!isPasswordValid) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
+      if (!isPasswordValid) {
+        this.logger.warn('Invalid password for email: ' + loginDto.email);
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
-        const payload = { sub: user.id, email: user.email, role: user.role };
-        const accessToken = this.jwtService.sign(payload);
+      const payload = { sub: user.id, email: user.email, role: user.role };
+      const accessToken = this.jwtService.sign(payload);
 
-        const refreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
-        user.refreshToken = await bcrypt.hash(refreshToken, 10);
-        await this.userRepository.save(user);
+      const refreshToken = this.jwtService.sign(payload, { expiresIn: '30d' });
+      user.refreshToken = await bcrypt.hash(refreshToken, 10);
+      await this.userRepository.save(user);
 
-        this.eventsGateway.emitToUser(user.id, 'user-logged-in', {
-            timestamp: new Date(),
-        });
+      this.eventsGateway.emitToUser(user.id, 'user-logged-in', {
+        timestamp: new Date(),
+      });
 
-        const { password, ...userData } = user;
+      const { password, ...userData } = user;
 
-        return {
-            user: userData,
-            accessToken,
-            refreshToken,
-        };
+      this.logger.debug('Login successful for user id: ' + user.id);
+      return {
+        user: userData,
+        accessToken,
+        refreshToken,
+      };
+    } catch (err) {
+      this.logger.error('Login error for email: ' + loginDto.email, err);
+      throw err;
     }
+  }
 
     async refresh(refreshDto: RefreshDto) {
         let payload: any;

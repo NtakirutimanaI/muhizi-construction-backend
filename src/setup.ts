@@ -24,6 +24,25 @@ export function setupApp(app: INestApplication) {
   app.use(json({ limit: '10mb' }));
   app.use(urlencoded({ extended: true, limit: '10mb' }));
 
+  // Debug logger for incoming request bodies
+  app.use((req, res, next) => {
+    console.log(`[DEBUG] ${req.method} ${req.path} - body type: ${typeof req.body}`);
+    console.log('[DEBUG] raw body:', req.body);
+    next();
+  });
+
+  // Ensure raw JSON bodies are correctly parsed (especially for login requests)
+  app.use((req, res, next) => {
+    if (req.path === '/auth/login' && req.is('application/json') && typeof req.body === 'string') {
+      try {
+        req.body = JSON.parse(req.body);
+      } catch (e) {
+        // Let the default JSON parser error handling handle malformed JSON
+      }
+    }
+    next();
+  });
+
   // Enable CORS
   app.enableCors(FrontendConfig.cors);
 
@@ -33,6 +52,7 @@ export function setupApp(app: INestApplication) {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      skipMissingProperties: true,
     }),
   );
 
