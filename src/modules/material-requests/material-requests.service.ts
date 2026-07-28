@@ -31,15 +31,30 @@ export class MaterialRequestsService {
         const entity = this.repo.create({ ...dto, unitPrice, totalCost, createdById: userId, createdByName: userName });
         const saved = await this.repo.save(entity);
 
-        const financeDirectors = await this.userRepo.find({ where: { role: 'finance_director' } });
-        for (const fd of financeDirectors) {
-            await this.notificationService.create({
-                type: NotificationType.SYSTEM,
-                title: 'New Material Request',
-                message: `${userName || 'A user'} requested ${dto.quantity} ${dto.unit} of ${dto.material} for project ${dto.project}`,
-                user: { id: fd.id },
-                metadata: { materialRequestId: saved.id, project: dto.project },
-            });
+        try {
+            const financeDirectors = await this.userRepo.find({ where: { role: 'finance_director' } });
+            for (const fd of financeDirectors) {
+                await this.notificationService.create({
+                    type: NotificationType.SYSTEM,
+                    title: 'New Material Request',
+                    message: `${userName || 'A user'} requested ${dto.quantity} ${dto.unit} of ${dto.material} for ${dto.site ? dto.site + ' - ' : ''}project ${dto.project}`,
+                    user: { id: fd.id },
+                    metadata: { materialRequestId: saved.id, project: dto.project, site: dto.site },
+                });
+            }
+
+            const storekeepers = await this.userRepo.find({ where: { role: 'storekeeper' } });
+            for (const sk of storekeepers) {
+                await this.notificationService.create({
+                    type: NotificationType.SYSTEM,
+                    title: 'New Material Request to Review',
+                    message: `${userName || 'A user'} requested ${dto.quantity} ${dto.unit} of ${dto.material} for ${dto.site ? dto.site + ' - ' : ''}project ${dto.project}. Please review and approve/reject.`,
+                    user: { id: sk.id },
+                    metadata: { materialRequestId: saved.id, project: dto.project, site: dto.site },
+                });
+            }
+        } catch (notifErr) {
+            console.error('Failed to send material request notifications:', notifErr);
         }
 
         return saved;
@@ -79,21 +94,37 @@ export class MaterialRequestsService {
                 vendor: saved.createdByName || undefined,
                 notes: `Auto-created from approved material request (${saved.quantity} ${saved.unit} @ RWF ${Number(saved.unitPrice).toLocaleString()}/unit)`,
             });
+        }
 
-            await this.stockRepo.save(this.stockRepo.create({
-                item: saved.material,
-                category: 'construction_materials',
-                type: 'in',
-                quantity: Number(saved.quantity),
-                unit: saved.unit,
-                unitPrice: Number(saved.unitPrice),
-                totalCost: Number(saved.totalCost),
-                date: saved.date,
-                reference: `MR-${saved.id}`,
-                notes: `Auto-stock from approved request: ${saved.quantity} ${saved.unit} for ${saved.project}`,
-                createdById: userId,
-                createdByName: userName,
-            }));
+        const existingStock = await this.stockRepo.findOne({ where: { item: saved.material } });
+        const stockUnit = existingStock?.unit || saved.unit;
+        const stockUnitPrice = existingStock?.unitPrice || Number(saved.unitPrice) || 0;
+        const stockTotalCost = Number(saved.quantity) * stockUnitPrice;
+
+        await this.stockRepo.save(this.stockRepo.create({
+            item: saved.material,
+            category: existingStock?.category || 'construction_materials',
+            type: 'out',
+            quantity: Number(saved.quantity),
+            unit: stockUnit,
+            unitPrice: stockUnitPrice,
+            totalCost: stockTotalCost,
+            date: saved.date,
+            reference: `MR-${saved.id}`,
+            notes: `Stock out from approved request: ${saved.quantity} ${stockUnit} for ${saved.project} (requested by ${saved.createdByName || 'Unknown'})`,
+            createdById: userId,
+            createdByName: userName,
+        }));
+
+        const admins = await this.userRepo.find({ where: { role: 'admin' } });
+        for (const admin of admins) {
+            await this.notificationService.create({
+                type: NotificationType.SYSTEM,
+                title: 'Material Request Approved',
+                message: `${userName} approved ${saved.quantity} ${saved.unit} of ${saved.material} for project ${saved.project}. Stock deducted.`,
+                user: { id: admin.id },
+                metadata: { materialRequestId: saved.id, project: saved.project, material: saved.material, quantity: saved.quantity },
+            });
         }
 
         return saved;

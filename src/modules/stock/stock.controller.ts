@@ -29,7 +29,7 @@ export class StockController {
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.STOREKEEPER, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR)
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER, Role.FINANCE_DIRECTOR, Role.MANAGING_DIRECTOR)
     @ApiOperation({ summary: 'Get all stock entries', description: 'Retrieves a list of all stock entries' })
     @ApiResponse({ status: 200, description: 'All stock entries retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -46,6 +46,16 @@ export class StockController {
     @ApiResponse({ status: 403, description: 'Forbidden' })
     getStats() {
         return this.service.getStats();
+    }
+
+    @Get('balance')
+    @Roles(Role.ADMIN, Role.STOREKEEPER, Role.SITE_ENGINEER, Role.MANAGING_DIRECTOR)
+    @ApiOperation({ summary: 'Get stock balance', description: 'Returns current available stock per item (in minus out)' })
+    @ApiResponse({ status: 200, description: 'Stock balance retrieved successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    getBalance() {
+        return this.service.getBalance();
     }
 
     @Get(':id')
