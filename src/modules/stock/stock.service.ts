@@ -59,4 +59,22 @@ export class StockService {
         const uniqueItems = new Set(all.map(s => s.item.toLowerCase()));
         return { totalIn, totalOut, netStock: totalIn - totalOut, itemCount: uniqueItems.size };
     }
+
+    async getBalance(): Promise<{ item: string; category: string; unit: string; balance: number; totalIn: number; totalOut: number }[]> {
+        const all = await this.repo.find();
+        const map = new Map<string, { item: string; category: string; unit: string; balance: number; totalIn: number; totalOut: number }>();
+        for (const s of all) {
+            const key = s.item.toLowerCase();
+            const existing = map.get(key) || { item: s.item, category: s.category, unit: s.unit, balance: 0, totalIn: 0, totalOut: 0 };
+            if (s.type === 'in') {
+                existing.totalIn += Number(s.quantity);
+                existing.balance += Number(s.quantity);
+            } else {
+                existing.totalOut += Number(s.quantity);
+                existing.balance -= Number(s.quantity);
+            }
+            map.set(key, existing);
+        }
+        return Array.from(map.values()).filter(i => i.balance > 0).sort((a, b) => a.item.localeCompare(b.item));
+    }
 }

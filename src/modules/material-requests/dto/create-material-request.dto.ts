@@ -7,6 +7,11 @@ export class CreateMaterialRequestDto {
     @IsNotEmpty({ message: 'project is required' })
     project: string;
 
+    @ApiProperty({ example: 'Site A - Foundation', required: false, description: 'Site name where materials are needed' })
+    @IsString({ message: 'site must be a string' })
+    @IsOptional()
+    site?: string;
+
     @ApiProperty({ example: 'Cement', description: 'Material name' })
     @IsString({ message: 'material must be a string' })
     @IsNotEmpty({ message: 'material is required' })

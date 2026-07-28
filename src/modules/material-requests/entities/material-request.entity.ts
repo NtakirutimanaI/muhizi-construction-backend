@@ -8,6 +8,9 @@ export class MaterialRequest {
     @Column()
     project: string;
 
+    @Column({ nullable: true })
+    site: string;
+
     @Column()
     material: string;
 

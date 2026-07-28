@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -16,19 +16,25 @@ export class MaterialRequestsController {
     constructor(private readonly service: MaterialRequestsService) { }
 
     @Post()
-    @Roles(Role.ADMIN, Role.STOREKEEPER)
+    @Roles(Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Create material request', description: 'Creates a new material request' })
     @ApiBody({ type: CreateMaterialRequestDto })
     @ApiResponse({ status: 201, description: 'Material request created successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    create(@Body() dto: CreateMaterialRequestDto, @Request() req) {
+    async create(@Body() dto: CreateMaterialRequestDto, @Request() req) {
         const user = req.user;
-        return this.service.create(dto, user.id, `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email);
+        try {
+            return await this.service.create(dto, user.id, `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email);
+        } catch (err: any) {
+            console.error('Material request create error:', err);
+            const msg = err?.message || 'Failed to create material request';
+            throw new BadRequestException(msg);
+        }
     }
 
     @Get()
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.STOREKEEPER)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.STOREKEEPER, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Get all material requests', description: 'Retrieves a list of all material requests' })
     @ApiResponse({ status: 200, description: 'All material requests retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -63,7 +69,7 @@ export class MaterialRequestsController {
     }
 
     @Post(':id/approve')
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Approve material request', description: 'Approves a material request by ID' })
     @ApiResponse({ status: 200, description: 'Material request approved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -76,7 +82,7 @@ export class MaterialRequestsController {
     }
 
     @Post(':id/reject')
-    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR)
+    @Roles(Role.ADMIN, Role.MANAGING_DIRECTOR, Role.STOREKEEPER)
     @ApiOperation({ summary: 'Reject material request', description: 'Rejects a material request by ID with notes' })
     @ApiBody({ type: UpdateMaterialRequestStatusDto })
     @ApiResponse({ status: 200, description: 'Material request rejected successfully' })
