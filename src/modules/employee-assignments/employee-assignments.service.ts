@@ -23,8 +23,19 @@ export class EmployeeAssignmentsService {
         return this.repo.save(assignment);
     }
 
-    async findAll(): Promise<EmployeeAssignment[]> {
+    async findAll(engineerId?: string): Promise<EmployeeAssignment[]> {
+        let where: any = {};
+        if (engineerId) {
+            const sites = await this.siteRepo.find({
+                where: { assignedEngineerId: engineerId },
+                select: ['projectId'],
+            });
+            const projectIds = [...new Set(sites.map(s => s.projectId).filter(Boolean))] as string[];
+            if (projectIds.length === 0) return [];
+            where = { projectId: In(projectIds) };
+        }
         return this.repo.find({
+            where,
             relations: ['employee', 'project', 'site'],
             order: { createdAt: 'DESC' },
         });
@@ -87,16 +98,32 @@ export class EmployeeAssignmentsService {
     }
 
     async findMyRecruits(engineerId?: string): Promise<any[]> {
+        let projectIds: string[] = [];
+
+        if (engineerId) {
+            const sites = await this.siteRepo.find({
+                where: { assignedEngineerId: engineerId },
+                select: ['projectId'],
+            });
+            projectIds = [...new Set(sites.map(s => s.projectId).filter(Boolean))] as string[];
+            if (projectIds.length === 0) return [];
+        }
+
+        const where = engineerId && projectIds.length > 0
+            ? { projectId: In(projectIds) }
+            : {};
+
         const assignments = await this.repo.find({
+            where,
             relations: ['employee', 'project', 'site'],
             order: { createdAt: 'DESC' },
         });
 
         const assignedEmployeeIds = new Set(assignments.map(a => a.employeeId).filter(Boolean));
 
-        const allEmployees = await this.employeeRepo.find({
-            order: { createdAt: 'DESC' },
-        });
+        const allEmployees = engineerId
+            ? []
+            : await this.employeeRepo.find({ order: { createdAt: 'DESC' } });
 
         const unassignedEmployees = allEmployees.filter(emp => !assignedEmployeeIds.has(emp.id));
 

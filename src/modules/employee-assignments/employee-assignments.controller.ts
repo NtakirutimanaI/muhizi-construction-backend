@@ -32,8 +32,9 @@ export class EmployeeAssignmentsController {
     @ApiResponse({ status: 200, description: 'All employee assignments retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
-    findAll() {
-        return this.service.findAll();
+    findAll(@Req() req: any) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.findAll(engineerId);
     }
 
     @Get('my-team')
