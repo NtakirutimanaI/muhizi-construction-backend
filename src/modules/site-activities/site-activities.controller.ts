@@ -76,13 +76,14 @@ export class SiteActivitiesController {
     @Delete(':id')
     @ApiBearerAuth('JWT-auth')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Delete a site activity', description: 'Delete a site activity (admin only)' })
     @ApiResponse({ status: 200, description: 'Site activity deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    remove(@Param('id') id: string) {
-        return this.service.remove(id);
+    remove(@Param('id') id: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.remove(id, engineerId);
     }
 }

@@ -64,13 +64,14 @@ export class ProjectEvidenceController {
     }
 
     @Delete(':id')
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.SITE_ENGINEER)
     @ApiOperation({ summary: 'Delete project evidence', description: 'Deletes a project evidence record by ID' })
     @ApiResponse({ status: 200, description: 'Project evidence deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
-    remove(@Param('id') id: string) {
-        return this.service.remove(id);
+    remove(@Param('id') id: string, @Request() req) {
+        const engineerId = req.user.role === Role.SITE_ENGINEER ? req.user.id : undefined;
+        return this.service.remove(id, engineerId);
     }
 }

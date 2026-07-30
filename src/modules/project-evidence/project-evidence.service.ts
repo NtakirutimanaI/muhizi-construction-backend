@@ -61,7 +61,8 @@ export class ProjectEvidenceService {
         return this.findOne(id);
     }
 
-    async remove(id: string): Promise<void> {
+    async remove(id: string, engineerId?: string): Promise<void> {
+        if (engineerId) await this.findOne(id, engineerId);
         const result = await this.repo.delete(id);
         if (result.affected === 0) throw new NotFoundException('Project evidence not found');
     }
