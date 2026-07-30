@@ -74,7 +74,7 @@ import { SharedFilesModule } from './modules/shared-files/shared-files.module';
                         logging: false,
                         retryAttempts: 1,
                         retryDelay: 1000,
-                        extra: { max: 1 },
+                        extra: { max: 10, connectionTimeoutMillis: 5000, idleTimeoutMillis: 30000 },
                     };
                 }
                 return {
